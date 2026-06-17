@@ -1,0 +1,61 @@
+export const meta = {
+  title: "Activations & Loss",
+  summary: "Two ingredients turn a pile of multiplications into something that can learn: a non-linear activation, and a loss to minimize.",
+};
+
+A neuron's weighted sum `z` is linear. Stack a thousand linear steps and you still get... a line. To model curves, language, and images, networks need **non-linearity** — and that comes from the **activation function**.
+
+## ReLU: the workhorse
+
+The most common activation is almost insultingly simple — **ReLU** (Rectified Linear Unit): keep positives, zero out negatives.
+
+```text
+ReLU(z) = max(0, z)
+```
+
+```python
+def relu(z):
+    return max(0.0, z)
+
+print(relu(3.0))    # 3.0
+print(relu(-2.0))   # 0.0
+```
+
+That tiny "bend" at zero is enough: stack ReLUs across layers and the network can approximate almost any function.
+
+## Loss: the thing we minimize
+
+To learn, the network needs a score for how wrong it is — the **loss**. You already met one: Mean Absolute Error. Training is just nudging weights to push the loss down.
+
+<Callout type="tip">
+Activation gives the network <strong>expressiveness</strong> (it can bend). Loss gives it a <strong>goal</strong> (get the number down). Next lesson connects them: how to nudge weights to reduce loss.
+</Callout>
+
+<Quiz
+  question="Why do neural networks need a non-linear activation like ReLU?"
+  options={[
+    "To make training faster",
+    "Without it, stacking layers still only produces a linear function — it can't model curves",
+    "To save memory",
+    "To encrypt the activations"
+  ]}
+  answer={1}
+  explanation="Composing linear functions yields another linear function. A non-linearity between layers lets the network represent complex, curved relationships."
+/>
+
+## Your turn
+
+Apply ReLU across a layer's outputs.
+
+<CodeExercise
+  id="relu-layer"
+  prompt="Apply ReLU (max(0.0, z)) to every value in zs and print the resulting list."
+  starter={`zs = [-2.0, 0.5, 3.0]
+# Print the list after applying ReLU to each value
+`}
+  expected="[0.0, 0.5, 3.0]"
+  solution={`zs = [-2.0, 0.5, 3.0]
+print([max(0.0, z) for z in zs])`}
+/>
+
+You now have a network that can express complex functions and a number telling it how wrong it is. The final piece is *how* it improves — gradients.

@@ -1,0 +1,50 @@
+export const meta = {
+  title: "Shipping AI Responsibly",
+  summary: "A demo that works once is easy. A system people trust in production needs evaluation, monitoring, and a conscience.",
+};
+
+Getting a model to work in a notebook is the start, not the finish. Shipping AI that people rely on means owning what happens after launch.
+
+## Four things that separate a demo from a product
+
+- **Evaluation** — measure quality on a real test set *before* shipping, and re-check after every change. "It felt good in the demo" is not a metric.
+- **Monitoring** — watch latency, cost, error rates, and quality drift in production. Models degrade as the world changes.
+- **Safety & bias** — check that the system behaves fairly across groups, and add guardrails for harmful or out-of-scope requests.
+- **Privacy** — be deliberate about what user data you send to a model or store, and for how long.
+
+<Callout type="tip">
+The cheapest time to catch a problem is before launch (evaluation); the next cheapest is the moment it starts (monitoring). Everything after that is damage control.
+</Callout>
+
+<Quiz
+  question="Your model passed its launch eval months ago and you haven't touched it. Why might quality still drop?"
+  options={[
+    "Models physically wear out over time",
+    "The real-world data distribution drifts away from what the model saw — so ongoing monitoring matters",
+    "Quality never drops if the code is unchanged",
+    "Only if the server restarts"
+  ]}
+  answer={1}
+  explanation="Data drift: the inputs people send change over time, so a static model gets relatively worse. Monitoring catches this; periodic re-evaluation and retraining fix it."
+/>
+
+## Your turn — a monitoring check
+
+<CodeExercise
+  id="ship-latency"
+  prompt="Print how many requests exceeded the latency budget (in ms)."
+  starter={`latencies = [120, 800, 200, 950, 300]
+budget = 500
+# Print how many requests were slower than the budget
+`}
+  expected="2"
+  solution={`latencies = [120, 800, 200, 950, 300]
+budget = 500
+print(sum(1 for ms in latencies if ms > budget))`}
+/>
+
+That counter, tracked over time and alerted on, is a real production monitor. Build the habit of measuring, and your AI earns trust instead of just demos.
+
+---
+
+That completes the core curriculum — from "what is AI" to shipping it responsibly. From here it's depth: more lessons per track, and hands-on capstones.

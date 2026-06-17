@@ -1,0 +1,50 @@
+export const meta = {
+  title: "The ML Mindset",
+  summary: "Machine learning flips programming on its head: instead of writing the rules, you show examples and let the machine find the rule.",
+};
+
+In normal programming, *you* write the rules. In machine learning, you provide **examples** and the computer figures out the rule that fits them. That shift is the whole game.
+
+## Features and labels
+
+A labeled example has two parts:
+
+- **Features** — the inputs you know (a house's size, an email's word counts).
+- **Label** — the answer you want to predict (the price, spam or not).
+
+Learning means finding a function from features → label that works on examples *and* generalizes to new ones.
+
+## Supervised vs unsupervised
+
+- **Supervised**: you have labels (prices, spam tags). Most practical ML.
+- **Unsupervised**: no labels — you ask the model to find structure, like grouping similar customers.
+
+<Callout type="note">
+Generalization is the point. A model that memorizes the training answers but fails on new data has learned nothing useful. We'll measure exactly this in lesson 3.
+</Callout>
+
+<Quiz
+  question="You're predicting house prices from house size. Which is the label?"
+  options={["The size", "The price", "Both", "Neither — there are no labels here"]}
+  answer={1}
+  explanation="The label is what you predict (price). The size is the feature (input). With labels present, this is supervised learning."
+/>
+
+## Your turn
+
+Before modeling, you always sanity-check your data. Compute the average label.
+
+<CodeExercise
+  id="ml-avg-label"
+  prompt="prices is the label column (in thousands). Print the average price."
+  starter={`sizes  = [50, 80, 120]    # feature: square meters
+prices = [150, 240, 360]  # label: price (thousands)
+# Print the average price
+`}
+  expected="250.0"
+  solution={`sizes  = [50, 80, 120]
+prices = [150, 240, 360]
+print(sum(prices) / len(prices))`}
+/>
+
+Predicting that average for every house is your **baseline**. Next, you'll beat it by actually using the size.

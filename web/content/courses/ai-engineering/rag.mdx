@@ -1,0 +1,48 @@
+export const meta = {
+  title: "Retrieval-Augmented Generation",
+  summary: "Language models don't know your private docs or yesterday's news. RAG fixes that by fetching relevant text and handing it to the model.",
+};
+
+A language model only knows what it saw during training. It doesn't know your company's wiki, your latest emails, or anything that happened after its cutoff. **Retrieval-Augmented Generation (RAG)** bridges that gap.
+
+## The pattern
+
+1. **Store** your documents (split into chunks).
+2. On a question, **retrieve** the most relevant chunks.
+3. **Stuff** those chunks into the prompt as context.
+4. The model answers using *that* context, not just its memory.
+
+The win is twofold: the model can use fresh, private knowledge — and it's far less likely to **hallucinate**, because the answer is grounded in real retrieved text.
+
+<Callout type="note">
+Real systems retrieve by <em>meaning</em> using vector embeddings (remember vectors?). But the core loop — find relevant text, add it to the prompt — is exactly what you'll build below with a simple keyword match.
+</Callout>
+
+<Quiz
+  question="What problem does RAG primarily solve?"
+  options={[
+    "It makes the model run faster",
+    "It lets a model use external, up-to-date, or private knowledge it wasn't trained on — and grounds answers to reduce hallucination",
+    "It shrinks the model's size",
+    "It removes the need for prompts"
+  ]}
+  answer={1}
+  explanation="RAG injects relevant retrieved text into the prompt, so the model can answer from knowledge outside its training data and stay grounded."
+/>
+
+## Your turn — a tiny retriever
+
+<CodeExercise
+  id="rag-retrieve"
+  prompt="Print the first document that contains the query word."
+  starter={`docs = ["cats are mammals", "python is a language", "the sky is blue"]
+query = "python"
+# Print the first doc that contains the query word
+`}
+  expected="python is a language"
+  solution={`docs = ["cats are mammals", "python is a language", "the sky is blue"]
+query = "python"
+print(next(d for d in docs if query in d))`}
+/>
+
+Swap keyword matching for embedding similarity and add the result to your prompt — that's a production RAG system in miniature.

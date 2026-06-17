@@ -1,0 +1,64 @@
+export const meta = {
+  title: "Anatomy of a Neuron",
+  summary: "A neural network is millions of one tiny operation, repeated. Learn that single operation and the whole field opens up.",
+};
+
+"Neural network" sounds intimidating until you see the unit it's built from. A single **neuron** does three small things: multiply, add, then squash.
+
+## What a neuron computes
+
+1. Multiply each input by a **weight**.
+2. Add them all up, plus a **bias**.
+3. Pass the result through an **activation function** (next lesson).
+
+The first two steps are exactly the linear model you already built — `w · x + b` — just with several inputs:
+
+```text
+z = (w1 * x1 + w2 * x2 + ...) + b
+```
+
+```python
+inputs  = [1.0, 2.0]
+weights = [0.5, -1.0]
+bias    = 1.0
+
+z = sum(i * w for i, w in zip(inputs, weights)) + bias
+print(z)   # -0.5
+```
+
+Stack many neurons side by side and you get a **layer**. Stack layers and you get a **deep** network. The math never gets harder than this — there's just a lot of it.
+
+<Callout type="tip">
+A neuron is linear regression with multiple inputs, plus a squashing step. If you understood the last course, you already understand 80% of this one.
+</Callout>
+
+<Quiz
+  question="What are the first two steps a neuron performs on its inputs?"
+  options={[
+    "Sort them, then pick the largest",
+    "Multiply each by a weight, then sum with a bias",
+    "Average them, then round",
+    "Encrypt them, then store them"
+  ]}
+  answer={1}
+  explanation="A neuron computes a weighted sum of its inputs plus a bias (z = Σ wᵢxᵢ + b), then applies an activation function."
+/>
+
+## Your turn
+
+<CodeExercise
+  id="neuron-z"
+  prompt="Compute the neuron's pre-activation value z = sum(inputs · weights) + bias, and print it."
+  starter={`inputs  = [1.0, 2.0]
+weights = [0.5, 0.25]
+bias    = 0.5
+# Print z = weighted sum of inputs + bias
+`}
+  expected="1.5"
+  solution={`inputs  = [1.0, 2.0]
+weights = [0.5, 0.25]
+bias    = 0.5
+print(sum(i * w for i, w in zip(inputs, weights)) + bias)`}
+/>
+
+That `z` is the raw signal. Next we squash it into something useful with an activation function.

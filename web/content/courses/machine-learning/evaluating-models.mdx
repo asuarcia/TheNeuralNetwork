@@ -1,0 +1,52 @@
+export const meta = {
+  title: "Is My Model Any Good?",
+  summary: "A model you can't measure is a model you can't trust. Meet error metrics — the scoreboard of machine learning.",
+};
+
+You can't improve what you don't measure. Before tuning anything, you need a single number that says how wrong your predictions are. The most intuitive one is **Mean Absolute Error (MAE)**.
+
+## Mean Absolute Error
+
+For each example, take the gap between prediction and truth, drop the sign, and average:
+
+```text
+MAE = average of |prediction - actual|, over all examples
+```
+
+Lower is better. MAE of 0 means perfect predictions. Its units match your label, so "MAE of 3" literally means "off by 3 on average."
+
+<Callout type="warning">
+Always measure error on data the model did <strong>not</strong> train on (a held-out test set). A model graded on its own study notes always looks smarter than it is.
+</Callout>
+
+<Quiz
+  question="Model A has MAE 2.0, Model B has MAE 5.0, on the same test set. Which is better?"
+  options={[
+    "Model B — higher numbers are better",
+    "Model A — lower average error means closer predictions",
+    "They're equivalent",
+    "You can't tell from MAE alone"
+  ]}
+  answer={1}
+  explanation="MAE is average distance from the truth, so lower is better. Model A is off by 2 on average; Model B by 5."
+/>
+
+## Your turn
+
+Compute MAE between your model's predictions and the actual values.
+
+<CodeExercise
+  id="eval-mae"
+  prompt="Print the Mean Absolute Error between preds and actual, rounded to 2 decimals."
+  starter={`preds  = [10, 20, 30]
+actual = [12, 18, 33]
+# Print MAE rounded to 2 decimals
+`}
+  expected="2.33"
+  solution={`preds  = [10, 20, 30]
+actual = [12, 18, 33]
+errors = [abs(p - a) for p, a in zip(preds, actual)]
+print(round(sum(errors) / len(errors), 2))`}
+/>
+
+Now you can rank any two models objectively. Optimizing that number is exactly what training a neural network does — next course.

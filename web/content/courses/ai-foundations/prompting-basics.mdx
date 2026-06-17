@@ -1,0 +1,50 @@
+export const meta = {
+  title: "Prompting Basics",
+  summary: "The same model gives wildly different answers depending on how you ask. Here's how to ask well.",
+};
+
+A language model predicts the next words based on everything you've given it so far. So the text you provide — the **prompt** — is the single biggest lever you control. Same model, better prompt, dramatically better output.
+
+## Three habits that fix most bad answers
+
+1. **Be specific about the outcome.** "Write about dogs" drifts. "Write three one-sentence tips for crate-training a puppy" lands.
+2. **Give context.** Tell it who it's for and any constraints — audience, length, tone, format.
+3. **Show the shape you want.** If you need a list, ask for a list. If you need JSON, show an example.
+
+<Callout type="note">
+You're not casting spells. You're reducing ambiguity. Every detail you add removes a way the model could guess wrong.
+</Callout>
+
+<Quiz
+  question="You get a vague, rambling answer. What's the highest-leverage fix?"
+  options={[
+    "Ask the exact same thing again and hope",
+    "Add specifics: audience, format, and length",
+    "Switch to a bigger model immediately",
+    "Make the prompt as short as possible"
+  ]}
+  answer={1}
+  explanation="Specificity removes ambiguity. Bigger models help, but a clear prompt beats a vague one on any model."
+/>
+
+## Practice: structure a prompt
+
+A useful pattern is **role + task + format**. Let's build one as a string and print it.
+
+<CodeExercise
+  id="prompt-1"
+  prompt="Combine the three parts into one prompt string and print it."
+  starter={`role = "You are a friendly Python tutor."
+task = "Explain what a variable is."
+fmt = "Use one short sentence."
+
+# Combine role, task, and fmt into one string (separated by spaces) and print it
+`}
+  expected="You are a friendly Python tutor. Explain what a variable is. Use one short sentence."
+  solution={`role = "You are a friendly Python tutor."
+task = "Explain what a variable is."
+fmt = "Use one short sentence."
+print(role + " " + task + " " + fmt)`}
+/>
+
+That role + task + format skeleton works for almost any request. You've now got the two fundamentals — what a model is, and how to steer it. Next up: the math that makes it all tick.

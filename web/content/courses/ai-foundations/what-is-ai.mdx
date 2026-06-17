@@ -1,0 +1,41 @@
+export const meta = {
+  title: "What Is AI, Really?",
+  summary: "Cut through the hype. A clear, honest picture of what today's AI does — and what it doesn't.",
+};
+
+People throw the word **AI** at everything from chatbots to dishwashers. So let's be precise.
+
+Artificial intelligence is software that learns patterns from data and uses those patterns to make predictions — instead of following rules a human wrote by hand. That single idea covers spam filters, recommendation feeds, image generators, and the large language models you've been chatting with.
+
+<Callout type="tip">
+The shift that made modern AI possible wasn't smarter rules — it was letting the computer **find the rules itself** from huge amounts of examples.
+</Callout>
+
+## A model is a prediction machine
+
+Strip away the mystique and a model does one thing: given some input, it predicts a likely output. A language model predicts the next word. An image classifier predicts a label. A recommender predicts what you'll click.
+
+It doesn't "understand" the way you do. It has seen so many examples that its predictions are often uncannily good — and sometimes confidently wrong. Holding both of those facts at once is the core skill of working with AI well.
+
+<Quiz question="Which best describes how a modern AI model produces its answers?" options={["It looks up the exact answer in a database", "It predicts likely outputs from patterns it learned in data", "It follows a fixed set of rules a programmer wrote", "It reasons from first principles like a human expert"]} answer={1} explanation="Models learn statistical patterns from data and predict from them. That's why they generalize to new inputs — and also why they can be confidently wrong." />
+
+## Your turn — run some Python
+
+You'll write real code throughout this course, and it runs right here in your browser. No setup. Let's start tiny: a model's predictions are often just math over numbers, so get comfortable with the basics.
+
+**Print the average of the numbers below.**
+
+<CodeExercise
+  id="avg-1"
+  prompt="Compute and print the average (mean) of the list."
+  starter={`nums = [10, 20, 30, 40]
+# Print the average of nums
+`}
+  expected="25.0"
+  solution={`nums = [10, 20, 30, 40]
+print(sum(nums) / len(nums))`}
+/>
+
+That number — the mean — is the simplest "model" there is: predict the average every time. Crude, but it's a real baseline, and beating the baseline is how every AI project starts.
+
+In the next lesson you'll talk to a language model deliberately, and learn why *how* you ask changes what you get.

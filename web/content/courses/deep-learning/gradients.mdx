@@ -1,0 +1,65 @@
+export const meta = {
+  title: "How Networks Learn",
+  summary: "Training is one idea repeated millions of times: measure the slope of the loss, and step downhill. That's gradient descent.",
+};
+
+We have a network that makes predictions and a loss that scores them. Learning means changing the weights to make the loss smaller. But there are millions of weights — how do we know which way to nudge each one?
+
+## The gradient points uphill
+
+For any weight, the **gradient** is the slope of the loss with respect to that weight: "if I increase this weight a little, does the loss go up or down, and how fast?"
+
+To *reduce* loss, we step in the **opposite** direction of the gradient. That's **gradient descent**:
+
+```text
+w_new = w - lr * gradient
+```
+
+The **learning rate** (`lr`) controls step size — too big and you overshoot, too small and training crawls.
+
+```python
+w = 2.0
+lr = 0.5
+gradient = 1.0
+w = w - lr * gradient
+print(w)   # 1.5
+```
+
+Repeat this for every weight, over and over, and the network slides downhill toward weights that fit the data. **Backpropagation** is just the efficient bookkeeping that computes all those gradients at once.
+
+<Callout type="note">
+Real frameworks (PyTorch, TensorFlow) compute gradients automatically and run on GPUs — too heavy for a browser tab. Once these fundamentals click, those tools are a thin layer on top. We'll point you to a Colab notebook to train a real network with PyTorch.
+</Callout>
+
+<Quiz
+  question="The gradient of the loss w.r.t. a weight is positive. To reduce the loss, you should:"
+  options={[
+    "Increase the weight",
+    "Decrease the weight (step opposite the gradient)",
+    "Leave it unchanged",
+    "Set it to zero"
+  ]}
+  answer={1}
+  explanation="A positive gradient means increasing the weight increases the loss. Gradient descent steps the opposite way, so you decrease the weight."
+/>
+
+## Your turn
+
+Perform one gradient-descent update.
+
+<CodeExercise
+  id="gd-step"
+  prompt="Apply one update: w_new = w - lr * gradient, then print w_new."
+  starter={`w = 5.0
+lr = 0.5
+gradient = 4.0
+# Print the updated weight after one gradient-descent step
+`}
+  expected="3.0"
+  solution={`w = 5.0
+lr = 0.5
+gradient = 4.0
+print(w - lr * gradient)`}
+/>
+
+That single line, repeated across every weight and every example, is how every neural network on Earth learns. You now understand deep learning's engine.

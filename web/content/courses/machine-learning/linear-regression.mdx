@@ -1,0 +1,57 @@
+export const meta = {
+  title: "Linear Regression by Hand",
+  summary: "The most important model in all of ML is a straight line. Understand it deeply and everything else is a variation.",
+};
+
+**Linear regression** fits a straight line through your data and uses it to predict. It's the "hello world" of machine learning — and the core idea inside far more complex models.
+
+## The model is one equation
+
+```text
+prediction = w * x + b
+```
+
+- `w` (**weight**) is the slope: how much the prediction rises per unit of input.
+- `b` (**bias**) is the intercept: the prediction when the input is zero.
+
+If price rises by 3 (thousand) per square meter, then `w = 3`. A 100&nbsp;m² house predicts `3 * 100 = 300`.
+
+```python
+def predict(x, w, b):
+    return w * x + b
+
+print(predict(100, 3, 0))   # 300
+```
+
+**Learning** linear regression means finding the `w` and `b` that make the line fit the data best — usually by minimizing error, which is the next lesson.
+
+<Quiz
+  question="In prediction = w · x + b, what does increasing w do?"
+  options={[
+    "Shifts the whole line up without changing its tilt",
+    "Makes the line steeper — predictions change faster as x grows",
+    "Has no effect on predictions",
+    "Only matters when x is zero"
+  ]}
+  answer={1}
+  explanation="w is the slope. Larger w means the prediction grows faster with x. b (the bias) is what shifts the line up or down."
+/>
+
+## Your turn
+
+<CodeExercise
+  id="lr-predict"
+  prompt="A model has weight w = 3 and bias b = 5. Print its prediction for x = 100."
+  starter={`w = 3
+b = 5
+x = 100
+# Print w * x + b
+`}
+  expected="305"
+  solution={`w = 3
+b = 5
+x = 100
+print(w * x + b)`}
+/>
+
+You just ran inference on a real model. The only thing left is teaching the machine to pick `w` and `b` for you — which starts with measuring how wrong it is.

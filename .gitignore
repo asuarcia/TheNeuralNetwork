@@ -1,0 +1,19 @@
+# --- TheNeuralNetwork repo ---
+# This public repo contains only the web app (./web).
+
+# Internal / not-for-public material
+/Finguard web/
+/research/
+
+# Safety nets (web/.gitignore already covers these inside the app)
+node_modules/
+.next/
+out/
+build/
+.env
+.env.local
+.env*.local
+*.log
+.DS_Store
+.vercel
+*.tsbuildinfo
