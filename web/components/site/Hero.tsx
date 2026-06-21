@@ -78,7 +78,7 @@ export const Hero = () => {
           transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="text-xl md:text-2xl font-light text-neutral-300 max-w-3xl mx-auto mb-12 leading-relaxed"
         >
-          Master artificial intelligence at any level — from beginner fundamentals to advanced neural architectures. Your journey into AI starts here.
+          Learn AI by <span className="text-white font-normal">doing</span> — from your first prompt to building a transformer from scratch. Run real code in your browser, build a portfolio, and earn certificates that get you exam-ready.
         </motion.p>
 
         <motion.div
@@ -114,7 +114,7 @@ export const Hero = () => {
           transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-wrap justify-center gap-3 mt-16 max-w-2xl"
         >
-          {['Beginner Friendly', 'Through to Expert', 'Real Python In-Browser', 'Always Free'].map((feature, i) => (
+          {['No coding to start', 'Build real projects', 'Earn certificates', 'Always free'].map((feature, i) => (
             <div
               key={i}
               className="px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm text-sm text-neutral-400"

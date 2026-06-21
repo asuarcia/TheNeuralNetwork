@@ -13,7 +13,14 @@ const levelColors: Record<string, string> = {
   Expert: 'text-pink-400 border-pink-500/30 bg-pink-500/10',
 };
 
+// One standout track per level — the landing teases, the catalog shows all.
+const FEATURED = ['ai-foundations', 'applied-ai', 'deep-learning', 'ai-engineering'];
+
 export const Projects = () => {
+  const featured = FEATURED
+    .map((slug) => curriculum.find((c) => c.slug === slug))
+    .filter(Boolean) as Course[];
+
   return (
     <section id="courses" className="py-32 px-6 bg-neutral-950">
       <div className="container mx-auto">
@@ -49,10 +56,25 @@ export const Projects = () => {
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-8 md:gap-y-24">
-          {curriculum.map((course, index) => (
+          {featured.map((course, index) => (
             <CourseCard key={course.slug} course={course} index={index} />
           ))}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-24 flex justify-center"
+        >
+          <Link
+            href="/courses"
+            className="group inline-flex items-center gap-3 rounded-full border border-violet-500/30 bg-violet-500/5 px-7 py-4 text-sm font-medium text-violet-200 hover:border-violet-500/60 hover:bg-violet-500/10 transition-colors"
+          >
+            Explore all {curriculum.length} tracks — beginner to expert
+            <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

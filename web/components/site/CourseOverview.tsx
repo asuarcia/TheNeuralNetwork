@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, Clock, Check, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, Clock, Check, Sparkles, GraduationCap } from "lucide-react";
 import { courseMinutes, type Course, type Level } from "@/content/curriculum";
 import { projectsForCourse } from "@/content/projects";
+import { certsForCourse } from "@/content/outcomes";
+import { CourseCertBadge } from "@/components/site/CourseCertBadge";
 
 const levelClass: Record<Level, string> = {
   Beginner: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10",
@@ -14,6 +16,7 @@ export function CourseOverview({ course }: { course: Course }) {
   const minutes = courseMinutes(course);
   const first = course.lessons[0];
   const projects = projectsForCourse(course.slug);
+  const certs = certsForCourse(course.slug);
 
   return (
     <div className="bg-neutral-950 min-h-screen text-white pt-32 px-6">
@@ -99,6 +102,26 @@ export function CourseOverview({ course }: { course: Course }) {
             <p className="text-center text-xs text-neutral-500">
               <Link href="/signup" className="text-violet-400 hover:text-violet-300">Create a free account</Link> to save your progress.
             </p>
+
+            <CourseCertBadge slug={course.slug} total={course.lessons.length} />
+
+            {certs.length > 0 && (
+              <div className="p-6 rounded-xl border border-white/5 bg-white/[0.02]">
+                <span className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-neutral-500 mb-3">
+                  <GraduationCap className="w-4 h-4 text-violet-400" /> Prepares you for
+                </span>
+                <ul className="space-y-2">
+                  {certs.map((c) => (
+                    <li key={c.name} className="text-sm">
+                      <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-neutral-200 hover:text-violet-300 transition-colors">
+                        {c.name}
+                      </a>
+                      <span className="block text-xs text-neutral-600">{c.provider}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
 
           {/* Right: outline */}
