@@ -1,0 +1,31 @@
+import type { Card } from "@/components/lab/FlashcardDeck";
+
+// Spaced-repetition review deck: the highest-leverage idea from each track,
+// phrased as a recall question. Keep these tight — one clear idea per card.
+export const reviewDeck: Card[] = [
+  { track: "Foundations", front: "How does a language model produce its answer?", back: "It predicts the next token from patterns it learned — one token at a time — then feeds each choice back in. It optimizes for plausible, not necessarily true." },
+  { track: "Foundations", front: "What is a 'hallucination' and the main defense?", back: "Fluent but fabricated output. Defense: grounding — give the model real sources and have it answer only from them, then verify." },
+  { track: "Foundations", front: "What does temperature control?", back: "Randomness of token sampling. Low = focused/repeatable; high = creative/varied." },
+  { track: "Prompting", front: "The reusable prompt skeleton?", back: "Role · Task · Format (plus explicit constraints and an example of the output shape)." },
+  { track: "Prompting", front: "Why does 'think step by step' help?", back: "It gives the model intermediate reasoning tokens (scratch space); each correct step makes the next more likely — big gains on math/logic." },
+  { track: "Math", front: "What does the dot product tell you about two vectors?", back: "How aligned they are. Large positive = similar direction (similar meaning in embedding space); near zero = unrelated." },
+  { track: "Math", front: "What is a gradient?", back: "A vector of slopes — one partial derivative per parameter — pointing toward steepest increase of the loss. Step opposite it to learn." },
+  { track: "Math", front: "Why normalize features (z-score)?", back: "So features on different scales contribute fairly; (x − mean) / std centers at 0 with spread 1, helping training converge." },
+  { track: "ML", front: "Linear vs. logistic regression?", back: "Both compute w·x + b. Linear outputs that number; logistic squashes it with a sigmoid into a probability, then thresholds to a class." },
+  { track: "ML", front: "When does accuracy lie?", back: "On imbalanced classes. A 99%-healthy dataset scores 99% by always saying 'healthy' yet catches zero cases — use precision/recall." },
+  { track: "ML", front: "Overfitting vs. underfitting?", back: "Overfit = great on train, poor on test (too complex / high variance). Underfit = poor on both (too simple / high bias)." },
+  { track: "ML", front: "The gradient-descent update rule?", back: "w_new = w − learning_rate · gradient. The learning rate is the make-or-break knob." },
+  { track: "Deep Learning", front: "What does a single neuron compute?", back: "A weighted sum of inputs plus a bias (w·x + b), then an activation like ReLU = max(0, z)." },
+  { track: "Deep Learning", front: "Why do networks need non-linear activations?", back: "Stacking linear layers collapses to one linear function. A non-linearity (ReLU) lets the network model curves." },
+  { track: "Deep Learning", front: "What does backpropagation do?", back: "Computes the gradient of the loss for every weight in one backward pass, using the chain rule (upstream × local gradient at each node)." },
+  { track: "Deep Learning", front: "In self-attention, what are Q, K, V?", back: "Query (what a token seeks), Key (what each offers), Value (the info carried). Score = Q·K, scale, softmax, then weighted-sum the Values." },
+  { track: "Computer Vision", front: "What does a convolution filter do?", back: "Slides a small kernel over the image, multiplying and summing, to produce a feature map showing where a pattern (e.g. an edge) appears." },
+  { track: "Computer Vision", front: "Why is transfer learning so effective?", back: "Early CNN layers learn general features; you freeze them and train only a small new head, so a few hundred images suffice." },
+  { track: "NLP", front: "What do word embeddings capture?", back: "Meaning as geometry — similar words get nearby vectors, so similarity becomes a dot product and analogies become vector arithmetic." },
+  { track: "NLP", front: "What did transformers fix about RNNs?", back: "Attention lets every token see every other at once — no sequential bottleneck and no long-range forgetting." },
+  { track: "Reinforcement Learning", front: "What does Q(state, action) estimate?", back: "The expected total future (discounted) reward of taking that action then playing well. Update toward reward + γ·max Q(next)." },
+  { track: "Reinforcement Learning", front: "Exploration vs. exploitation — the fix?", back: "Epsilon-greedy: usually take the best known action, but with probability ε try a random one. Decay ε over time." },
+  { track: "Generative AI", front: "What does a diffusion model learn?", back: "To predict and remove the noise added to an image. Run that denoiser repeatedly from pure noise and an image emerges." },
+  { track: "AI Engineering", front: "Prompt vs. RAG vs. fine-tune?", back: "Prompt = change instructions. RAG = add missing knowledge. Fine-tune = change behavior/style from examples (LoRA makes it cheap)." },
+  { track: "MLOps", front: "What is train/serve skew?", back: "Computing features differently in training vs. production, so the model gets inputs it never trained on — a silent failure. Fix: one definition, one place." },
+];

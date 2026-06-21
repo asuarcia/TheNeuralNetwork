@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight, Check, Clock } from "lucide-react";
+import { ArrowLeft, ArrowRight, Clock } from "lucide-react";
 import { curriculum, getLessonContext } from "@/content/curriculum";
-import { markLessonComplete } from "@/lib/progress/actions";
+import { CompleteButton } from "@/components/lesson/CompleteButton";
 
 type Meta = { title: string; summary?: string };
 
@@ -115,15 +115,11 @@ export default async function LessonPage(
               <span />
             )}
 
-            <form action={markLessonComplete}>
-              <input type="hidden" name="course" value={courseData.slug} />
-              <input type="hidden" name="lesson" value={lesson} />
-              <button className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/30 hover:from-violet-500 hover:to-purple-500 transition-all">
-                <Check className="w-4 h-4" />
-                {next ? "Complete & continue" : "Finish course"}
-                {next && <ArrowRight className="w-4 h-4" />}
-              </button>
-            </form>
+            <CompleteButton
+              lessonId={`${courseData.slug}/${lesson}`}
+              nextHref={next ? `/learn/${courseData.slug}/${next.slug}` : "/dashboard"}
+              isLast={!next}
+            />
           </div>
         </article>
       </div>

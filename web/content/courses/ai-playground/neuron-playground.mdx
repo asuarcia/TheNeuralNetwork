@@ -1,0 +1,38 @@
+export const meta = {
+  title: "Feel a Neuron",
+  summary: "No code, no math lecture — just drag the dials and build a gut feel for the one operation behind all of deep learning.",
+};
+
+A neural network is millions of copies of one tiny operation. Instead of reading about it, let's *play* with it until it's obvious. A neuron takes inputs, multiplies each by a **weight**, adds a **bias**, and squashes the result with an **activation** (here, ReLU = keep positives, zero out negatives).
+
+<PredictThenReveal prompt="If you set both weights to 0, what will the neuron output — no matter what the inputs are?">
+Just the bias, passed through ReLU. With weights at 0 the inputs can't matter, so `z = bias`, and the output is `max(0, bias)`. Try it below: set w₁ and w₂ to 0 and drag the inputs — nothing changes.
+</PredictThenReveal>
+
+## Your live neuron
+
+Drag everything. Watch `z` (the weighted sum) and the ReLU output update instantly. Two goals: make the neuron **fire hard**, then make it go completely **silent**.
+
+<NeuronLab />
+
+Notice the pattern: the output only responds to an input when that input has a non-zero weight. The weights are what the network *learns* — they decide which inputs matter and how much.
+
+<Quiz
+  question="What makes a ReLU neuron go completely silent (output exactly 0)?"
+  options={[
+    "Any time the inputs are large",
+    "Whenever the weighted sum z is zero or negative",
+    "Only when the bias is exactly 0",
+    "It can never output exactly 0"
+  ]}
+  answer={1}
+  explanation="ReLU outputs max(0, z). So the moment z = w₁x₁ + w₂x₂ + b drops to 0 or below, the neuron is silent — that bend at zero is the non-linearity that makes deep networks powerful."
+/>
+
+<Callout type="tip">
+That's it — multiply, add, squash. Stack a few of these side by side and you have a layer; stack layers and you have a deep network. You just felt the atom the whole field is built from.
+</Callout>
+
+<Homework>
+Set w₁ = 1, w₂ = 1, bias = 0. Find the exact input values where the neuron sits right at the edge of firing (output ≈ 0). Then explain in a sentence what the bias does to that firing threshold.
+</Homework>

@@ -23,6 +23,12 @@ w_new = w - learning_rate * gradient
 
 The **learning rate** controls step size. Let's take one step minimizing the simplest loss, `f(w) = w²`, whose gradient is `2w`.
 
+## Watch it roll downhill
+
+Press **Run** and watch the ball descend the loss curve. Then drag the learning rate: around 0.1 it glides in smoothly, near 0.9 it bounces, and above 1.0 it overshoots and explodes off the curve. This one dial decides whether training works at all.
+
+<GradientDescentLab />
+
 <CodeExercise
   id="gd-step"
   prompt="Minimize f(w) = w². Its gradient is 2*w. Take one gradient-descent step from w = 4.0 with lr = 0.1, and print the new w."

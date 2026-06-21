@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, Brain } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { XpBadge } from '@/components/gamification/XpBadge';
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,10 +26,10 @@ export const Navbar = () => {
   }, [pathname]);
 
   const navItems = [
+    { name: 'Map', to: '/map' },
     { name: 'Courses', to: '/courses' },
     { name: 'Projects', to: '/projects' },
-    { name: 'Learning Paths', to: '/#paths' },
-    { name: 'Community', to: '/#community' }
+    { name: 'Review', to: '/review' }
   ];
 
   return (
@@ -74,6 +75,9 @@ export const Navbar = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* XP / level / streak */}
+        <XpBadge />
 
         {/* Mobile Toggle */}
         <button

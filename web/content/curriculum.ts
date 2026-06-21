@@ -62,6 +62,28 @@ export const curriculum: Course[] = [
     ],
   },
   {
+    slug: "ai-playground",
+    code: "AI 100",
+    title: "AI Playground",
+    level: "Beginner",
+    summary:
+      "Skip the reading — build intuition by playing. Drag live neurons and gradient descent, predict what happens, and feel why AI works before you ever write code.",
+    topics: ["Live neuron", "Gradient descent", "Predict & reveal", "No setup"],
+    outcomes: [
+      "Build hands-on intuition for what a neuron computes",
+      "Feel how the learning rate makes or breaks gradient descent",
+      "Practice predicting model behavior before being told",
+      "Connect the pieces into how a whole network learns",
+    ],
+    runsCode: false,
+    image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1200&auto=format&fit=crop",
+    lessons: [
+      { slug: "neuron-playground", title: "Feel a Neuron", minutes: 8 },
+      { slug: "descent-playground", title: "Feel Gradient Descent", minutes: 10 },
+      { slug: "how-learning-works", title: "How a Network Learns", minutes: 10 },
+    ],
+  },
+  {
     slug: "coding-for-ai",
     code: "AI 110",
     title: "Python for AI",

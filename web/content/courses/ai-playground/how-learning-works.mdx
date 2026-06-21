@@ -1,0 +1,51 @@
+export const meta = {
+  title: "How a Network Learns",
+  summary: "Put the two pieces together: a neuron makes a guess, and gradient descent fixes its weights. That loop is all of deep learning.",
+};
+
+You've felt both halves. Now connect them into the single loop that powers every neural network.
+
+1. A **neuron** (and a network of them) makes a **prediction** from its current weights.
+2. A **loss** measures how wrong that prediction was.
+3. **Gradient descent** nudges every weight a little downhill to shrink the loss.
+4. Repeat — millions of times.
+
+## Half one: the prediction
+
+The network's guess comes from neurons like this. The weights here are *fixed* — this is the forward pass, the "make a guess" step.
+
+<NeuronLab />
+
+<PredictThenReveal prompt="During training, which of the neuron's dials get adjusted automatically — the inputs, or the weights and bias?">
+The **weights and bias**. The inputs are the data (fixed for a given example); learning means searching for the weights and bias that make the predictions good. That search is gradient descent.
+</PredictThenReveal>
+
+## Half two: the fix
+
+Once we know how wrong the guess was, gradient descent rolls each weight downhill on the loss surface — exactly this motion, happening for every weight at once.
+
+<GradientDescentLab />
+
+## The whole loop
+
+Guess → measure error → step downhill → guess again. Run that loop enough times and the weights settle into values that make the network's predictions good. There's no magic step hiding anywhere — it's these two things you just played with, repeated at scale.
+
+<Quiz
+  question="In one sentence, how does a neural network learn?"
+  options={[
+    "It memorizes every training example in a database",
+    "It repeatedly makes a prediction, measures the error, and uses gradient descent to nudge its weights downhill",
+    "A human hand-tunes each weight",
+    "It searches the internet for the answer"
+  ]}
+  answer={1}
+  explanation="That's the entire training loop: forward pass (predict) → loss (measure) → gradient descent (adjust weights) → repeat. Everything else in deep learning is a variation on it."
+/>
+
+<Callout type="tip">
+That's the big secret, demystified by feel. When you move on to the Deep Learning track and write this in real Python, you'll already *know* what every line is doing.
+</Callout>
+
+<Homework>
+In your own words (3–4 sentences), explain the learning loop to a friend who's never coded — using the neuron and the rolling ball as your analogy. Teaching it is the fastest way to lock it in.
+</Homework>
