@@ -1,0 +1,95 @@
+export const meta = {
+  title: "Derivatives & the Gradient",
+  summary: "A derivative is just a slope — how fast something changes. That single idea is the engine of all learning: it tells the model which way to adjust.",
+};
+
+Every model learns by asking "if I nudge this number a little, does my error go up or down?" The answer is a **derivative** — and you don't need heavy calculus to get it.
+
+## A derivative is a slope
+
+The derivative of a function at a point is its **slope** there: how much the output changes for a tiny change in the input. Steep slope = fast change. Flat slope (zero) = a peak, a valley, or a plateau.
+
+You can estimate any slope numerically: nudge the input by a tiny amount `h`, see how much the output moved, and divide.
+
+```text
+slope ≈ (f(x + h) − f(x)) / h
+```
+
+<CodeExercise
+  id="deriv-numeric"
+  prompt="Estimate the slope of f(x) = x² at x = 3 using a tiny h. Print it rounded to 2 decimals (it should be ~6)."
+  starter={`def f(x):
+    return x * x
+
+x = 3.0
+h = 0.0001
+# Estimate the slope: (f(x+h) - f(x)) / h, rounded to 2 decimals
+`}
+  expected="6.0"
+  solution={`def f(x):
+    return x * x
+
+x = 3.0
+h = 0.0001
+print(round((f(x + h) - f(x)) / h, 2))`}
+/>
+
+The exact derivative of `x²` is `2x`, which at `x = 3` is `6` — our numerical estimate nails it. (Real frameworks compute exact derivatives automatically; this is the intuition behind that magic.)
+
+<Quiz
+  question="The derivative (slope) of the loss at the current weight is 0. What does that tell you?"
+  options={[
+    "The loss is as high as possible",
+    "You're at a flat spot — a minimum, maximum, or plateau — so gradient descent would stop moving",
+    "The weight must be zero",
+    "Training has failed"
+  ]}
+  answer={1}
+  explanation="A zero slope means a flat point. At a minimum the loss can't be reduced by a small step, so gradient descent naturally settles there."
+/>
+
+## Slope from two points
+
+The same idea — rise over run — measures the slope between any two points.
+
+<CodeExercise
+  id="deriv-slope"
+  prompt="Compute the slope between the points (2, 4) and (5, 10): (y2 - y1) / (x2 - x1)."
+  starter={`x1, y1 = 2, 4
+x2, y2 = 5, 10
+# Print the slope (rise over run)
+`}
+  expected="2.0"
+  solution={`x1, y1 = 2, 4
+x2, y2 = 5, 10
+print((y2 - y1) / (x2 - x1))`}
+/>
+
+## The gradient: slope in many directions
+
+A model has millions of weights, so we don't have one slope — we have one per weight. Bundle them into a vector and you get the **gradient**: it points in the direction the loss increases *fastest*.
+
+To *reduce* the loss, you step the opposite way. That's gradient descent, and now you know exactly what the "gradient" in its name is: a vector of slopes.
+
+<Callout type="tip">
+Derivative → one slope. Gradient → a vector of slopes, one per parameter. "Step opposite the gradient" is the single rule behind training every neural network. The Machine Learning and Deep Learning tracks put it to work.
+</Callout>
+
+<Quiz
+  question="What is a 'gradient'?"
+  options={[
+    "The model's final accuracy",
+    "A vector of slopes — one derivative per parameter — pointing toward steepest increase",
+    "Another word for the learning rate",
+    "The number of layers in a network"
+  ]}
+  answer={1}
+  explanation="The gradient collects the slope of the loss with respect to every parameter. Stepping opposite it lowers the loss — the essence of learning."
+/>
+
+Slopes tell a model how to improve. But real data is noisy and uncertain — so the last math ideas you need are about chance: probability and statistics.
+
+
+<Homework>
+Numerically estimate the slope of **f(x) = x³** at x = 2 using a tiny h (the exact answer is 3x² = 12). Then try x = 0 and x = −2 and confirm the sign of the slope matches the curve's direction.
+</Homework>

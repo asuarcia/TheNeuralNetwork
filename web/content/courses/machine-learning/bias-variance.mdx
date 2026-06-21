@@ -1,0 +1,105 @@
+export const meta = {
+  title: "Overfitting & the Bias-Variance Tradeoff",
+  summary: "The deepest idea in machine learning: a model can fail by being too simple or too clever. Learning to tell which is the whole job.",
+};
+
+You've trained models and measured them. Now the question that separates practitioners from beginners: when a model underperforms, *why*? Almost always, it's one of two opposite failures — and the cure for one makes the other worse.
+
+## Two ways to be wrong
+
+- **Underfitting (high bias)** — the model is too simple to capture the pattern. A straight line through clearly curved data. It does badly on *both* training and test data. It hasn't learned enough.
+- **Overfitting (high variance)** — the model is too complex and memorizes the training data, including its noise. It does *great* on training and *badly* on test data. It learned too much of the wrong thing.
+
+The tell is the **gap** between training and test performance.
+
+## Reading the gap
+
+A tiny training error with a large test error is the classic fingerprint of overfitting: the model aced its study notes but flunked the real exam.
+
+<CodeExercise
+  id="bv-detect"
+  prompt="If test error exceeds training error by more than 0.1, flag overfitting. Print 'overfitting' or 'ok'."
+  starter={`train_err = 0.02
+test_err = 0.35
+# Print "overfitting" if (test_err - train_err) > 0.1, else "ok"
+`}
+  expected="overfitting"
+  solution={`train_err = 0.02
+test_err = 0.35
+print("overfitting" if (test_err - train_err) > 0.1 else "ok")`}
+/>
+
+That gap of 0.33 is a screaming red flag. Now quantify it directly — the **generalization gap** is just train performance minus test performance.
+
+<CodeExercise
+  id="bv-gap"
+  prompt="Print the generalization gap (train accuracy minus test accuracy), rounded to 2."
+  starter={`train_acc = 0.99
+test_acc = 0.72
+# Print the gap, rounded to 2 decimals
+`}
+  expected="0.27"
+  solution={`train_acc = 0.99
+test_acc = 0.72
+print(round(train_acc - test_acc, 2))`}
+/>
+
+99% on training, 72% on test — a 27-point gap. The model memorized rather than generalized.
+
+<Quiz
+  question="A model scores 99% on training data but 72% on the test set. This is a classic case of:"
+  options={[
+    "Underfitting (high bias)",
+    "Overfitting (high variance) — it memorized the training data and fails to generalize",
+    "A perfect model",
+    "A bug in the metric"
+  ]}
+  answer={1}
+  explanation="Excellent training performance with much worse test performance means the model learned noise specific to the training set. That's overfitting / high variance."
+/>
+
+## The tradeoff
+
+Here's the rub: making a model more complex lowers bias but raises variance, and vice versa. You can't drive both to zero. The goal is the **sweet spot** — complex enough to capture the real pattern, simple enough to ignore the noise.
+
+```text
+Too simple  ──────────────►  Too complex
+high bias        SWEET         high variance
+(underfit)        SPOT          (overfit)
+```
+
+## The fixes are opposite
+
+Because they're opposite problems, they need opposite cures:
+
+**To fix overfitting (too complex):**
+- Get **more training data** — harder to memorize a bigger set.
+- **Regularize** — penalize large weights to keep the model humble (L1/L2, dropout in nets).
+- **Simplify** — fewer features, a shallower tree, a smaller network.
+
+**To fix underfitting (too simple):**
+- Add **complexity** — more features, a deeper model.
+- Train **longer** or reduce regularization.
+
+<Callout type="tip">
+This single idea reaches all the way up to large language models. "More data and regularization fix overfitting" is why frontier models are trained on enormous, diverse corpora — and it's the backdrop for everything in the AI Engineering track, where you adapt giant models without overfitting your small dataset.
+</Callout>
+
+<Quiz
+  question="Your model underfits — poor on both training and test data. The best fix is to:"
+  options={[
+    "Add more training data",
+    "Increase model capacity (more features or complexity) and/or reduce regularization",
+    "Add stronger regularization",
+    "Use a smaller model"
+  ]}
+  answer={1}
+  explanation="Underfitting means the model is too simple to capture the pattern. The cure is more capacity — opposite to the cure for overfitting. More data rarely helps a model that's too simple to use it."
+/>
+
+**That completes Machine Learning Foundations.** You understand how models predict, how they're scored, how they learn via gradient descent, and how to keep them honest with the bias-variance tradeoff. Now we stack these ideas into something far more powerful — neural networks — in the Deep Learning track.
+
+
+<Homework>
+Given three models with (train, test) accuracy — A: (0.99, 0.70), B: (0.72, 0.71), C: (0.93, 0.91) — label each **overfit**, **underfit**, or **good**, and write the one fix you'd try for A and for B.
+</Homework>

@@ -1,0 +1,90 @@
+export const meta = {
+  title: "From RNNs to Transformers",
+  summary: "Language is a sequence — order changes everything. This is the story of how models learned to handle sequences, ending at the transformer that changed AI.",
+};
+
+"Dog bites man" and "man bites dog" use the same words but mean opposite things. Counts and embeddings alone miss this — language is a **sequence**, and order carries meaning. This lesson traces how models learned to read in order, and why transformers won.
+
+## Recurrent networks: reading one word at a time
+
+The first successful approach was the **Recurrent Neural Network (RNN)**. It reads a sequence one token at a time, keeping a **hidden state** — a running memory — that it updates with each new word. The state carries information forward, so earlier words can influence later ones.
+
+Here's the essence of a hidden state: information accumulating as you step through a sequence.
+
+<CodeExercise
+  id="rnn-state"
+  prompt="Simulate a simple hidden state that accumulates the sequence. Start at 0, add each value, print the final state."
+  starter={`sequence = [1, 2, 3]
+hidden = 0
+# Update the hidden state with each value (add it), then print the final state
+`}
+  expected="6"
+  solution={`sequence = [1, 2, 3]
+hidden = 0
+for x in sequence:
+    hidden = hidden + x
+print(hidden)`}
+/>
+
+A real RNN's update is more elaborate (learned weights, a non-linearity), but this is the shape: a state that evolves as the sequence flows through.
+
+## The problem: long-range forgetting
+
+RNNs have two big weaknesses:
+
+- **They forget.** By the end of a long paragraph, information from the first sentence has faded — the hidden state gets overwritten. (Improved versions like **LSTMs** helped, but didn't fully solve it.)
+- **They're slow.** Reading strictly one token at a time can't be parallelized, so long sequences are sluggish to train.
+
+<Quiz
+  question="What is the main weakness of RNNs on long sequences?"
+  options={[
+    "They use too little memory",
+    "Information from early in the sequence fades by the end, and they can't be parallelized",
+    "They can't handle numbers",
+    "They only work on images"
+  ]}
+  answer={1}
+  explanation="RNNs process sequentially and their hidden state gradually loses early information — causing long-range forgetting and slow, hard-to-parallelize training."
+/>
+
+## Bigrams: a tiny taste of sequence prediction
+
+Before deep models, people predicted the next word from the previous one using **bigram** statistics — a lookup of "what usually follows this word." Crude, but it captures the core task of language modeling: predict the next token.
+
+<CodeExercise
+  id="seq-bigram"
+  prompt="A bigram table maps a word to its most likely next word. Print what follows 'the'."
+  starter={`bigrams = {"the": "cat", "cat": "sat"}
+# Print the most likely word after "the"
+`}
+  expected="cat"
+  solution={`bigrams = {"the": "cat", "cat": "sat"}
+print(bigrams["the"])`}
+/>
+
+## The transformer: attention solves it
+
+In 2017, the **transformer** replaced recurrence with **attention** — letting every word look directly at every other word, all at once. No sequential bottleneck (so it's fast and parallel) and no long-range forgetting (any two words connect directly). You studied this mechanism in depth in the Deep Learning track; this is *why* it was such a leap for language.
+
+<Callout type="tip">
+The arc: bigrams (count the next word) → RNN/LSTM (a memory that reads in order, but forgets) → transformer (attention connects everything at once). Every modern language model — and this entire platform's favorite example, the LLM — is a transformer.
+</Callout>
+
+<Quiz
+  question="What did the transformer's attention mechanism fix about RNNs?"
+  options={[
+    "It made models smaller",
+    "It lets every token attend to every other directly — removing the sequential bottleneck and long-range forgetting",
+    "It removed the need for training data",
+    "It only works for short text"
+  ]}
+  answer={1}
+  explanation="Attention connects all positions at once, so transformers process in parallel (fast) and capture long-range dependencies (no forgetting) — the breakthrough behind modern NLP."
+/>
+
+**That completes Natural Language Processing.** You've gone from counting words to the architecture behind ChatGPT. Next, a different kind of learning entirely — one that learns from trial, error, and reward: Reinforcement Learning.
+
+
+<Homework>
+Build a **bigram** table from the sentence "I like to code and I like to learn" (each word → the words that follow it). Then use it to predict what comes after "like" and after "to".
+</Homework>

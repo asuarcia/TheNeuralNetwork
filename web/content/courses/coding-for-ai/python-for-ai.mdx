@@ -1,0 +1,129 @@
+export const meta = {
+  title: "Just Enough Python",
+  summary: "You don't need to be a programmer. You need six ideas: variables, lists, loops, functions, dictionaries, and comprehensions. Let's get them down.",
+};
+
+Every AI tool you'll build is, underneath, a Python program shuffling numbers around. You only need a handful of building blocks to follow along — and you'll write each one right here in the browser.
+
+## Variables hold things
+
+A **variable** is a labeled box. You put a value in, you take it out by name.
+
+```python
+learning_rate = 0.01
+model_name = "tiny-net"
+epochs = 10
+```
+
+## Lists hold many things, in order
+
+A **list** is an ordered collection — exactly how we'll store datasets, predictions, and weights. Indexing starts at **zero**, and you can slice ranges.
+
+```python
+scores = [88, 92, 79, 95]
+print(scores[0])    # 88   (first item)
+print(scores[-1])   # 95   (last item)
+print(scores[1:3])  # [92, 79]  (items 1 and 2)
+```
+
+<Callout type="tip">
+Almost all data in machine learning is "a list of numbers" (or a list of lists). Get comfortable here and the rest feels familiar.
+</Callout>
+
+## Loops repeat work
+
+A **for loop** walks through a collection one item at a time.
+
+```python
+for s in scores:
+    print(s)
+```
+
+## Functions package up work
+
+A **function** takes inputs, does something, and returns a result. A model is really just a (very fancy) function.
+
+```python
+def double(x):
+    return x * 2
+
+print(double(21))   # 42
+```
+
+<Quiz
+  question="In the list scores = [88, 92, 79, 95], what does scores[1] give you?"
+  options={["88", "92", "79", "The whole list"]}
+  answer={1}
+  explanation="Indexing starts at 0, so scores[0] is 88 and scores[1] is 92."
+/>
+
+## Dictionaries map keys to values
+
+A **dictionary** stores labeled pairs — perfect for things like token→probability or word→count.
+
+```python
+prices = {"apple": 3, "banana": 1}
+print(prices["apple"])   # 3
+```
+
+<CodeExercise
+  id="py-count"
+  prompt="The list 'words' repeats some tags. Print how many times 'ai' appears."
+  starter={`words = ["ai", "ml", "ai", "dl", "ai", "ml"]
+# Print the number of times "ai" appears
+`}
+  expected="3"
+  solution={`words = ["ai", "ml", "ai", "dl", "ai", "ml"]
+print(words.count("ai"))`}
+/>
+
+## Comprehensions transform whole lists
+
+A **list comprehension** applies an expression to every item — you'll use these constantly to run a model over a batch of inputs.
+
+<CodeExercise
+  id="py-double"
+  prompt="Print a new list with every number in nums doubled."
+  starter={`nums = [1, 2, 3]
+# Print a list where each number is doubled, e.g. [2, 4, 6]
+`}
+  expected="[2, 4, 6]"
+  solution={`nums = [1, 2, 3]
+print([x * 2 for x in nums])`}
+/>
+
+## zip pairs two lists together
+
+When you have predictions and truths — or inputs and weights — `zip` lets you walk both at once. This single pattern appears in nearly every lesson ahead.
+
+<CodeExercise
+  id="py-zip"
+  prompt="Print a list of pairwise sums of a and b, e.g. [11, 22, 33]."
+  starter={`a = [1, 2, 3]
+b = [10, 20, 30]
+# Print the element-wise sums of a and b
+`}
+  expected="[11, 22, 33]"
+  solution={`a = [1, 2, 3]
+b = [10, 20, 30]
+print([x + y for x, y in zip(a, b)])`}
+/>
+
+<Quiz
+  question="What does zip([1,2,3], [10,20,30]) let you do?"
+  options={[
+    "Compress the lists to save memory",
+    "Walk both lists together, pairing up matching positions",
+    "Sort both lists at once",
+    "Merge them into one flat list [1,2,3,10,20,30]"
+  ]}
+  answer={1}
+  explanation="zip pairs items by position: (1,10), (2,20), (3,30). It's the standard way to iterate over predictions and actuals side by side."
+/>
+
+That's the toolkit: variables, lists, loops, functions, dictionaries, comprehensions, and zip. Everything ahead is built from these seven moves. Next, we look at how AI turns *real things* into the numbers these tools operate on.
+
+
+<Homework>
+Without using Python's built-in **max()**, write a function that returns the largest number in a list using a loop. Test it on `[3, 9, 2, 7]`. Then make it also return the *index* of that largest value.
+</Homework>

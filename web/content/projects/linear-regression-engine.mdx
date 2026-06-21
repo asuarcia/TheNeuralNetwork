@@ -1,0 +1,135 @@
+export const meta = { title: "Linear Regression Engine from Scratch" };
+
+Welcome to your first from-scratch machine-learning build. By the end you'll have a working linear-regression model that **learns** its own weights with gradient descent — using nothing but plain Python. Everything runs right here; just press **Run** on each cell, top to bottom.
+
+<Callout type="note">
+This is a notebook: cells run in order and remember each other (a function you define in one cell is available in the next). If a cell complains a name isn't defined, run the cells above it first.
+</Callout>
+
+## 1. The data
+
+We'll fit a line to four points that follow `y = 2x + 1` (the model doesn't know that — it has to discover it). Run this to see the data.
+
+<CodeExercise
+  id="lr-data"
+  prompt="Print the training data as paired (x, y) points."
+  starter={`xs = [1, 2, 3, 4]
+ys = [3, 5, 7, 9]
+# Print the (x, y) pairs
+print(list(zip(xs, ys)))`}
+  expected="[(1, 3), (2, 5), (3, 7), (4, 9)]"
+  solution={`xs = [1, 2, 3, 4]
+ys = [3, 5, 7, 9]
+print(list(zip(xs, ys)))`}
+/>
+
+## 2. The model
+
+A linear model is one line of math: `prediction = w * x + b`. Define it as a function — you'll call it everywhere below.
+
+<CodeExercise
+  id="lr-predict"
+  prompt="Define predict(x, w, b) = w*x + b, then print the prediction for x=2 with w=1, b=0."
+  starter={`def predict(x, w, b):
+    return w * x + b
+
+# Print predict(2, 1, 0)
+print(predict(2, 1, 0))`}
+  expected="2"
+  solution={`def predict(x, w, b):
+    return w * x + b
+
+print(predict(2, 1, 0))`}
+/>
+
+## 3. Measuring how wrong we are
+
+To learn, the model needs a score. **Mean Squared Error** averages the squared gaps between predictions and truth. With the *right* weights (w=2, b=1) the error should be exactly 0.
+
+<CodeExercise
+  id="lr-cost"
+  prompt="Write mse(w, b) over the data, then print the error for the perfect fit w=2, b=1."
+  starter={`xs = [1, 2, 3, 4]
+ys = [3, 5, 7, 9]
+
+def mse(w, b):
+    return sum((w * x + b - y) ** 2 for x, y in zip(xs, ys)) / len(xs)
+
+# Print the error for the perfect fit
+print(mse(2, 1))`}
+  expected="0.0"
+  solution={`xs = [1, 2, 3, 4]
+ys = [3, 5, 7, 9]
+
+def mse(w, b):
+    return sum((w * x + b - y) ** 2 for x, y in zip(xs, ys)) / len(xs)
+
+print(mse(2, 1))`}
+/>
+
+Try changing `2, 1` to `0, 0` and re-run — watch the error jump. That number is what training drives down.
+
+## 4. The gradients
+
+Gradient descent needs the slope of the error with respect to each weight. For MSE these are standard:
+
+- `dL/dw = mean( 2 · (pred − y) · x )`
+- `dL/db = mean( 2 · (pred − y) )`
+
+<CodeExercise
+  id="lr-grad"
+  prompt="Compute the gradients at w=0, b=0 and print them rounded to 1 decimal."
+  starter={`xs = [1, 2, 3, 4]
+ys = [3, 5, 7, 9]
+w, b = 0, 0
+
+gw = sum(2 * (w * x + b - y) * x for x, y in zip(xs, ys)) / len(xs)
+gb = sum(2 * (w * x + b - y) for x, y in zip(xs, ys)) / len(xs)
+print(round(gw, 1), round(gb, 1))`}
+  expected="-35.0 -12.0"
+  solution={`xs = [1, 2, 3, 4]
+ys = [3, 5, 7, 9]
+w, b = 0, 0
+gw = sum(2 * (w * x + b - y) * x for x, y in zip(xs, ys)) / len(xs)
+gb = sum(2 * (w * x + b - y) for x, y in zip(xs, ys)) / len(xs)
+print(round(gw, 1), round(gb, 1))`}
+/>
+
+Both gradients are negative — meaning we should *increase* w and b. That's exactly what the training loop does.
+
+## 5. Train it
+
+Now the payoff: loop the gradient-descent update many times and watch the model discover w≈2, b≈1 on its own.
+
+<CodeExercise
+  id="lr-train"
+  prompt="Run gradient descent for 1000 steps and print the learned w, b (rounded to 1)."
+  starter={`xs = [1, 2, 3, 4]
+ys = [3, 5, 7, 9]
+w, b = 0.0, 0.0
+lr = 0.01
+
+for _ in range(1000):
+    gw = sum(2 * (w * x + b - y) * x for x, y in zip(xs, ys)) / len(xs)
+    gb = sum(2 * (w * x + b - y) for x, y in zip(xs, ys)) / len(xs)
+    w -= lr * gw
+    b -= lr * gb
+
+print(round(w, 1), round(b, 1))`}
+  solution={`xs = [1, 2, 3, 4]
+ys = [3, 5, 7, 9]
+w, b = 0.0, 0.0
+lr = 0.01
+for _ in range(1000):
+    gw = sum(2 * (w * x + b - y) * x for x, y in zip(xs, ys)) / len(xs)
+    gb = sum(2 * (w * x + b - y) for x, y in zip(xs, ys)) / len(xs)
+    w -= lr * gw
+    b -= lr * gb
+print(round(w, 1), round(b, 1))`}
+/>
+
+You built a model that learned from data — no libraries, just the math. 🎉
+
+<Homework>
+Make it yours: (1) change the data to follow a different line and confirm it still learns; (2) print the error every 100 steps to watch it fall; (3) try lr = 0.1 and lr = 0.0001 and see what breaks. Then add a second feature so the prediction becomes `w1·x1 + w2·x2 + b`.
+</Homework>

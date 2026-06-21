@@ -3,18 +3,19 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'motion/react';
 import { Brain, Network, Cpu, GraduationCap } from 'lucide-react';
+import { totalCourses, totalLessons } from '@/content/curriculum';
 
 const stats = [
-  { value: '50+', label: 'AI Courses' },
-  { value: '120k+', label: 'Students Enrolled' },
-  { value: '98%', label: 'Completion Rate' },
+  { value: String(totalCourses), label: 'Learning Tracks' },
+  { value: String(totalLessons), label: 'Interactive Lessons' },
+  { value: 'Free', label: 'No Card Needed' },
 ];
 
 const pillars = [
-  { icon: Brain, title: 'Neural Foundations', desc: 'Understand how artificial neurons fire, connect, and learn from data.' },
-  { icon: Network, title: 'Deep Architecture', desc: 'Build and train transformer, CNN, and RNN models from the ground up.' },
-  { icon: Cpu, title: 'Applied AI', desc: 'Ship real-world ML pipelines — from dataset to deployed model.' },
-  { icon: GraduationCap, title: 'Certifications', desc: 'Earn industry-recognized credentials at every stage of mastery.' },
+  { icon: Brain, title: 'Real Foundations', desc: 'Understand what AI actually is and how today’s models work — no hand-waving.' },
+  { icon: Network, title: 'Built From Scratch', desc: 'Implement neurons, gradients, and models yourself, a few lines of Python at a time.' },
+  { icon: Cpu, title: 'Runs In Your Browser', desc: 'Coding lessons execute real Python via WebAssembly. No install, no setup.' },
+  { icon: GraduationCap, title: 'Learn At Your Pace', desc: 'From total beginner to expert, at your own pace. Pick up exactly where you left off.' },
 ];
 
 export const About = () => {
@@ -39,7 +40,7 @@ export const About = () => {
         {/* Section label */}
         <div className="flex items-center gap-6 mb-24">
           <div className="flex items-baseline gap-3">
-            <span className="font-mono text-violet-500 text-sm">02</span>
+            <span className="font-mono text-violet-500 text-sm">03</span>
             <span className="text-xs font-mono uppercase tracking-[0.3em] text-neutral-400">About the Platform</span>
           </div>
           <div className="h-px w-32 bg-gradient-to-r from-violet-500/40 to-transparent" />
@@ -69,7 +70,7 @@ export const About = () => {
                 viewport={{ once: true }}
                 transition={{ delay: 0.2, duration: 0.8 }}
               >
-                TheNeuralNetwork is an AI education platform built for curious minds. Whether you&apos;re writing your first Python script or tuning a large language model, we meet you exactly where you are.
+                TheNeuralNetwork is a free way to learn AI from the ground up. Whether you&apos;re sending your very first prompt or implementing backpropagation, the lessons meet you exactly where you are.
               </motion.p>
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
@@ -77,7 +78,7 @@ export const About = () => {
                 viewport={{ once: true }}
                 transition={{ delay: 0.3, duration: 0.8 }}
               >
-                Every course is crafted by researchers and engineers who build AI for a living — not just write about it. You learn by doing: interactive notebooks, live models, and real datasets.
+                You don&apos;t just read — you practice with quizzes, real-world prompts, and (when you&apos;re ready) runnable Python with auto-checked exercises. The tracks take you from your first prompt to shipping production AI.
               </motion.p>
             </div>
 

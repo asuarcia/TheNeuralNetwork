@@ -1,0 +1,79 @@
+export const meta = {
+  title: "How AI Chatbots Actually Work",
+  summary: "A chatbot is a very good autocomplete. Once you really believe that, all of its strange behavior starts to make sense — no technical background required.",
+};
+
+The AI behind ChatGPT, Claude, and Gemini is called a **large language model** (LLM). It does exactly one thing: given some text, it predicts the next bit of text. Then it adds that bit and predicts again. And again. That loop, run incredibly fast, produces emails, essays, and conversation.
+
+That's not a comforting simplification — it's the actual mechanism. Believe it, and the rest of this lesson clicks into place.
+
+## It reads in chunks called "tokens"
+
+Before anything else, the model breaks your text into small pieces called **tokens** — roughly word-sized, but long or rare words get split up ("unbelievable" might become "un-believ-able"). You don't need to count them, but two practical facts follow:
+
+- Tokens are what you're billed for if you use paid AI tools.
+- Tokens are what fill up the model's limited "memory" for a conversation (more on that later).
+
+A handy rule of thumb: **about 750 words is roughly 1,000 tokens** — a page and a half of text.
+
+<Quiz
+  question="Roughly speaking, what is a 'token'?"
+  options={[
+    "A password that unlocks the AI",
+    "A small chunk of text — about a word — that the model reads and writes in",
+    "A type of AI model",
+    "A picture the model generates"
+  ]}
+  answer={1}
+  explanation="Tokens are word-sized pieces of text. The model processes everything as a sequence of tokens, and they're also the unit of cost and memory."
+/>
+
+## It predicts the next word, over and over
+
+Here's the heart of it. Given the text so far, the model doesn't pull one answer from a shelf — it weighs *every possible next word* and picks a likely one. Given "The sky is", words like "blue" or "clear" are far more likely than "spaghetti," so one of those comes out. Then it repeats for the next word, having now seen "The sky is blue."
+
+The model never plans the whole answer in advance. It commits one word at a time, always chasing the most *plausible* continuation.
+
+<Quiz
+  question="At each step, what is a chatbot really doing?"
+  options={[
+    "Deciding on a complete, final answer all at once",
+    "Choosing a likely next word, then repeating with that word added",
+    "Searching the internet for your exact question",
+    "Copying a pre-written response from its makers"
+  ]}
+  answer={1}
+  explanation="It generates one likely token at a time and feeds each choice back in to pick the next. The whole response is built word by word."
+/>
+
+## Why it's sometimes "creative" — and sometimes random
+
+If the model always grabbed the single most likely word, it would sound stiff and repetitive. So it adds a bit of controlled randomness, often described as **"temperature":**
+
+- **Low temperature** — almost always the safest, most likely word. Focused and consistent. Good for facts and precise tasks.
+- **High temperature** — gives less-likely words a real chance. More surprising and creative — and more likely to wander off. Good for brainstorming.
+
+This is also why asking the same question twice can give two different answers.
+
+## Why this explains its quirks
+
+Once you hold onto "it predicts plausible next words," the frustrating behavior stops being mysterious:
+
+- It **rambles when unsure** — vague topics have many plausible continuations.
+- It **makes things up** — a fake-but-plausible fact or source is, to the model, a great next guess. (This is called a *hallucination* — a whole lesson later.)
+- It's **sensitive to how you phrase things** — different input means different predictions. That's exactly why prompting matters so much.
+
+<Callout type="tip">
+"Confidently wrong" isn't a glitch — it comes straight from the design. The model aims for *plausible*, not *true*. Those usually overlap, but not always — which is why **you** stay in the driver's seat.
+</Callout>
+
+<Callout type="note">
+**Try this:** Ask an AI assistant the same opinion-based question twice in two separate chats — like "suggest a name for a coffee shop." Notice the answers differ. That variation is the controlled randomness from this lesson, live.
+</Callout>
+
+You now know what's under the hood — no code needed. Next: with so many AI tools out there, which one should you actually reach for?
+
+
+<Homework>
+Ask an AI the same open-ended question (like "name a coffee shop") in **three** separate chats and compare the answers. Then ask once and add "be precise and factual." Notice how randomness and your instructions change the output.
+</Homework>

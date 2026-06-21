@@ -1,0 +1,77 @@
+export const meta = {
+  title: "Turning Text into Numbers",
+  summary: "A model can't read words — only numbers. Natural language processing starts with one question: how do we turn a sentence into a vector?",
+};
+
+**Natural Language Processing (NLP)** is teaching machines to work with human language. But models only do math, so step one — for everything from spam filters to ChatGPT — is turning text into numbers.
+
+## Tokenization: splitting text into pieces
+
+First we break text into **tokens** — usually words (modern systems use word-pieces, as you saw in Foundations). The set of all unique tokens is the **vocabulary**.
+
+<CodeExercise
+  id="nlp-vocab"
+  prompt="Build the vocabulary size: count the unique words in the sentence."
+  starter={`text = "the cat sat on the mat"
+# Print the number of unique words (hint: split, then use set)
+`}
+  expected="5"
+  solution={`text = "the cat sat on the mat"
+print(len(set(text.split())))`}
+/>
+
+Six words, but only five *unique* ones ("the" repeats) — so the vocabulary has 5 entries.
+
+## Bag-of-words: counting tokens
+
+The simplest way to turn a document into numbers is **bag-of-words**: just count how often each vocabulary word appears. The document becomes a vector of counts. It throws away word *order* (hence "bag"), but it's a surprisingly strong baseline for classification.
+
+<CodeExercise
+  id="nlp-count"
+  prompt="Count how many times 'the' appears in the text — one entry of its bag-of-words vector."
+  starter={`text = "the cat the dog the bird"
+# Print the count of the word "the"
+`}
+  expected="3"
+  solution={`text = "the cat the dog the bird"
+print(text.split().count("the"))`}
+/>
+
+<Quiz
+  question="What does the 'bag-of-words' representation ignore?"
+  options={[
+    "The words themselves",
+    "The order of the words — it only keeps counts",
+    "The document's length",
+    "Nothing; it keeps everything"
+  ]}
+  answer={1}
+  explanation="Bag-of-words records which words appear and how often, but discards their order. 'dog bites man' and 'man bites dog' look identical to it."
+/>
+
+## One-hot vectors
+
+To represent a *single* word as a vector, we use **one-hot encoding**: a vector as long as the vocabulary, all zeros except a single 1 at that word's position. It's how words enter a network before being turned into richer **embeddings** (a later lesson).
+
+<Callout type="tip">
+Bag-of-words and one-hot are crude — every word is equally distant from every other, so the model has no idea "cat" and "kitten" are related. Fixing that is the whole motivation for embeddings. But for many classification tasks, simple counts already work remarkably well.
+</Callout>
+
+<Quiz
+  question="What is a one-hot vector for a word?"
+  options={[
+    "A vector of the word's letter counts",
+    "A vector of all zeros except a single 1 at that word's position in the vocabulary",
+    "The word's definition as numbers",
+    "A random vector"
+  ]}
+  answer={1}
+  explanation="One-hot encoding marks a word's vocabulary index with a 1 and leaves everything else 0 — a basic way to feed a discrete word into a numeric model."
+/>
+
+You can turn text into count vectors. But raw counts overweight boring common words like "the". Next we fix that with TF-IDF and build a real text classifier.
+
+
+<Homework>
+For the sentence "the cat sat on the mat", build a **bag-of-words** count dictionary (word → count) in code. Then turn it into a count vector given the vocabulary list `["the","cat","sat","on","mat"]`.
+</Homework>

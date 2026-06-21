@@ -5,7 +5,7 @@ import { ArrowUpRight, BookOpen, Flame, Trophy, LogOut, TriangleAlert } from "lu
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { signOut } from "@/lib/auth/actions";
-import { projects } from "@/data/projects";
+import { curriculum } from "@/content/curriculum";
 
 export const metadata: Metadata = {
   title: "Dashboard — TheNeuralNetwork",
@@ -28,7 +28,7 @@ export default async function DashboardPage() {
       "Explorer";
   }
 
-  const recommended = projects.slice(0, 3);
+  const recommended = curriculum.slice(0, 3);
 
   return (
     <main className="min-h-screen bg-neutral-950 pt-32 px-6 pb-24">
@@ -68,7 +68,7 @@ export default async function DashboardPage() {
           {[
             { icon: Flame, label: "Day streak", value: "0" },
             { icon: BookOpen, label: "Lessons completed", value: "0" },
-            { icon: Trophy, label: "Certificates", value: "0" },
+            { icon: Trophy, label: "Courses started", value: "0" },
           ].map((s) => (
             <div key={s.label} className="rounded-2xl border border-white/5 bg-white/[0.02] p-6 flex items-center gap-4">
               <div className="w-11 h-11 rounded-xl bg-violet-500/10 flex items-center justify-center">
@@ -87,7 +87,7 @@ export default async function DashboardPage() {
           <h2 className="text-xs font-mono uppercase tracking-[0.3em] text-neutral-400 mb-6">Continue learning</h2>
           <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] px-8 py-14 text-center">
             <p className="text-lg text-neutral-300 font-light mb-2">Your first interactive course is ready.</p>
-            <p className="text-sm text-neutral-500 mb-6">Written lessons with runnable Python, right in the browser.</p>
+            <p className="text-sm text-neutral-500 mb-6">Plain-language lessons, quizzes, and runnable Python when you&apos;re ready — right in the browser.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/learn/ai-foundations"
@@ -116,10 +116,10 @@ export default async function DashboardPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {recommended.map((course) => {
-              const [level] = course.category.split(" · ");
+              const level = course.level;
               return (
                 <Link
-                  key={course.id}
+                  key={course.slug}
                   href={`/courses/${course.slug}`}
                   className="group rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden hover:border-violet-500/30 transition-colors"
                 >

@@ -1,0 +1,81 @@
+export const meta = { title: "Build a Tokenizer" };
+
+Every language model starts by turning text into numbers. In this notebook you'll build that first step yourself — a tokenizer that splits text, builds a vocabulary, and encodes words into integer IDs. Run the cells in order.
+
+## 1. Split text into tokens
+
+The simplest tokenizer lowercases and splits on spaces. Run it.
+
+<CodeExercise
+  id="tok-split"
+  prompt="Lowercase and split the text into a list of tokens."
+  starter={`text = "the cat sat on the mat"
+tokens = text.lower().split()
+print(tokens)`}
+  expected="['the', 'cat', 'sat', 'on', 'the', 'mat']"
+  solution={`text = "the cat sat on the mat"
+tokens = text.lower().split()
+print(tokens)`}
+/>
+
+## 2. Build a vocabulary
+
+A **vocabulary** maps each unique token to an integer ID. We sort the unique tokens so the mapping is stable. Build it and check its size.
+
+<CodeExercise
+  id="tok-vocab"
+  prompt="Build a {token: id} vocabulary from the unique tokens and print how many entries it has."
+  starter={`tokens = "the cat sat on the mat".lower().split()
+vocab = {tok: i for i, tok in enumerate(sorted(set(tokens)))}
+print(len(vocab))`}
+  expected="5"
+  solution={`tokens = "the cat sat on the mat".lower().split()
+vocab = {tok: i for i, tok in enumerate(sorted(set(tokens)))}
+print(len(vocab))`}
+/>
+
+Six words, five unique — "the" appears twice but gets one ID.
+
+## 3. Encode text to IDs
+
+Now convert any text into the integer sequence a model actually consumes.
+
+<CodeExercise
+  id="tok-encode"
+  prompt="Encode the sentence into its list of token IDs using the vocabulary."
+  starter={`tokens = "the cat sat on the mat".lower().split()
+vocab = {tok: i for i, tok in enumerate(sorted(set(tokens)))}
+
+encoded = [vocab[t] for t in tokens]
+print(encoded)`}
+  expected="[4, 0, 3, 2, 4, 1]"
+  solution={`tokens = "the cat sat on the mat".lower().split()
+vocab = {tok: i for i, tok in enumerate(sorted(set(tokens)))}
+encoded = [vocab[t] for t in tokens]
+print(encoded)`}
+/>
+
+Those numbers — `[4, 0, 3, 2, 4, 1]` — are exactly what gets fed into an embedding layer. You've built the front door of every language model.
+
+## 4. Toward subwords (BPE)
+
+Real tokenizers don't use whole words — they use **subwords**, learned by Byte-Pair Encoding (BPE): repeatedly merge the most frequent adjacent pair of symbols. Here's the core move — find the most common adjacent pair in a sequence.
+
+<CodeExercise
+  id="tok-bpe"
+  prompt="Find the most frequent adjacent pair of characters in the word."
+  starter={`from collections import Counter
+word = list("lowlowlow")
+pairs = Counter(zip(word, word[1:]))
+print(pairs.most_common(1)[0][0])`}
+  solution={`from collections import Counter
+word = list("lowlowlow")
+pairs = Counter(zip(word, word[1:]))
+print(pairs.most_common(1)[0][0])`}
+/>
+
+Merge that pair into a single symbol, repeat a few hundred times, and you've learned a subword vocabulary — exactly how GPT's tokenizer is built.
+
+<Homework>
+Level it up: (1) add a decoder that turns IDs back into text and confirm encode→decode round-trips; (2) handle punctuation by splitting it into its own tokens; (3) implement a few real BPE merge steps: repeatedly find the top pair and replace it with a new merged symbol, printing the vocabulary as it grows.
+</Homework>

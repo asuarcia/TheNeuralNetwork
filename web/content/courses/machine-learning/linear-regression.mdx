@@ -3,7 +3,7 @@ export const meta = {
   summary: "The most important model in all of ML is a straight line. Understand it deeply and everything else is a variation.",
 };
 
-**Linear regression** fits a straight line through your data and uses it to predict. It's the "hello world" of machine learning — and the core idea inside far more complex models.
+**Linear regression** fits a straight line through your data and uses it to predict. It's the "hello world" of machine learning — and the core idea inside far more complex models, including the neuron you'll build in the next track.
 
 ## The model is one equation
 
@@ -23,22 +23,6 @@ def predict(x, w, b):
 print(predict(100, 3, 0))   # 300
 ```
 
-**Learning** linear regression means finding the `w` and `b` that make the line fit the data best — usually by minimizing error, which is the next lesson.
-
-<Quiz
-  question="In prediction = w · x + b, what does increasing w do?"
-  options={[
-    "Shifts the whole line up without changing its tilt",
-    "Makes the line steeper — predictions change faster as x grows",
-    "Has no effect on predictions",
-    "Only matters when x is zero"
-  ]}
-  answer={1}
-  explanation="w is the slope. Larger w means the prediction grows faster with x. b (the bias) is what shifts the line up or down."
-/>
-
-## Your turn
-
 <CodeExercise
   id="lr-predict"
   prompt="A model has weight w = 3 and bias b = 5. Print its prediction for x = 100."
@@ -54,4 +38,88 @@ x = 100
 print(w * x + b)`}
 />
 
-You just ran inference on a real model. The only thing left is teaching the machine to pick `w` and `b` for you — which starts with measuring how wrong it is.
+<Quiz
+  question="In prediction = w · x + b, what does increasing w do?"
+  options={[
+    "Shifts the whole line up without changing its tilt",
+    "Makes the line steeper — predictions change faster as x grows",
+    "Has no effect on predictions",
+    "Only matters when x is zero"
+  ]}
+  answer={1}
+  explanation="w is the slope. Larger w means the prediction grows faster with x. b (the bias) is what shifts the line up or down."
+/>
+
+## What does "best fit" mean?
+
+There are infinitely many lines. **Learning** means picking the `w` and `b` whose line sits closest to the data. To make "closest" precise, we measure error with **Mean Squared Error (MSE)** — the average of the squared gaps between prediction and truth:
+
+```text
+MSE = average of (prediction - actual)²
+```
+
+Squaring does two things: it makes all errors positive, and it punishes big misses far more than small ones. The best line is the one with the **smallest MSE**.
+
+<CodeExercise
+  id="lr-mse"
+  prompt="The data follows y = 2x exactly, and w=2, b=0. Print the MSE (it should be 0.0 — a perfect fit)."
+  starter={`xs = [1, 2, 3]
+ys = [2, 4, 6]   # true relationship: y = 2x
+w, b = 2, 0
+# Print the mean squared error of w*x + b vs ys
+`}
+  expected="0.0"
+  solution={`xs = [1, 2, 3]
+ys = [2, 4, 6]
+w, b = 2, 0
+preds = [w * x + b for x in xs]
+print(sum((p - y) ** 2 for p, y in zip(preds, ys)) / len(ys))`}
+/>
+
+Zero error — the line passes through every point. Change `w` to 3 and watch the MSE shoot up. Training is the search for the `w` and `b` that drive this number to its minimum, which is exactly what gradient descent does later in this track.
+
+## More than one feature
+
+Real problems have many features — size, bedrooms, age. The model just gains one weight per feature, and the prediction becomes a **dot product** plus the bias (you built dot products in the Python for AI track):
+
+```text
+prediction = w₁x₁ + w₂x₂ + ... + b
+```
+
+<CodeExercise
+  id="lr-multi"
+  prompt="Predict with two features. prediction = dot(features, weights) + bias."
+  starter={`features = [2, 3]      # e.g. [bedrooms, bathrooms]
+weights  = [10, 20]
+bias     = 5
+# Print the prediction: dot product of features and weights, plus bias
+`}
+  expected="85"
+  solution={`features = [2, 3]
+weights  = [10, 20]
+bias     = 5
+print(sum(f * w for f, w in zip(features, weights)) + bias)`}
+/>
+
+<Callout type="tip">
+That weighted sum plus a bias — <code>w·x + b</code> — is <em>literally</em> what a single neuron computes. Linear regression isn't just a model; it's the atom that deep learning is built from. Learn it cold here and the next track is half done.
+</Callout>
+
+<Quiz
+  question="Why does MSE square the errors instead of just averaging the raw gaps?"
+  options={[
+    "To make the math harder",
+    "Squaring makes all errors positive and penalizes large mistakes much more than small ones",
+    "It's faster to compute",
+    "So the result is always a whole number"
+  ]}
+  answer={1}
+  explanation="Squaring removes sign (so positive and negative errors don't cancel) and disproportionately punishes big misses, pushing the fit to avoid large errors."
+/>
+
+You can predict with one or many features and measure the fit with MSE. But what if the answer isn't a number, but a *category* — spam or not? That needs a twist on this same equation: logistic regression.
+
+
+<Homework>
+For the data `xs=[1,2,3]`, `ys=[2,4,6]`, try three values of **w** (1, 2, 3) with b=0 and compute the MSE of each. Print which w gives the lowest error — you've just done a tiny manual version of training.
+</Homework>

@@ -3,7 +3,7 @@ export const meta = {
   summary: "Machine learning flips programming on its head: instead of writing the rules, you show examples and let the machine find the rule.",
 };
 
-In normal programming, *you* write the rules. In machine learning, you provide **examples** and the computer figures out the rule that fits them. That shift is the whole game.
+In normal programming, *you* write the rules. In machine learning, you provide **examples** and the computer figures out the rule that fits them. That shift is the whole game — and it changes how you think about a problem.
 
 ## Features and labels
 
@@ -14,15 +14,6 @@ A labeled example has two parts:
 
 Learning means finding a function from features → label that works on examples *and* generalizes to new ones.
 
-## Supervised vs unsupervised
-
-- **Supervised**: you have labels (prices, spam tags). Most practical ML.
-- **Unsupervised**: no labels — you ask the model to find structure, like grouping similar customers.
-
-<Callout type="note">
-Generalization is the point. A model that memorizes the training answers but fails on new data has learned nothing useful. We'll measure exactly this in lesson 3.
-</Callout>
-
 <Quiz
   question="You're predicting house prices from house size. Which is the label?"
   options={["The size", "The price", "Both", "Neither — there are no labels here"]}
@@ -30,13 +21,23 @@ Generalization is the point. A model that memorizes the training answers but fai
   explanation="The label is what you predict (price). The size is the feature (input). With labels present, this is supervised learning."
 />
 
-## Your turn
+## Supervised vs. unsupervised
 
-Before modeling, you always sanity-check your data. Compute the average label.
+- **Supervised** — you have labels (prices, spam tags) and learn to predict them. Most practical ML, and the focus of this track.
+- **Unsupervised** — no labels; you ask the model to find structure, like grouping similar customers (clustering) or compressing features.
+
+Within supervised learning there are two flavors you'll meet this track:
+
+- **Regression** — predict a *number* (price, temperature). 
+- **Classification** — predict a *category* (spam/ham, cat/dog).
+
+## The baseline: always start here
+
+Before anything fancy, build the dumbest possible model and measure it. For regression, that's "predict the average every time." It sounds useless — but it's the bar every real model must clear.
 
 <CodeExercise
   id="ml-avg-label"
-  prompt="prices is the label column (in thousands). Print the average price."
+  prompt="prices is the label column (in thousands). Print the average — your regression baseline."
   starter={`sizes  = [50, 80, 120]    # feature: square meters
 prices = [150, 240, 360]  # label: price (thousands)
 # Print the average price
@@ -47,4 +48,45 @@ prices = [150, 240, 360]
 print(sum(prices) / len(prices))`}
 />
 
-Predicting that average for every house is your **baseline**. Next, you'll beat it by actually using the size.
+Predicting 250 for every house is your baseline. Next lesson, you'll beat it by actually *using* the size.
+
+## Generalization and the train/test split
+
+Here's the rule that humbles every beginner: **a model that memorizes the training answers but fails on new data has learned nothing.** The point isn't to fit the data you have — it's to predict data you *don't*.
+
+To check honestly, you split your data: **train** on most of it, then **test** on a held-out slice the model never saw. Performance on that test set is your real estimate of how it'll do in the wild.
+
+<CodeExercise
+  id="ml-split"
+  prompt="Use the first 80% of the data for training. Print the training portion."
+  starter={`data = [10, 20, 30, 40, 50]
+# Compute the 80% split index and print data up to that index
+`}
+  expected="[10, 20, 30, 40]"
+  solution={`data = [10, 20, 30, 40, 50]
+split = int(len(data) * 0.8)
+print(data[:split])`}
+/>
+
+<Callout type="warning">
+Never evaluate on data the model trained on. A model graded on its own study notes always looks smarter than it is. The held-out test set is your only honest scoreboard.
+</Callout>
+
+<Quiz
+  question="Why hold out a separate test set instead of measuring on all your data?"
+  options={[
+    "To save computation",
+    "Because the goal is performance on unseen data — testing on training data overstates how good the model really is",
+    "Test sets are required by law",
+    "It makes training faster"
+  ]}
+  answer={1}
+  explanation="Generalization is the goal. A model can memorize training data and look perfect, yet fail on new inputs. The held-out test set reveals that gap."
+/>
+
+You've got the mindset: features and labels, a baseline to beat, and an honest way to measure. Now let's build the first real model that beats the baseline — linear regression.
+
+
+<Homework>
+Take a list of 10 numbers and split it **70/30** into training and test sets in code. Print the size of each. Then explain in a sentence why the test set must stay untouched until the very end.
+</Homework>

@@ -1,34 +1,25 @@
 export const meta = {
   title: "Shipping AI Responsibly",
-  summary: "A demo that works once is easy. A system people trust in production needs evaluation, monitoring, and a conscience.",
+  summary: "A demo that works once is easy. A system people trust in production needs evaluation, monitoring, guardrails, and a conscience.",
 };
 
-Getting a model to work in a notebook is the start, not the finish. Shipping AI that people rely on means owning what happens after launch.
+Getting a model to work in a notebook is the start, not the finish. Shipping AI that people rely on means owning what happens after launch — when real users send inputs you never imagined, costs scale, and the world keeps changing.
 
-## Four things that separate a demo from a product
+## What separates a demo from a product
 
-- **Evaluation** — measure quality on a real test set *before* shipping, and re-check after every change. "It felt good in the demo" is not a metric.
+- **Evaluation** — measure quality on a real test set *before* shipping, and re-check after every change (you built this last lesson). "It felt good in the demo" is not a metric.
 - **Monitoring** — watch latency, cost, error rates, and quality drift in production. Models degrade as the world changes.
-- **Safety & bias** — check that the system behaves fairly across groups, and add guardrails for harmful or out-of-scope requests.
-- **Privacy** — be deliberate about what user data you send to a model or store, and for how long.
+- **Guardrails** — filter harmful or out-of-scope requests on the way in, and unsafe content on the way out.
+- **Safety & bias** — check the system behaves fairly across groups, and red-team it for misuse before attackers do.
+- **Privacy & governance** — be deliberate about what user data you send to a model or store, for how long, and who's accountable.
 
 <Callout type="tip">
-The cheapest time to catch a problem is before launch (evaluation); the next cheapest is the moment it starts (monitoring). Everything after that is damage control.
+The cheapest time to catch a problem is before launch (evaluation); the next cheapest is the moment it starts (monitoring). Everything after that is damage control — and damage control with AI can mean headlines.
 </Callout>
 
-<Quiz
-  question="Your model passed its launch eval months ago and you haven't touched it. Why might quality still drop?"
-  options={[
-    "Models physically wear out over time",
-    "The real-world data distribution drifts away from what the model saw — so ongoing monitoring matters",
-    "Quality never drops if the code is unchanged",
-    "Only if the server restarts"
-  ]}
-  answer={1}
-  explanation="Data drift: the inputs people send change over time, so a static model gets relatively worse. Monitoring catches this; periodic re-evaluation and retraining fix it."
-/>
+## Monitoring: watch it in production
 
-## Your turn — a monitoring check
+You can't fix what you can't see. Production AI needs live dashboards on latency, cost per request, error rate, and output quality. Start with the basics — like counting requests that blow the latency budget.
 
 <CodeExercise
   id="ship-latency"
@@ -43,8 +34,69 @@ budget = 500
 print(sum(1 for ms in latencies if ms > budget))`}
 />
 
-That counter, tracked over time and alerted on, is a real production monitor. Build the habit of measuring, and your AI earns trust instead of just demos.
+<Quiz
+  question="Your model passed its launch eval months ago and you haven't touched it. Why might quality still drop?"
+  options={[
+    "Models physically wear out over time",
+    "The real-world data distribution drifts away from what the model saw — so ongoing monitoring matters",
+    "Quality never drops if the code is unchanged",
+    "Only if the server restarts"
+  ]}
+  answer={1}
+  explanation="Data drift: the inputs people send change over time, so a static model gets relatively worse. Monitoring catches this; periodic re-evaluation and retraining fix it."
+/>
 
----
+## Detecting drift automatically
 
-That completes the core curriculum — from "what is AI" to shipping it responsibly. From here it's depth: more lessons per track, and hands-on capstones.
+Don't wait for users to complain. Compare current quality against your launch baseline and alert when it slips past a threshold — a simple, automatable check.
+
+<CodeExercise
+  id="ship-drift"
+  prompt="Alert if accuracy has dropped more than 0.05 from the baseline. Print 'alert' or 'ok'."
+  starter={`baseline_acc = 0.90
+current_acc = 0.78
+# Print "alert" if the drop exceeds 0.05, else "ok"
+`}
+  expected="alert"
+  solution={`baseline_acc = 0.90
+current_acc = 0.78
+print("alert" if baseline_acc - current_acc > 0.05 else "ok")`}
+/>
+
+A 12-point drop trips the alert — you find out from your monitoring, not from an angry customer.
+
+## Guardrails and red-teaming
+
+Users (and attackers) will send things you didn't plan for. Defense in depth:
+
+- **Input filtering** — block prompt injection, abuse, and out-of-scope requests.
+- **Output filtering** — catch toxic, unsafe, or policy-violating generations before they reach the user.
+- **Red-teaming** — deliberately attack your own system to find failures first. Assume someone will try to jailbreak it, because they will.
+- **Human-in-the-loop** — require human approval for high-stakes actions (the agent guardrails from Applied AI apply double in production).
+
+<Quiz
+  question="What is 'red-teaming' an AI system?"
+  options={[
+    "Painting the UI red for warnings",
+    "Deliberately probing your own system for failures, jailbreaks, and misuse before real attackers find them",
+    "A type of model architecture",
+    "Running the model on a backup server"
+  ]}
+  answer={1}
+  explanation="Red-teaming is adversarial self-testing: you attack your own system to surface harmful outputs, jailbreaks, and edge cases so you can fix them before deployment."
+/>
+
+## The bigger picture
+
+Responsible AI isn't a checkbox at the end — it's woven through everything you've learned. The risks from Foundations (hallucination, bias, privacy, injection), the honest evaluation from this track, the guardrails from agents — they all converge here. Regulation (the EU AI Act and others) increasingly *requires* this diligence, but the real reason to do it is simpler: systems that are measured, monitored, and guarded earn trust. Systems that aren't, eventually break it.
+
+<Callout type="note">
+You've come the whole way — from "what is AI" to deploying generative models responsibly at scale. The next move is to <strong>build</strong>: pick a project, ship something real, and put every layer of this into practice.
+</Callout>
+
+**That completes the curriculum.** Five tracks, from first principles to production. Now go build something — the Projects bank is waiting.
+
+
+<Homework>
+Pick a real AI feature you'd ship. Write a **5-item pre-launch checklist** covering evaluation, monitoring, a guardrail, a privacy decision, and a rollback plan. For each item, name the one signal you'd watch after launch.
+</Homework>

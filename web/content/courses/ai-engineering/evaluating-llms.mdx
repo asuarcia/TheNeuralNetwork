@@ -1,0 +1,91 @@
+export const meta = {
+  title: "Evaluating LLMs",
+  summary: "How do you grade an open-ended answer? Evaluating generative models is genuinely hard — and getting it wrong means shipping regressions you never see.",
+};
+
+In the ML track, evaluation was clean: compare predictions to labels, compute accuracy or MAE. But how do you score *"write a friendly support reply"*? There's no single right answer. Evaluating LLMs is one of the hardest, most underrated problems in AI engineering — and skipping it is how teams ship silent regressions.
+
+## Why it's hard
+
+- **Open-ended outputs** — many different responses can be equally good. Exact-match breaks instantly.
+- **Quality is multi-dimensional** — correct, but also helpful? safe? concise? on-brand?
+- **Non-determinism** — the same prompt can give different answers (temperature), so a single run proves little.
+- **No labels** — you usually don't have a "gold" answer to compare against.
+
+<Quiz
+  question="Why can't you evaluate an open-ended LLM task with simple exact-match accuracy?"
+  options={[
+    "Exact-match is too slow",
+    "Many different responses can be correct, so demanding one exact string wrongly fails good answers",
+    "LLMs always give the same answer",
+    "Accuracy can't be computed for text"
+  ]}
+  answer={1}
+  explanation="Open-ended generation has many valid outputs. Exact-match only works for constrained tasks (classification, extraction) where the correct answer is a fixed string."
+/>
+
+## When you CAN use hard metrics
+
+For *structured* tasks — classification, extraction, "respond with yes/no/JSON" — exact-match is perfect and you should use it. This is where you fall back on the ML-track metrics.
+
+<CodeExercise
+  id="eval-exact"
+  prompt="For a structured yes/no task, print the exact-match accuracy (fraction correct), rounded to 2."
+  starter={`preds = ["yes", "no", "yes"]
+gold  = ["yes", "yes", "yes"]
+# Print exact-match accuracy: correct / total, rounded to 2 decimals
+`}
+  expected="0.67"
+  solution={`preds = ["yes", "no", "yes"]
+gold  = ["yes", "yes", "yes"]
+correct = sum(1 for p, g in zip(preds, gold) if p == g)
+print(round(correct / len(gold), 2))`}
+/>
+
+## Benchmarks and their limits
+
+Public benchmarks — **MMLU** (knowledge), **HumanEval** (coding), **GSM8K** (math) — let you compare models on standardized tests. They're useful for picking a base model, but beware: a high benchmark score doesn't guarantee good performance on *your* specific task, and benchmarks can leak into training data ("contamination"), inflating scores.
+
+## LLM-as-judge
+
+The clever trick that scales open-ended evaluation: use a strong model to **grade** another model's output against a rubric. "On a scale of 1–5, how helpful and accurate is this reply?" You aggregate the judge's scores across a test set.
+
+<CodeExercise
+  id="eval-judge"
+  prompt="An LLM judge rated four responses on a 1–5 scale. Print the average score."
+  starter={`scores = [4, 5, 3, 4]
+# Print the average judge score
+`}
+  expected="4.0"
+  solution={`scores = [4, 5, 3, 4]
+print(sum(scores) / len(scores))`}
+/>
+
+It's not perfect — judges have biases (they favor longer answers, their own style) — but calibrated against some human ratings, LLM-as-judge is fast, cheap, and consistent enough to catch regressions.
+
+<Quiz
+  question="What is 'LLM-as-judge' evaluation?"
+  options={[
+    "Letting the model grade its own training",
+    "Using a strong model to score another model's open-ended outputs against a rubric, at scale",
+    "Asking users to rate every response",
+    "A benchmark dataset"
+  ]}
+  answer={1}
+  explanation="LLM-as-judge uses a capable model to rate outputs on defined criteria, making open-ended evaluation scalable and repeatable where exact-match can't apply."
+/>
+
+## Build an eval set and never lose it
+
+The single most valuable engineering habit here: maintain a **regression test set** — a fixed collection of representative inputs with known-good behavior. Run it on every prompt change, model swap, or fine-tune, *before* shipping. This is how you answer "did my change make things better or worse?" with data instead of vibes.
+
+<Callout type="tip">
+Treat prompts and models like code: nothing ships without passing the eval suite. The teams that move fastest with LLMs aren't the ones who skip evaluation — they're the ones who automated it. A good eval set is a moat.
+</Callout>
+
+You can now measure a generative system honestly. The final lesson zooms out to everything *around* the model — the practices that turn a working prototype into a system people can trust.
+
+
+<Homework>
+Build a tiny eval set: 5 questions with known answers. Compute **exact-match accuracy** for a set of predictions, and separately average a 1–5 "judge" score over four responses. Then explain when exact-match won't work and you'd need the judge.
+</Homework>

@@ -1,0 +1,87 @@
+export const meta = {
+  title: "The Ethics of Generative AI",
+  summary: "Generative AI can create anything — including things it shouldn't. The technical skill comes with a responsibility to understand the harms and the safeguards.",
+};
+
+You can now build systems that generate realistic text, images, and more. That power is genuinely dual-use, so finishing this track means understanding where generative AI causes harm — and what's being done about it.
+
+## Deepfakes and synthetic media
+
+Generative models can fabricate convincing images, audio, and video of real people saying or doing things they never did — **deepfakes**. The upside (film, accessibility, art) is real, but so is the harm: fraud, non-consensual imagery, and political disinformation.
+
+A practical defense is **detection** — flagging content that's likely synthetic when a detector's confidence is high.
+
+<CodeExercise
+  id="ethics-flag"
+  prompt="A deepfake detector scored a video 0.92. If confidence exceeds 0.8, flag it. Print 'flag' or 'ok'."
+  starter={`confidence = 0.92
+threshold = 0.8
+# Print "flag" if confidence > threshold, else "ok"
+`}
+  expected="flag"
+  solution={`confidence = 0.92
+threshold = 0.8
+print("flag" if confidence > threshold else "ok")`}
+/>
+
+<CodeExercise
+  id="ethics-count"
+  prompt="A platform scored uploads for being synthetic. Count how many should be flagged (score above 0.8)."
+  starter={`scores = [0.9, 0.4, 0.85, 0.2]
+# Count how many uploads exceed the 0.8 threshold
+`}
+  expected="2"
+  solution={`scores = [0.9, 0.4, 0.85, 0.2]
+print(sum(1 for s in scores if s > 0.8))`}
+/>
+
+<Quiz
+  question="What is a 'deepfake'?"
+  options={[
+    "A blurry photo",
+    "Synthetic media that convincingly depicts real people doing or saying things they never did",
+    "A type of GPU",
+    "A training dataset"
+  ]}
+  answer={1}
+  explanation="Deepfakes are AI-generated images, audio, or video that realistically fabricate real people — a serious risk for fraud, harassment, and disinformation."
+/>
+
+## Copyright and training data
+
+Generative models learn from enormous datasets scraped from the internet — often including **copyrighted** art, writing, and code, used without explicit consent. This raises hard, still-unsettled questions:
+
+- Who owns an AI-generated image trained on millions of artists' work?
+- Should creators be able to opt out, or be compensated?
+- Can a model "memorize" and reproduce training examples too closely?
+
+These are active legal and ethical debates in 2026, with real lawsuits shaping the answers.
+
+## Bias, consent, and provenance
+
+- **Bias** — generative models reflect and can amplify biases in their training data (e.g., stereotyped depictions). The fairness lessons from Foundations apply directly.
+- **Consent** — using someone's likeness or an artist's style without permission is an ethical (and increasingly legal) problem.
+- **Provenance** — knowing whether content is AI-made. Approaches include **watermarking** generated outputs and content-credential standards (like C2PA) that attach a verifiable "made by AI" label.
+
+<Callout type="warning">
+As a builder, you're responsible for what your systems can do. Add guardrails against generating harmful content, be transparent that content is AI-generated, respect consent and copyright, and watermark outputs where you can. "I just built the tool" is not a sufficient answer when the tool causes harm.
+</Callout>
+
+<Quiz
+  question="Which of these is a genuine, unresolved ethical issue with generative AI?"
+  options={[
+    "Models run too fast",
+    "Training on copyrighted work without consent, and the resulting questions of ownership and compensation",
+    "Images have too many pixels",
+    "Prompts are too short"
+  ]}
+  answer={1}
+  explanation="Training data often includes copyrighted material used without consent, raising open questions about ownership, compensation, and reproduction — actively debated and litigated."
+/>
+
+**That completes Generative AI & Diffusion — and the entire expanded curriculum.** From "what is AI" for total beginners, through Python, math, machine learning, deep learning, computer vision, NLP, reinforcement learning, applied engineering, and now generative models — you've covered the full landscape of modern AI. The only thing left is to keep building. The Projects bank is the place to start.
+
+
+<Homework>
+Choose a real generative-AI use case (e.g. an AI headshot app, a marketing-copy tool). List **two concrete harms** it could cause and **two mitigations** you'd build in (such as watermarking, consent checks, or output filtering). This is the builder's responsibility in practice.
+</Homework>

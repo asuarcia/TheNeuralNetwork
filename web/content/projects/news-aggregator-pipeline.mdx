@@ -1,0 +1,86 @@
+export const meta = { title: "The Automated News Aggregator Pipeline" };
+
+You'll build a hands-off pipeline that takes raw articles, normalizes them, summarizes each, and assembles a clean digest — the backbone of any "daily brief" automation. Run the cells in order.
+
+## 1. The raw feed
+
+Articles arrive in messy, varied shapes. Here's a small batch.
+
+<CodeExercise
+  id="na-feed"
+  prompt="Store the incoming articles and print how many arrived."
+  starter={`articles = [
+    {"title": "Markets rally", "body": "Stocks rose sharply today. Investors cheered the news."},
+    {"title": "New AI model", "body": "A lab released a fast model. It runs on a laptop."},
+    {"title": "Storm warning", "body": "Heavy rain is expected tomorrow. Stay indoors if possible."},
+]
+print(len(articles))`}
+  expected="3"
+  solution={`articles = [
+    {"title": "Markets rally", "body": "Stocks rose sharply today. Investors cheered the news."},
+    {"title": "New AI model", "body": "A lab released a fast model. It runs on a laptop."},
+    {"title": "Storm warning", "body": "Heavy rain is expected tomorrow. Stay indoors if possible."},
+]
+print(len(articles))`}
+/>
+
+## 2. Summarize each article
+
+A real pipeline sends each article to an LLM with a templated prompt. We'll simulate the summarizer by taking the first sentence — the point is the **consistent template**, applied to every item automatically.
+
+<CodeExercise
+  id="na-summarize"
+  prompt="Summarize each article (first sentence) into a formatted digest line."
+  starter={`articles = [
+    {"title": "Markets rally", "body": "Stocks rose sharply today. Investors cheered the news."},
+    {"title": "New AI model", "body": "A lab released a fast model. It runs on a laptop."},
+    {"title": "Storm warning", "body": "Heavy rain is expected tomorrow. Stay indoors if possible."},
+]
+
+def summarize(body):
+    return body.split(".")[0].strip() + "."
+
+for a in articles:
+    print("- " + a["title"] + ": " + summarize(a["body"]))`}
+  solution={`articles = [
+    {"title": "Markets rally", "body": "Stocks rose sharply today. Investors cheered the news."},
+    {"title": "New AI model", "body": "A lab released a fast model. It runs on a laptop."},
+    {"title": "Storm warning", "body": "Heavy rain is expected tomorrow. Stay indoors if possible."},
+]
+def summarize(body):
+    return body.split(".")[0].strip() + "."
+for a in articles:
+    print("- " + a["title"] + ": " + summarize(a["body"]))`}
+/>
+
+One templated function, applied to every article — that consistency is what makes a pipeline reliable instead of a pile of one-off scripts.
+
+## 3. Make it robust
+
+Real feeds have missing fields and duplicates. A production pipeline is **idempotent** (re-running doesn't duplicate) and handles bad input gracefully. Here's a defensive version that skips empty articles.
+
+<CodeExercise
+  id="na-robust"
+  prompt="Filter out articles with an empty body before summarizing; print how many survive."
+  starter={`articles = [
+    {"title": "Markets rally", "body": "Stocks rose today."},
+    {"title": "Broken feed", "body": ""},
+    {"title": "Storm warning", "body": "Heavy rain expected."},
+]
+clean = [a for a in articles if a["body"].strip()]
+print(len(clean))`}
+  expected="2"
+  solution={`articles = [
+    {"title": "Markets rally", "body": "Stocks rose today."},
+    {"title": "Broken feed", "body": ""},
+    {"title": "Storm warning", "body": "Heavy rain expected."},
+]
+clean = [a for a in articles if a["body"].strip()]
+print(len(clean))`}
+/>
+
+The broken article is dropped before it can crash the summarizer — exactly the kind of guard a hands-off pipeline needs.
+
+<Homework>
+Ship it: (1) replace the fake summarizer with a real LLM API call using a fixed prompt template; (2) pull articles from an RSS feed or news API instead of a hard-coded list; (3) de-duplicate by title; (4) format the digest as Markdown and "send" it (print or email). Then schedule it to run every morning.
+</Homework>

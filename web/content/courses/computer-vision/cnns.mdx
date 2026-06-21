@@ -1,0 +1,90 @@
+export const meta = {
+  title: "Convolutional Neural Networks",
+  summary: "Stack learned convolution filters into layers and you get a CNN — the architecture that cracked image recognition. Here's how it builds understanding, layer by layer.",
+};
+
+A **Convolutional Neural Network (CNN)** is what you get when you make convolution *learnable* and stack it deep. It's the architecture behind face unlock, medical imaging, self-driving perception, and the image half of multimodal models.
+
+## Layers of learned filters
+
+Each convolutional layer holds many filters, and the network **learns their values** through gradient descent (exactly like the weights in any neural net). Early layers learn simple patterns; later layers combine those into complex ones:
+
+- **Layer 1** learns edges and color blobs.
+- **Layer 2** combines edges into corners, curves, and textures.
+- **Layer 3+** combines those into parts — an eye, a wheel, a letter.
+- **Final layers** combine parts into whole objects — a face, a car, a digit.
+
+This **hierarchy of features** — simple to complex — is why deep CNNs work so well. Nobody programmed "eye detector"; the network discovered it.
+
+<CodeExercise
+  id="cnn-apply"
+  prompt="A neuron in a conv layer applies its 2x2 filter to a patch. Multiply matching cells and sum to get the feature value."
+  starter={`patch  = [[2, 0],
+          [1, 3]]
+filter = [[1, 1],
+          [1, 1]]
+# Sum of patch[i][j] * filter[i][j] — this filter sums the patch
+`}
+  expected="6"
+  solution={`patch  = [[2, 0], [1, 3]]
+filter = [[1, 1], [1, 1]]
+print(sum(p * f for prow, frow in zip(patch, filter) for p, f in zip(prow, frow)))`}
+/>
+
+<Quiz
+  question="In a deep CNN, what do the EARLY layers typically learn?"
+  options={[
+    "Whole objects like faces and cars",
+    "Simple patterns like edges and color blobs",
+    "The final class label",
+    "Nothing — only the last layer learns"
+  ]}
+  answer={1}
+  explanation="Early layers detect simple, local patterns (edges, colors). Deeper layers combine these into increasingly complex features, ending with whole objects."
+/>
+
+## Why not just use a regular (dense) network?
+
+You *could* flatten an image into one long vector and feed it to a normal network — but it falls apart fast:
+
+- **Too many weights.** A 1000×1000 color image is 3 million inputs; a single dense layer would need billions of weights.
+- **No sense of place.** A dense layer treats the top-left pixel as unrelated to its neighbor. Convolution builds in **locality**.
+- **No reuse.** A cat in the corner and a cat in the center would need separately-learned detectors. Convolution's **weight sharing** detects it anywhere with one filter.
+
+CNNs fix all three: small shared filters, slid everywhere, stacked deep.
+
+<CodeExercise
+  id="cnn-params"
+  prompt="A single 3x3 convolution filter has 9 weights plus 1 bias. Print its total parameter count."
+  starter={`filter_size = 3
+# weights = filter_size * filter_size, plus 1 bias. Print the total.
+`}
+  expected="10"
+  solution={`filter_size = 3
+print(filter_size * filter_size + 1)`}
+/>
+
+Just 10 numbers — and that *same* filter scans the entire image. Compare that to a dense layer's millions, and you see why convolution was the breakthrough.
+
+<Callout type="tip">
+Training a CNN is still the same loop you know: forward pass → loss → backprop → update. The only new idea is the convolution layer. Everything from the Deep Learning track carries straight over.
+</Callout>
+
+<Quiz
+  question="Why are CNNs far more efficient than dense networks for images?"
+  options={[
+    "They use bigger images",
+    "Small shared filters mean far fewer weights, and they reuse the same pattern detector across the whole image",
+    "They skip the training step",
+    "They don't use convolution"
+  ]}
+  answer={1}
+  explanation="Weight sharing and locality let a tiny filter (e.g., 10 parameters) scan an entire image, instead of needing millions of independent weights like a dense layer."
+/>
+
+CNNs build rich features — but the maps get large. Next we shrink them with pooling and tour the famous architectures that won the field.
+
+
+<Homework>
+Convolve a 3×3 filter of all 1s over a 3×3 image patch of your choice (multiply matching cells, sum). Then explain in two sentences why a CNN needs **far fewer** parameters than a dense network for the same image.
+</Homework>

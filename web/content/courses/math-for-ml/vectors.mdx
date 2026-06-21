@@ -1,0 +1,90 @@
+export const meta = {
+  title: "Vectors & Linear Algebra",
+  summary: "Linear algebra sounds scary; it's really just organized lists of numbers and a few operations on them. Those operations are what every model runs on.",
+};
+
+Machine learning is built on **linear algebra** — but you need far less of it than a textbook implies. At its heart, linear algebra is about **vectors** (lists of numbers) and **matrices** (grids of numbers), and a handful of operations you can learn in an afternoon.
+
+## A vector is a list of numbers
+
+You met vectors in the Python track; here we make them precise. A vector is an ordered list of numbers, and in ML it represents *one thing* described by several measurements — a house as `[size, bedrooms, age]`, or a word as a long list of learned numbers (an embedding).
+
+```python
+u = [1, 2, 3]
+v = [4, 5, 6]
+```
+
+## Adding and scaling
+
+Two operations come up constantly. **Addition** combines vectors slot by slot. **Scaling** multiplies every number by one value (a *scalar*) — stretching or shrinking the vector.
+
+<CodeExercise
+  id="vec-add"
+  prompt="Add u and v element by element. Print the resulting vector."
+  starter={`u = [1, 2, 3]
+v = [4, 5, 6]
+# Print the element-wise sum of u and v
+`}
+  expected="[5, 7, 9]"
+  solution={`u = [1, 2, 3]
+v = [4, 5, 6]
+print([a + b for a, b in zip(u, v)])`}
+/>
+
+<Quiz
+  question="What does a vector represent in machine learning?"
+  options={[
+    "A single number",
+    "One example or thing, described by several numbers (its features)",
+    "The model's accuracy",
+    "A type of loss function"
+  ]}
+  answer={1}
+  explanation="A vector bundles several measurements about one item — a row of features, a word embedding, a pixel's color channels. ML works on vectors constantly."
+/>
+
+## The dot product: the most important operation
+
+The **dot product** multiplies two vectors slot-by-slot and sums the result, giving back a single number. It quietly powers similarity search, every neuron, and the attention inside transformers.
+
+```text
+u · v = u₁v₁ + u₂v₂ + u₃v₃ + ...
+```
+
+A large dot product means the vectors "point the same way" — they're similar. A dot product near zero means they're unrelated.
+
+<CodeExercise
+  id="vec-dot"
+  prompt="Compute the dot product of u and v (1·4 + 2·5 + 3·6)."
+  starter={`u = [1, 2, 3]
+v = [4, 5, 6]
+# Print the dot product
+`}
+  expected="32"
+  solution={`u = [1, 2, 3]
+v = [4, 5, 6]
+print(sum(a * b for a, b in zip(u, v)))`}
+/>
+
+<Callout type="tip">
+A single neuron computes <code>dot(weights, inputs) + bias</code>. So the dot product isn't abstract math — it's the literal operation happening billions of times inside every model you use.
+</Callout>
+
+<Quiz
+  question="Two vectors have a dot product near zero. What does that suggest?"
+  options={[
+    "They're nearly identical",
+    "They're roughly unrelated — pointing in 'different directions'",
+    "One of them is all zeros, necessarily",
+    "There was a computation error"
+  ]}
+  answer={1}
+  explanation="A dot product near zero means little alignment between the vectors — in ML terms, low similarity. A large positive value means strong alignment."
+/>
+
+Vectors describe single things. To transform *whole collections* of them at once — which is what a neural-network layer does — we need matrices. That's next.
+
+
+<Homework>
+Write code for two more vector operations: **subtraction** (u − v) and **scaling** (3 · u). Test them on `[4, 2, 6]` and `[1, 1, 2]`. Then explain in a sentence what scaling a vector by 0.5 does geometrically.
+</Homework>

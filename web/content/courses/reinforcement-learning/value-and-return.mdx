@@ -1,0 +1,76 @@
+export const meta = {
+  title: "Value, Return & Discounting",
+  summary: "An agent must weigh a reward now against a bigger reward later. Discounting is how it does the math — and 'value' is the number everything hinges on.",
+};
+
+An agent's whole job is choosing actions for **future** payoff. But a reward now isn't worth quite the same as a reward in ten steps. **Discounting** captures that, and leads to the single most important quantity in RL: **value**.
+
+## The return, with discounting
+
+The **return** is the total future reward from a point onward. But we shrink rewards that are further away using a **discount factor** called **gamma (γ)**, between 0 and 1. Each step into the future, the reward is multiplied by another factor of gamma:
+
+```text
+return = r₀ + γ·r₁ + γ²·r₂ + γ³·r₃ + ...
+```
+
+A gamma near 1 makes the agent far-sighted (cares about the long run); a gamma near 0 makes it greedy for immediate reward.
+
+<CodeExercise
+  id="rl-discounted"
+  prompt="Compute the discounted return for rewards [1, 1, 1] with gamma = 0.5 (so 1 + 0.5 + 0.25)."
+  starter={`rewards = [1, 1, 1]
+gamma = 0.5
+total = 0
+# Add gamma**step * reward for each step. Print the discounted return.
+`}
+  expected="1.75"
+  solution={`rewards = [1, 1, 1]
+gamma = 0.5
+total = 0
+for step, r in enumerate(rewards):
+    total = total + (gamma ** step) * r
+print(total)`}
+/>
+
+The same three rewards are worth 3 undiscounted, but only 1.75 when later rewards count less.
+
+<Quiz
+  question="What does a discount factor (gamma) close to 0 make an agent do?"
+  options={[
+    "Care a lot about long-term, distant rewards",
+    "Focus almost entirely on immediate reward, ignoring the future",
+    "Ignore all rewards",
+    "Explore more"
+  ]}
+  answer={1}
+  explanation="Low gamma shrinks future rewards heavily, so the agent becomes short-sighted — chasing immediate reward. High gamma makes it value the long run."
+/>
+
+## Value: expected return from a state
+
+The **value** of a state is the *expected return* you'll get from there onward, if you play well. It answers: "how good is it to be *here*?" A state one move from winning has high value; a state about to lose has low value.
+
+Value is the compass of RL. If you knew the true value of every state, you'd just always step toward the highest-value next state. The trouble is you *don't* know it up front — the agent has to **learn** it from experience. That learning algorithm is Q-learning, next.
+
+<Callout type="tip">
+"Value" connects straight back to the Math track's expected value: it's the average total (discounted) reward you expect from a state. RL is largely the art of estimating these values well from trial and error.
+</Callout>
+
+<Quiz
+  question="What does the 'value' of a state represent?"
+  options={[
+    "The immediate reward for entering it",
+    "The expected total (discounted) future reward from that state onward",
+    "The number of actions available",
+    "How many times it's been visited"
+  ]}
+  answer={1}
+  explanation="A state's value is the expected return (discounted future reward) achievable from it. Higher value = a better situation to be in."
+/>
+
+You understand value in principle. Now the famous algorithm that learns it from raw experience — Q-learning.
+
+
+<Homework>
+Compute the **discounted return** for `rewards=[1, 1, 1, 1]` at gamma = 0.9, then again at gamma = 0.5. Print both and explain in a sentence how the discount factor changed how "far-sighted" the agent is.
+</Homework>

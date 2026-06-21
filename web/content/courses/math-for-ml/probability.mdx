@@ -1,0 +1,81 @@
+export const meta = {
+  title: "Probability Essentials",
+  summary: "AI deals in uncertainty — a model outputs probabilities, not certainties. A little probability makes its behavior far less mysterious.",
+};
+
+A model rarely says "this is a cat." It says "85% cat." Under the hood, modern AI is a probability machine, so a working grasp of probability pays off everywhere — from a classifier's confidence to the next-token odds in a chatbot.
+
+## Probability is a number between 0 and 1
+
+A probability measures how likely something is: **0** means impossible, **1** means certain, **0.5** means a coin flip. You can read it as a percentage by multiplying by 100.
+
+The simplest probabilities come from counting: favorable outcomes divided by total outcomes.
+
+<CodeExercise
+  id="prob-count"
+  prompt="A bag has 3 red marbles out of 4 total. Print the probability of drawing red."
+  starter={`red = 3
+total = 4
+# Print the probability of drawing red
+`}
+  expected="0.75"
+  solution={`red = 3
+total = 4
+print(red / total)`}
+/>
+
+<Quiz
+  question="A model outputs a probability of 0.9 for 'spam'. What does that mean?"
+  options={[
+    "The email is definitely spam",
+    "The model is 90% confident it's spam — likely, but not guaranteed",
+    "90 emails were spam",
+    "The model failed"
+  ]}
+  answer={1}
+  explanation="A probability is a confidence between 0 and 1. 0.9 means strong belief, not certainty — which is why a decision threshold and verification still matter."
+/>
+
+## The complement and combining events
+
+Two quick rules cover most everyday reasoning:
+
+- **Complement:** the chance something *doesn't* happen is `1 − P`. If rain is 0.3, no-rain is 0.7.
+- **Independent events:** if two things don't affect each other, the chance of *both* is the **product** of their probabilities. Two fair coins both landing heads: `0.5 × 0.5 = 0.25`.
+
+That multiplication rule is the engine behind the Naive Bayes spam filter you'll build in the NLP track.
+
+<Quiz
+  question="Two independent events each have probability 0.5. What's the chance both happen?"
+  options={["1.0", "0.5", "0.25", "0.0"]}
+  answer={2}
+  explanation="For independent events, multiply: 0.5 × 0.5 = 0.25. This 'multiply the probabilities' rule underlies Naive Bayes classification."
+/>
+
+## Expected value: the long-run average
+
+The **expected value** is what you'd get on average if you repeated something many times: multiply each outcome by its probability and add them up. It's how you reason about risk, rewards, and — in the Reinforcement Learning track — what an action is "worth."
+
+<CodeExercise
+  id="prob-ev"
+  prompt="A game pays $10 half the time and $20 half the time. Compute the expected payout."
+  starter={`values = [10, 20]
+probs = [0.5, 0.5]
+# Expected value = sum of value * probability
+`}
+  expected="15.0"
+  solution={`values = [10, 20]
+probs = [0.5, 0.5]
+print(sum(v * p for v, p in zip(values, probs)))`}
+/>
+
+<Callout type="tip">
+Expected value is the backbone of decision-making under uncertainty. A reinforcement-learning agent picks actions with the highest expected future reward; a trader weighs expected return against risk. Same formula every time.
+</Callout>
+
+You can now reason about single uncertain events. The last step is summarizing *whole datasets* of them — the job of statistics.
+
+
+<Homework>
+Using the **complement** rule, compute the probability of getting **at least one head** in two fair coin flips (hint: 1 − P(no heads)). Then compute the expected value of a die roll (values 1–6, each with probability 1/6).
+</Homework>

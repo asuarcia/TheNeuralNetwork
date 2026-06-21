@@ -1,0 +1,118 @@
+export const meta = { title: "Neural Network from Scratch (NumPy)" };
+
+The ultimate way to understand deep learning: build a real neural network with **only NumPy** — forward pass, backpropagation, and a training loop — and teach it the XOR problem (which a single layer famously *can't* solve). Run the cells in order.
+
+<Callout type="note">
+NumPy loads automatically the first time you hit Run (a few seconds). Cells build on each other.
+</Callout>
+
+## 1. The problem: XOR
+
+XOR outputs 1 when its two inputs differ. It's the classic test that needs a *hidden layer*. Set up the data.
+
+<CodeExercise
+  id="nn-data"
+  prompt="Create the XOR inputs X and targets y, and print the shape of X."
+  starter={`import numpy as np
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+y = np.array([[0], [1], [1], [0]])
+print(X.shape)`}
+  expected="(4, 2)"
+  solution={`import numpy as np
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+y = np.array([[0], [1], [1], [0]])
+print(X.shape)`}
+/>
+
+Four examples, two features each — a 4×2 matrix.
+
+## 2. The forward pass
+
+We'll use a 2 → 4 → 1 network (two inputs, a hidden layer of four neurons, one output), with a sigmoid squash. Initialize the weights and push the data through once.
+
+<CodeExercise
+  id="nn-forward"
+  prompt="Initialize weights, run a forward pass, and print the output shape (one prediction per example)."
+  starter={`import numpy as np
+np.random.seed(0)
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+W1 = np.random.randn(2, 4); b1 = np.zeros((1, 4))
+W2 = np.random.randn(4, 1); b2 = np.zeros((1, 1))
+
+hidden = sigmoid(X @ W1 + b1)
+out = sigmoid(hidden @ W2 + b2)
+print(out.shape)`}
+  expected="(4, 1)"
+  solution={`import numpy as np
+np.random.seed(0)
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+W1 = np.random.randn(2, 4); b1 = np.zeros((1, 4))
+W2 = np.random.randn(4, 1); b2 = np.zeros((1, 1))
+hidden = sigmoid(X @ W1 + b1)
+out = sigmoid(hidden @ W2 + b2)
+print(out.shape)`}
+/>
+
+Untrained, those four predictions are basically noise. Time to learn.
+
+## 3. Train it with backpropagation
+
+Now the full loop: forward pass, then backprop the error through both layers, then a gradient step — 5000 times. By the end the network should output ≈ [0, 1, 1, 0].
+
+<CodeExercise
+  id="nn-train"
+  prompt="Train the network on XOR and print the rounded predictions (expect 0, 1, 1, 0)."
+  starter={`import numpy as np
+np.random.seed(0)
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+y = np.array([[0], [1], [1], [0]])
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+W1 = np.random.randn(2, 4); b1 = np.zeros((1, 4))
+W2 = np.random.randn(4, 1); b2 = np.zeros((1, 1))
+lr = 0.5
+
+for i in range(5000):
+    h = sigmoid(X @ W1 + b1)            # forward
+    out = sigmoid(h @ W2 + b2)
+    d_out = (out - y) * out * (1 - out)  # backprop
+    d_h = (d_out @ W2.T) * h * (1 - h)
+    W2 -= lr * h.T @ d_out               # update
+    b2 -= lr * d_out.sum(0, keepdims=True)
+    W1 -= lr * X.T @ d_h
+    b1 -= lr * d_h.sum(0, keepdims=True)
+
+print(np.round(out).ravel())`}
+  solution={`import numpy as np
+np.random.seed(0)
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+y = np.array([[0], [1], [1], [0]])
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+W1 = np.random.randn(2, 4); b1 = np.zeros((1, 4))
+W2 = np.random.randn(4, 1); b2 = np.zeros((1, 1))
+lr = 0.5
+for i in range(5000):
+    h = sigmoid(X @ W1 + b1)
+    out = sigmoid(h @ W2 + b2)
+    d_out = (out - y) * out * (1 - out)
+    d_h = (d_out @ W2.T) * h * (1 - h)
+    W2 -= lr * h.T @ d_out
+    b2 -= lr * d_out.sum(0, keepdims=True)
+    W1 -= lr * X.T @ d_h
+    b1 -= lr * d_h.sum(0, keepdims=True)
+print(np.round(out).ravel())`}
+/>
+
+It learned XOR — a problem impossible without the hidden layer. You just implemented forward propagation, backpropagation, and gradient descent by hand. This *is* deep learning; frameworks like PyTorch are this, vectorized and on a GPU.
+
+<Homework>
+Go deeper: (1) print the loss every 500 steps and watch it fall; (2) try removing the hidden layer (go straight 2→1) and confirm it *can't* solve XOR; (3) change the hidden size to 8 and see if it learns faster; (4) swap sigmoid for ReLU in the hidden layer (adjust the backward step) and compare.
+</Homework>

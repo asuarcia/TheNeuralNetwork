@@ -1,0 +1,91 @@
+export const meta = {
+  title: "Pooling & CNN Architectures",
+  summary: "Feature maps pile up fast. Pooling shrinks them while keeping what matters — and a few legendary architectures show how depth won the field.",
+};
+
+Convolution layers produce lots of feature maps, and they can be large. **Pooling** keeps networks efficient by shrinking those maps while preserving the strongest signals.
+
+## Max pooling: keep the loudest response
+
+The most common kind is **max pooling**: slide a small window (usually 2×2) over the feature map and keep only the **largest** value in each window. The map gets smaller, but the strongest detections survive.
+
+<CodeExercise
+  id="pool-max"
+  prompt="Apply 2x2 max pooling to this patch: print the single largest value."
+  starter={`patch = [[1, 3],
+         [2, 4]]
+# Print the maximum value in the patch
+`}
+  expected="4"
+  solution={`patch = [[1, 3], [2, 4]]
+print(max(max(row) for row in patch))`}
+/>
+
+Pooling does two helpful things: it cuts the data the next layer must process, and it adds a little **translation tolerance** — if a feature shifts by a pixel, the max often stays the same, so the network cares *that* a pattern appeared more than *exactly where*.
+
+<CodeExercise
+  id="pool-size"
+  prompt="An 8x8 feature map goes through 2x2 pooling with stride 2. Print the new side length."
+  starter={`size = 8
+pool = 2
+# Each dimension is divided by the pool size. Print the new side length.
+`}
+  expected="4"
+  solution={`size = 8
+pool = 2
+print(size // pool)`}
+/>
+
+<Quiz
+  question="What does max pooling do?"
+  options={[
+    "Adds more pixels to the image",
+    "Shrinks a feature map by keeping the strongest value in each small window",
+    "Trains the filters",
+    "Converts the image to grayscale"
+  ]}
+  answer={1}
+  explanation="Max pooling downsamples by taking the maximum in each window — reducing size and computation while keeping the strongest detections and adding small-shift tolerance."
+/>
+
+## The typical CNN recipe
+
+Stack these pieces and you have the classic image classifier:
+
+```text
+[Convolution → activation → pooling] × several, then → flatten → dense layers → prediction
+```
+
+Convolution-and-pooling blocks extract features and shrink the map; the dense layers at the end turn those features into a class.
+
+## Architectures that made history
+
+A few designs defined the field — worth knowing by name:
+
+- **LeNet-5** (1998) — the original CNN, read handwritten digits (checks, zip codes).
+- **AlexNet** (2012) — won ImageNet by a landslide and kicked off the deep-learning boom.
+- **VGG** (2014) — showed that simply going *deeper* with small 3×3 filters works well.
+- **ResNet** (2015) — added **residual (skip) connections** so networks could go *hundreds* of layers deep without the signal vanishing. (You met residual connections in the transformer lesson — same idea, born here.)
+
+<Callout type="tip">
+The trend across these is simple: <strong>deeper networks learn richer features</strong> — but only once tricks like residual connections made very deep training stable. ResNet's skip connection is one of the most reused ideas in all of deep learning.
+</Callout>
+
+<Quiz
+  question="What problem did ResNet's residual (skip) connections solve?"
+  options={[
+    "Images being too small",
+    "Allowing very deep networks to train without the signal/gradient vanishing",
+    "Removing the need for convolution",
+    "Making images colorful"
+  ]}
+  answer={1}
+  explanation="Skip connections give the signal a direct path through layers, so gradients don't vanish — enabling networks hundreds of layers deep, far beyond what was trainable before."
+/>
+
+You can now design a CNN's shape. But training one from scratch needs lots of data and compute — so next, the shortcut professionals actually use: transfer learning.
+
+
+<Homework>
+Take a 4×4 grid of numbers and apply **2×2 max pooling** (four non-overlapping windows) to produce a 2×2 output. Print it. Then say what the output size would be after pooling an 8×8 map twice.
+</Homework>

@@ -1,0 +1,98 @@
+export const meta = {
+  title: "Monitoring & Drift",
+  summary: "A deployed model isn't done — it's decaying. The world shifts out from under it. Monitoring is how you notice before your users do.",
+};
+
+Here's the uncomfortable truth of production ML: your model was trained on the past, but it predicts the future, and the world keeps changing. Performance silently erodes. **Monitoring** is how you catch that — ideally before it costs you.
+
+## What to monitor
+
+Two layers:
+
+- **Operational health** — latency, throughput, error rate, cost. The same things any service watches.
+- **Model quality** — accuracy/precision over time, prediction distributions, and **drift**. This is what's unique (and easy to forget) about ML systems.
+
+Start with the basics — an error rate is just failures over total requests.
+
+<CodeExercise
+  id="mon-errorrate"
+  prompt="Out of 1000 requests, 30 returned errors. Print the error rate."
+  starter={`errors = 30
+total = 1000
+# Print the error rate (errors / total)
+`}
+  expected="0.03"
+  solution={`errors = 30
+total = 1000
+print(errors / total)`}
+/>
+
+## Drift: when the world moves
+
+**Drift** is the core ML-specific failure. Two flavors:
+
+- **Data drift** — the *inputs* change. A model trained on last year's shopping behavior sees this year's different habits.
+- **Concept drift** — the *relationship* changes. What counted as fraud last year isn't what counts now.
+
+Either way, the model gets relatively worse without any code changing. You detect it by comparing a live quality metric against your launch **baseline** and alerting when it slips too far.
+
+<CodeExercise
+  id="mon-drift"
+  prompt="Baseline accuracy was 0.92; current is 0.80. Alert if it dropped more than 0.05. Print 'alert' or 'ok'."
+  starter={`baseline = 0.92
+current = 0.80
+threshold = 0.05
+# Print "alert" if the drop exceeds the threshold, else "ok"
+`}
+  expected="alert"
+  solution={`baseline = 0.92
+current = 0.80
+threshold = 0.05
+print("alert" if baseline - current > threshold else "ok")`}
+/>
+
+A 12-point drop trips the alarm — you find out from monitoring, not from a furious customer.
+
+<Quiz
+  question="What is 'data drift'?"
+  options={[
+    "The model's files getting corrupted",
+    "The distribution of incoming inputs shifting away from the training data over time",
+    "The server slowing down",
+    "Losing the training data"
+  ]}
+  answer={1}
+  explanation="Data drift is when production inputs gradually differ from what the model trained on, degrading performance even though nothing in the code changed."
+/>
+
+## The catch: labels arrive late
+
+Measuring accuracy live needs the *true* answer — which often comes much later (did this flagged transaction turn out fraudulent? did the user actually churn?). So teams also watch **proxy signals** that are available immediately:
+
+- Shifts in the **input distribution** (statistical drift tests).
+- Shifts in the model's **output distribution** (suddenly predicting "fraud" 3× as often).
+- **Business metrics** (click-through, conversion) tied to the model.
+
+When monitoring fires, the response is usually: investigate, then **retrain** on fresh data — closing the lifecycle loop.
+
+<Callout type="tip">
+Set up monitoring <em>before</em> you launch, not after the first incident. The cheapest moment to catch degradation is the moment it begins. A model with no monitoring is a model you're flying blind.
+</Callout>
+
+<Quiz
+  question="Why do teams monitor input/output distributions instead of only accuracy?"
+  options={[
+    "Distributions are more fun to look at",
+    "True labels often arrive late, so distribution shifts are an early, immediately-available warning of trouble",
+    "Accuracy can't be computed in production",
+    "They don't — accuracy is enough"
+  ]}
+  answer={1}
+  explanation="Ground-truth labels are frequently delayed. Watching input/output distributions (and business metrics) gives an immediate signal of drift before accuracy can even be measured."
+/>
+
+You can now watch a model in the wild. The final piece ties the whole track together: how to ship changes safely without breaking what works.
+
+<Homework>
+Design a one-screen "model health dashboard" on paper. List the **4–6 metrics** you'd put on it (mix operational and model-quality), and for each, the **threshold** that should trigger an alert. Then answer: for your model, would true labels arrive fast or slow — and what **proxy signal** would you watch in the meantime?
+</Homework>

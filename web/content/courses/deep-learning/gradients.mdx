@@ -1,51 +1,17 @@
 export const meta = {
-  title: "How Networks Learn",
-  summary: "Training is one idea repeated millions of times: measure the slope of the loss, and step downhill. That's gradient descent.",
+  title: "Backpropagation: How Networks Learn",
+  summary: "A network has millions of weights. Backpropagation is the elegant bookkeeping that figures out how to nudge every single one — all in one backward sweep.",
 };
 
-We have a network that makes predictions and a loss that scores them. Learning means changing the weights to make the loss smaller. But there are millions of weights — how do we know which way to nudge each one?
+We have a network that makes predictions and a loss that scores them. From the ML track, you know the update rule: step each weight opposite its gradient. But a deep network has *millions* of weights buried across many layers. How do we get the gradient for each one? The answer — **backpropagation** — is the algorithm that made deep learning practical.
 
-## The gradient points uphill
+## Recap: the update rule
 
-For any weight, the **gradient** is the slope of the loss with respect to that weight: "if I increase this weight a little, does the loss go up or down, and how fast?"
-
-To *reduce* loss, we step in the **opposite** direction of the gradient. That's **gradient descent**:
+For any weight, we step opposite its gradient (the slope of the loss with respect to that weight), scaled by the learning rate:
 
 ```text
-w_new = w - lr * gradient
+w_new = w - learning_rate * gradient
 ```
-
-The **learning rate** (`lr`) controls step size — too big and you overshoot, too small and training crawls.
-
-```python
-w = 2.0
-lr = 0.5
-gradient = 1.0
-w = w - lr * gradient
-print(w)   # 1.5
-```
-
-Repeat this for every weight, over and over, and the network slides downhill toward weights that fit the data. **Backpropagation** is just the efficient bookkeeping that computes all those gradients at once.
-
-<Callout type="note">
-Real frameworks (PyTorch, TensorFlow) compute gradients automatically and run on GPUs — too heavy for a browser tab. Once these fundamentals click, those tools are a thin layer on top. We'll point you to a Colab notebook to train a real network with PyTorch.
-</Callout>
-
-<Quiz
-  question="The gradient of the loss w.r.t. a weight is positive. To reduce the loss, you should:"
-  options={[
-    "Increase the weight",
-    "Decrease the weight (step opposite the gradient)",
-    "Leave it unchanged",
-    "Set it to zero"
-  ]}
-  answer={1}
-  explanation="A positive gradient means increasing the weight increases the loss. Gradient descent steps the opposite way, so you decrease the weight."
-/>
-
-## Your turn
-
-Perform one gradient-descent update.
 
 <CodeExercise
   id="gd-step"
@@ -62,4 +28,80 @@ gradient = 4.0
 print(w - lr * gradient)`}
 />
 
-That single line, repeated across every weight and every example, is how every neural network on Earth learns. You now understand deep learning's engine.
+Easy when someone *hands* you the gradient. The hard part is computing it for a weight that's buried five layers deep, feeding through everything after it. That's what backprop solves.
+
+## The chain rule is the whole trick
+
+A deep network is functions inside functions: layer 3 takes the output of layer 2, which took the output of layer 1. To find how an early weight affects the final loss, calculus gives us the **chain rule**: multiply the local slopes along the path.
+
+If `y = (3x)²`, then `dy/dx = 2·(3x)·3` — the outer derivative times the inner derivative. Let's evaluate it.
+
+<CodeExercise
+  id="bp-chain"
+  prompt="For y = (3x)², the chain rule gives dy/dx = 2*(3x)*3. Print dy/dx at x = 2."
+  starter={`x = 2
+# Chain rule: outer' (2*(3x)) times inner' (3). Print dy/dx at x=2.
+`}
+  expected="36"
+  solution={`x = 2
+print(2 * (3 * x) * 3)`}
+/>
+
+## Forward, then backward
+
+Training each batch is two passes:
+
+1. **Forward pass** — run inputs through the layers to get a prediction and the loss.
+2. **Backward pass** — start from the loss and walk *backward*, using the chain rule to compute each layer's gradient from the one after it. The error signal flows from output toward input.
+
+At each node, the gradient it sends back is its **upstream gradient × its local gradient**. That single multiply, applied node by node, propagates the error all the way to the first layer — hence "back-propagation."
+
+<CodeExercise
+  id="bp-node"
+  prompt="A node receives an upstream gradient of 5.0 and its local derivative is 2.0. Print the gradient it passes to the previous layer."
+  starter={`upstream = 5.0   # gradient arriving from the next layer
+local = 2.0      # this node's local derivative
+# Backprop multiplies them. Print the gradient passed backward.
+`}
+  expected="10.0"
+  solution={`upstream = 5.0
+local = 2.0
+print(upstream * local)`}
+/>
+
+Chain those multiplications across every node and you've computed gradients for the *entire* network in one backward sweep — far cheaper than nudging each weight individually to see what happens.
+
+<Quiz
+  question="What does backpropagation actually compute?"
+  options={[
+    "The model's predictions",
+    "The gradient of the loss with respect to every weight, by applying the chain rule backward through the layers",
+    "The learning rate",
+    "The training data"
+  ]}
+  answer={1}
+  explanation="Backprop efficiently computes all the gradients in one backward pass using the chain rule, so gradient descent knows how to update every weight."
+/>
+
+<Quiz
+  question="The gradient of the loss w.r.t. a weight is positive. To reduce the loss, you should:"
+  options={[
+    "Increase the weight",
+    "Decrease the weight (step opposite the gradient)",
+    "Leave it unchanged",
+    "Set it to zero"
+  ]}
+  answer={1}
+  explanation="A positive gradient means increasing the weight increases the loss. Gradient descent steps the opposite way, so you decrease the weight."
+/>
+
+<Callout type="note">
+Real frameworks (PyTorch, TensorFlow) build a graph of these operations and run backprop automatically on GPUs — far too heavy for a browser tab. But "autograd" is exactly the chain-rule bookkeeping you just did by hand. The concept is the whole secret; the framework is convenience.
+</Callout>
+
+Forward to predict, backward to learn — that loop, run millions of times, is how every neural network on Earth is trained. Now let's assemble neurons, layers, and a forward pass into a complete network.
+
+
+<Homework>
+For a two-node chain where node A's local gradient is 3 and node B's local gradient is 2, and the loss sends back an upstream gradient of 1, compute the gradient that reaches the **input** (multiply along the chain). Confirm you get 6.
+</Homework>

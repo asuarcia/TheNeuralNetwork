@@ -2,19 +2,18 @@
 
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
-import { ArrowUpRight, Clock } from 'lucide-react';
+import { ArrowUpRight, BookOpen } from 'lucide-react';
 import Link from 'next/link';
-import { projects } from '@/data/projects';
+import { curriculum, type Course } from '@/content/curriculum';
 
 const levelColors: Record<string, string> = {
   Beginner: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10',
   Intermediate: 'text-amber-400 border-amber-500/30 bg-amber-500/10',
   Advanced: 'text-violet-400 border-violet-500/30 bg-violet-500/10',
+  Expert: 'text-pink-400 border-pink-500/30 bg-pink-500/10',
 };
 
 export const Projects = () => {
-  const featured = projects.slice(0, 4);
-
   return (
     <section id="courses" className="py-32 px-6 bg-neutral-950">
       <div className="container mx-auto">
@@ -29,7 +28,7 @@ export const Projects = () => {
             <div className="flex items-center gap-6 mb-8">
               <div className="flex items-baseline gap-3">
                 <span className="font-mono text-violet-500 text-sm">01</span>
-                <span className="text-xs font-mono uppercase tracking-[0.3em] text-neutral-400">Featured Courses</span>
+                <span className="text-xs font-mono uppercase tracking-[0.3em] text-neutral-400">The Tracks</span>
               </div>
               <div className="h-px w-32 bg-gradient-to-r from-violet-500/40 to-transparent" />
             </div>
@@ -44,14 +43,14 @@ export const Projects = () => {
             href="/courses"
             className="hidden md:inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-neutral-400 border-b border-white/20 pb-2 hover:text-violet-400 hover:border-violet-500/50 transition-colors"
           >
-            All Courses
+            Full Curriculum
             <ArrowUpRight className="w-3 h-3" />
           </Link>
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-8 md:gap-y-24">
-          {featured.map((project, index) => (
-            <CourseCard key={project.id} project={project} index={index} />
+          {curriculum.map((course, index) => (
+            <CourseCard key={course.slug} course={course} index={index} />
           ))}
         </div>
       </div>
@@ -59,14 +58,12 @@ export const Projects = () => {
   );
 };
 
-const CourseCard = ({ project, index }: { project: (typeof projects)[number]; index: number }) => {
+const CourseCard = ({ course, index }: { course: Course; index: number }) => {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const y = useTransform(scrollYProgress, [0, 1], [0, -40]);
   const isEven = index % 2 === 0;
-
-  const [level, hours] = project.category.split(' · ');
-  const levelClass = levelColors[level] ?? 'text-violet-400 border-violet-500/30 bg-violet-500/10';
+  const levelClass = levelColors[course.level] ?? levelColors.Advanced;
 
   return (
     <motion.div
@@ -74,14 +71,14 @@ const CourseCard = ({ project, index }: { project: (typeof projects)[number]; in
       style={{ y: isEven ? 0 : y }}
       className={`group cursor-pointer ${!isEven ? 'md:mt-24' : ''}`}
     >
-      <Link href={`/courses/${project.slug}`}>
+      <Link href={`/courses/${course.slug}`}>
         {/* Image */}
         <div className="relative overflow-hidden rounded-xl aspect-[16/10] mb-6 bg-neutral-900">
           <motion.img
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.7, ease: [0.25, 1, 0.5, 1] }}
-            src={project.image}
-            alt={project.title}
+            src={course.image}
+            alt={course.title}
             className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
           />
           {/* Gradient */}
@@ -89,7 +86,7 @@ const CourseCard = ({ project, index }: { project: (typeof projects)[number]; in
 
           {/* Level badge */}
           <div className={`absolute top-4 left-4 px-3 py-1 rounded-full border text-xs font-mono uppercase tracking-wide ${levelClass}`}>
-            {level}
+            {course.level}
           </div>
 
           {/* Hover arrow */}
@@ -104,13 +101,15 @@ const CourseCard = ({ project, index }: { project: (typeof projects)[number]; in
         <div className="flex justify-between items-start border-t border-violet-500/10 pt-5">
           <div className="flex-1">
             <h3 className="text-2xl font-bold tracking-tight mb-2 group-hover:text-violet-300 transition-colors">
-              {project.title}
+              {course.title}
             </h3>
-            <p className="font-mono text-xs uppercase tracking-widest text-neutral-500">{project.role}</p>
+            <p className="font-mono text-xs uppercase tracking-widest text-neutral-500">
+              {course.topics.join(' · ')}
+            </p>
           </div>
           <div className="flex items-center gap-1.5 text-neutral-600 font-mono text-xs mt-1 ml-4 shrink-0">
-            <Clock className="w-3 h-3" />
-            {hours}
+            <BookOpen className="w-3 h-3" />
+            {course.lessons.length} lessons
           </div>
         </div>
       </Link>

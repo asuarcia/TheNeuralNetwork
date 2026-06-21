@@ -1,0 +1,86 @@
+export const meta = {
+  title: "Word Embeddings",
+  summary: "Counts treat 'great' and 'excellent' as totally unrelated. Embeddings fix that — they give words coordinates where meaning becomes geometry.",
+};
+
+Bag-of-words and one-hot vectors have a deep flaw: every word is equally far from every other. The model has no way to know "happy" and "joyful" are similar. **Word embeddings** solve this by giving each word a position in space where **closeness means similar meaning**.
+
+## Meaning as coordinates
+
+An embedding maps each word to a vector of numbers (often a few hundred), learned from huge amounts of text. The training trick (used by methods like **word2vec**) is simple: *words that appear in similar contexts get similar vectors.* "Tea" and "coffee" show up around the same words ("drink", "cup", "morning"), so they land near each other.
+
+Now "similar meaning" becomes "nearby vectors," which we measure with the **cosine similarity** from the Math track. Identical direction → similarity 1.
+
+<CodeExercise
+  id="emb-cosine"
+  prompt="Two word vectors point the same way: [1, 2] and [2, 4]. Compute their cosine similarity, rounded to 2 decimals (expect 1.0)."
+  starter={`import math
+a = [1, 2]
+b = [2, 4]
+# cosine = dot(a,b) / (length(a) * length(b)), rounded to 2 decimals
+`}
+  expected="1.0"
+  solution={`import math
+a = [1, 2]
+b = [2, 4]
+dot = sum(x * y for x, y in zip(a, b))
+la = math.sqrt(sum(x * x for x in a))
+lb = math.sqrt(sum(x * x for x in b))
+print(round(dot / (la * lb), 2))`}
+/>
+
+<Quiz
+  question="How do word embeddings represent that two words are similar in meaning?"
+  options={[
+    "They give them the same spelling",
+    "They place their vectors close together in space (high similarity)",
+    "They store a dictionary definition",
+    "They count how often the words co-occur, and nothing else"
+  ]}
+  answer={1}
+  explanation="Embeddings position similar-meaning words near each other. Distance/similarity in the vector space reflects semantic similarity — learned from context."
+/>
+
+## Meaning becomes arithmetic
+
+The famous, almost magical property: directions in embedding space carry meaning, so you can do *analogies with arithmetic*. The classic example: **king − man + woman ≈ queen**. Subtracting "man" and adding "woman" moves along the "gender" direction.
+
+<CodeExercise
+  id="emb-analogy"
+  prompt="Toy vectors: king=[5,5], man=[4,0], woman=[0,4]. Compute king - man + woman element-wise."
+  starter={`king  = [5, 5]
+man   = [4, 0]
+woman = [0, 4]
+# Print king - man + woman, element by element
+`}
+  expected="[1, 9]"
+  solution={`king  = [5, 5]
+man   = [4, 0]
+woman = [0, 4]
+print([k - m + w for k, m, w in zip(king, man, woman)])`}
+/>
+
+The result vector would land nearest to "queen" in a real embedding space. Relationships became geometry.
+
+<Callout type="tip">
+Embeddings aren't just for words. The same idea powers semantic search, recommendations, and the input layer of every transformer — text, images, and audio all get embedded into vectors where similar things sit close. This is one of the most important concepts in modern AI.
+</Callout>
+
+<Quiz
+  question="What does the analogy 'king − man + woman ≈ queen' demonstrate about embeddings?"
+  options={[
+    "Embeddings store grammar rules",
+    "Directions in the vector space capture meaningful relationships, so analogies work as arithmetic",
+    "Word vectors are random",
+    "Subtraction deletes words"
+  ]}
+  answer={1}
+  explanation="Consistent directions encode relationships (like gender or tense). Moving along them with vector arithmetic lands you near semantically related words."
+/>
+
+Embeddings give words meaning, but language is also about *order and context*. How do models handle sequences? That's the final NLP lesson — and the road to transformers.
+
+
+<Homework>
+Given a query word vector and three candidate word vectors, compute the cosine similarity to each (round to 2 decimals) and print the **nearest** word. Then describe one analogy (like king − man + woman) you'd test if you had real embeddings.
+</Homework>

@@ -1,0 +1,84 @@
+export const meta = {
+  title: "Exploration vs. Exploitation",
+  summary: "Always do what works, and you'll never find what works better. Every learning agent — and arguably every person — must balance exploration with exploitation.",
+};
+
+Here's the central dilemma of reinforcement learning. Once an agent finds an action that gives decent reward, should it keep **exploiting** it — or **explore** other actions that *might* be better but might be worse? Lean too far either way and learning fails.
+
+## The trade-off
+
+- **Exploitation** — take the action your Q-table currently rates highest. Safe, but you might be stuck on a mediocre choice because you never tried the alternatives.
+- **Exploration** — try a different action to gather information. Risky in the short term, but it's the only way to discover something better.
+
+A new restaurant vs. your usual order; a known route vs. an untried shortcut — same dilemma, every day.
+
+<Quiz
+  question="Why can't an agent just always exploit (pick the current best action)?"
+  options={[
+    "It would be too slow",
+    "It might be stuck on a suboptimal action it never had a chance to improve on — it never explores alternatives",
+    "Exploiting is against the rules",
+    "It would use too much memory"
+  ]}
+  answer={1}
+  explanation="Pure exploitation locks in early, possibly-wrong estimates. Without exploration the agent never discovers better actions, so its Q-values stay incomplete."
+/>
+
+## Epsilon-greedy: a simple, brilliant fix
+
+The standard solution is **epsilon-greedy**: most of the time, exploit (take the best action); but with a small probability **epsilon (ε)**, explore (take a random action instead). With ε = 0.1, the agent explores 10% of the time and exploits 90%.
+
+Whether to explore on a given step is a simple probability check.
+
+<CodeExercise
+  id="explore-decide"
+  prompt="With epsilon = 0.1 and a random draw of 0.05, decide whether to explore (explore if the draw is below epsilon)."
+  starter={`epsilon = 0.1
+draw = 0.05
+# Print True if the agent should explore (draw < epsilon), else False
+`}
+  expected="True"
+  solution={`epsilon = 0.1
+draw = 0.05
+print(draw < epsilon)`}
+/>
+
+And when it *doesn't* explore, it exploits — taking the best known action.
+
+<CodeExercise
+  id="explore-greedy"
+  prompt="The agent is exploiting. Given these action values, print the greedy (best) action."
+  starter={`Q_row = {"a": 1, "b": 2, "c": 0}
+# Print the highest-value action
+`}
+  expected="b"
+  solution={`Q_row = {"a": 1, "b": 2, "c": 0}
+print(max(Q_row, key=Q_row.get))`}
+/>
+
+## Decaying epsilon
+
+A common refinement: start with a **high** epsilon (explore a lot early, when you know nothing) and **decay** it over time (exploit more as your estimates get trustworthy). Explore broadly first, then settle down — much like how you learn a new skill.
+
+<Callout type="tip">
+The explore/exploit trade-off reaches far beyond RL: A/B testing, recommendation systems, even scientific research all face it. Epsilon-greedy is the simplest good answer, and a great mental model for decisions under uncertainty.
+</Callout>
+
+<Quiz
+  question="In epsilon-greedy with a decaying epsilon, how does behavior change over training?"
+  options={[
+    "It explores more and more over time",
+    "It explores a lot early (high ε) and gradually shifts to exploiting as estimates improve",
+    "It never explores",
+    "Epsilon has no effect"
+  ]}
+  answer={1}
+  explanation="Decaying epsilon front-loads exploration when the agent is ignorant, then increasingly exploits its now-reliable Q-values as learning progresses."
+/>
+
+Q-learning stores a value per action and picks the max. But what if the agent learned to output *the action itself*? That's the other great family — policy methods — and the bridge to how modern AI is tuned.
+
+
+<Homework>
+Given epsilon = 0.2 and a list of random draws `[0.05, 0.5, 0.1, 0.9, 0.15]`, count how many steps the agent **explores** (the draw is below epsilon). Then describe a decay schedule that would lower epsilon over 1000 episodes.
+</Homework>

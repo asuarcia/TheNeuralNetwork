@@ -1,0 +1,96 @@
+export const meta = {
+  title: "LoRA & Parameter-Efficient Tuning",
+  summary: "Full fine-tuning updates billions of weights. LoRA updates a tiny fraction and matches the quality — which is why it's the default everywhere today.",
+};
+
+Full fine-tuning has a brutal cost: you update *every* weight (billions of them), need huge GPU memory to do it, and end up with a complete multi-gigabyte copy of the model per task. **Parameter-Efficient Fine-Tuning (PEFT)** sidesteps all of that — and **LoRA** is its star technique.
+
+## The key insight
+
+When you adapt a model to a task, the *change* to its weights turns out to be "low-rank" — it can be captured by a much smaller matrix than the full weight matrix. So instead of editing the giant weight matrix directly, LoRA does this:
+
+- **Freeze** the original weights entirely — never touch them.
+- **Inject** two small matrices alongside them, whose product approximates the needed change.
+- Train **only those small matrices**.
+
+A `d × d` weight matrix (millions of numbers) gets adapted by two skinny matrices: `d × r` and `r × d`, where the **rank** `r` is tiny (often 8 or 16).
+
+<CodeExercise
+  id="lora-count"
+  prompt="A d×d layer is adapted by two LoRA matrices: d×r and r×d. Print the LoRA parameter count (2 * d * r)."
+  starter={`d = 1000
+r = 8
+# Full layer would be d*d. LoRA uses 2*d*r. Print the LoRA count.
+`}
+  expected="16000"
+  solution={`d = 1000
+r = 8
+print(2 * d * r)`}
+/>
+
+## The savings are staggering
+
+Compare that to full fine-tuning of the same layer and you see why LoRA took over.
+
+<CodeExercise
+  id="lora-reduction"
+  prompt="Compare full (d*d) vs LoRA (2*d*r) parameters. Print how many times smaller LoRA is (integer division)."
+  starter={`d = 1000
+r = 8
+full = d * d
+lora = 2 * d * r
+# Print how many times fewer parameters LoRA trains
+`}
+  expected="62"
+  solution={`d = 1000
+r = 8
+full = d * d
+lora = 2 * d * r
+print(full // lora)`}
+/>
+
+62× fewer trainable parameters for *one* layer — and the gap widens with model size. In practice LoRA often trains **less than 1%** of a model's parameters while matching full fine-tuning's quality.
+
+<Quiz
+  question="What does LoRA actually train?"
+  options={[
+    "All of the model's weights",
+    "Two small low-rank matrices injected alongside the frozen original weights",
+    "Only the input embeddings",
+    "Nothing — it's just prompting"
+  ]}
+  answer={1}
+  explanation="LoRA freezes the base model and trains only a pair of small low-rank matrices whose product approximates the weight update. That's where 'parameter-efficient' comes from."
+/>
+
+## Why this changed the game
+
+Because the base model stays frozen, LoRA gives you superpowers:
+
+- **Cheap training** — fits on a single consumer GPU instead of a cluster.
+- **Tiny artifacts** — a LoRA "adapter" is a few megabytes, not gigabytes. You ship the adapter, not a new model.
+- **Swappable & composable** — keep one base model in memory and hot-swap adapters for different tasks (a support-bot adapter, a coding adapter, a brand-voice adapter).
+- **No catastrophic forgetting** — the original weights are untouched, so general ability is preserved.
+
+<Callout type="tip">
+The mental model: the big pretrained model is a shared, read-only foundation; each LoRA adapter is a small, swappable "skin" that specializes it. One base, many cheap personalities — that's the modern fine-tuning workflow.
+</Callout>
+
+<Quiz
+  question="Why can you serve many fine-tuned tasks from one base model with LoRA?"
+  options={[
+    "LoRA deletes the base model",
+    "The base stays frozen and shared; each task is just a small swappable adapter applied on top",
+    "Each task needs its own full copy of the model",
+    "LoRA only works for one task ever"
+  ]}
+  answer={1}
+  explanation="Since LoRA leaves the base weights frozen, the multi-gigabyte base is shared across tasks and you only swap in tiny per-task adapters — efficient to store and to serve."
+/>
+
+You can now adapt huge models cheaply. But a fine-tuned 70-billion-parameter model is still enormous to *run*. Next: shrinking models so they actually fit and respond fast.
+
+
+<Homework>
+For a weight matrix of size d = 4096 with LoRA rank r = 16, compute the **LoRA parameter count** (2·d·r) and how many times **smaller** it is than full fine-tuning (d·d). Then explain why you can keep many LoRA adapters but only one base model in memory.
+</Homework>

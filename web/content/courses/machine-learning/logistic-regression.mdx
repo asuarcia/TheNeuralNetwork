@@ -1,0 +1,90 @@
+export const meta = {
+  title: "Logistic Regression & Classification",
+  summary: "Take linear regression, squash the output into a probability, and you get the workhorse classifier behind spam filters, fraud detection, and more.",
+};
+
+Linear regression predicts a number. But often you want a *category*: spam or not, fraud or legit, will-click or won't. **Logistic regression** adapts the exact same `w·x + b` machinery to predict a **probability** between 0 and 1 — and then a class.
+
+## The problem with a raw line
+
+A linear model can output anything: -40, 3.7, 9000. But a probability must live between 0 and 1. We need to squash that unbounded score into the `[0, 1]` range. Enter the **sigmoid** function:
+
+```text
+sigmoid(z) = 1 / (1 + e^(-z))
+```
+
+It takes any number and bends it into a smooth S-curve: very negative inputs → near 0, very positive → near 1, and `z = 0` → exactly 0.5.
+
+<CodeExercise
+  id="logreg-sigmoid"
+  prompt="Print sigmoid(0). (For z = 0 the result is exactly 0.5.)"
+  starter={`import math
+z = 0
+# Print 1 / (1 + e^(-z))
+`}
+  expected="0.5"
+  solution={`import math
+z = 0
+print(1 / (1 + math.exp(-z)))`}
+/>
+
+## From probability to decision
+
+Logistic regression computes `z = w·x + b` (the linear part), runs it through the sigmoid to get a probability, then applies a **threshold** — usually 0.5 — to decide the class. Above the threshold, predict "yes"; below it, "no". (That's the threshold idea from "Your First Model" in the Python for AI track, now with a principled probability behind it.)
+
+<CodeExercise
+  id="logreg-classify"
+  prompt="Given z = 2.0, compute the sigmoid probability, then print 'yes' if it's >= 0.5, else 'no'."
+  starter={`import math
+z = 2.0
+# Compute sigmoid(z); print "yes" if >= 0.5 else "no"
+`}
+  expected="yes"
+  solution={`import math
+z = 2.0
+p = 1 / (1 + math.exp(-z))
+print("yes" if p >= 0.5 else "no")`}
+/>
+
+A `z` of 2.0 gives a probability around 0.88 — comfortably a "yes."
+
+<Quiz
+  question="Why pass the linear score through a sigmoid in logistic regression?"
+  options={[
+    "To make training faster",
+    "To squash the unbounded score into a 0–1 range so it can be read as a probability",
+    "To round the answer to a whole number",
+    "To remove the bias term"
+  ]}
+  answer={1}
+  explanation="A raw linear score can be any value. The sigmoid maps it to [0, 1], giving a valid probability you can threshold into a class."
+/>
+
+## How it learns: log loss
+
+Linear regression minimized squared error. Classification uses a different scorecard: **log loss** (cross-entropy). It punishes confident *wrong* answers brutally — predicting 0.99 for something that was actually "no" costs far more than predicting 0.6. That pressure pushes the model to be both correct *and* well-calibrated in its confidence.
+
+The training mechanism is the same as everything else in ML: adjust `w` and `b` via gradient descent to drive the loss down.
+
+<Callout type="tip">
+Notice the pattern: <strong>linear core (w·x + b) → a function that shapes the output → a loss to minimize → gradient descent.</strong> Swap the shaping function and the loss, and you move from regression to classification — or, later, to a neuron in a neural network.
+</Callout>
+
+<Quiz
+  question="What's the key difference between linear and logistic regression?"
+  options={[
+    "Logistic regression uses no weights",
+    "Linear regression predicts a continuous number; logistic regression squashes the score into a probability and predicts a class",
+    "Logistic regression can't be trained",
+    "They are the same thing"
+  ]}
+  answer={1}
+  explanation="Both compute w·x + b. Linear regression outputs that directly (a number); logistic regression passes it through a sigmoid to get a probability, then thresholds it into a category."
+/>
+
+Linear and logistic regression are *linear* models — they draw straight boundaries. Some patterns need something that can carve the space into regions with rules. That's the decision tree, next.
+
+
+<Homework>
+Given a list of z-values `[-2, 0, 1, 3]`, apply the sigmoid to each and classify with a 0.5 threshold. Print how many are predicted "yes." Then explain what changes if you move the threshold to 0.7.
+</Homework>

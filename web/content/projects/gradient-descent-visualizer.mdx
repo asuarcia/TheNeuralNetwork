@@ -1,0 +1,115 @@
+export const meta = { title: "Gradient Descent Visualizer" };
+
+Gradient descent is the engine of all machine learning, but it can feel abstract. In this notebook you'll watch it work — logging every step as it rolls downhill to the minimum of a function. Run the cells in order.
+
+## 1. The landscape
+
+We'll minimize `f(x) = (x − 3)²` — a simple bowl whose lowest point is at x = 3. Its slope (derivative) is `f'(x) = 2(x − 3)`. Define both.
+
+<CodeExercise
+  id="gd-funcs"
+  prompt="Define f(x) and its derivative df(x), then print the slope at x = 0."
+  starter={`def f(x):
+    return (x - 3) ** 2
+
+def df(x):
+    return 2 * (x - 3)
+
+# Print the slope at x = 0
+print(df(0))`}
+  expected="-6"
+  solution={`def f(x):
+    return (x - 3) ** 2
+
+def df(x):
+    return 2 * (x - 3)
+
+print(df(0))`}
+/>
+
+The slope at x=0 is −6: negative, so the function drops as x increases — we should step **right** (toward 3).
+
+## 2. One step downhill
+
+The update rule: `x = x − learning_rate · slope`. Step opposite the slope. Take one step from x = 0.
+
+<CodeExercise
+  id="gd-step"
+  prompt="From x = 0 with lr = 0.1, take one gradient-descent step and print the new x."
+  starter={`def df(x):
+    return 2 * (x - 3)
+
+x = 0.0
+lr = 0.1
+x = x - lr * df(x)
+print(round(x, 2))`}
+  expected="0.6"
+  solution={`def df(x):
+    return 2 * (x - 3)
+x = 0.0
+lr = 0.1
+x = x - lr * df(x)
+print(round(x, 2))`}
+/>
+
+One step moved us from 0 to 0.6 — closer to 3. Now repeat.
+
+## 3. Watch it converge
+
+Log the trajectory: run several steps and print x and the loss at each. You'll see it close in on x = 3, taking smaller steps as the slope flattens.
+
+<CodeExercise
+  id="gd-trace"
+  prompt="Run 12 steps from x = 0 (lr = 0.2) and print x at each step, rounded to 3."
+  starter={`def f(x):
+    return (x - 3) ** 2
+def df(x):
+    return 2 * (x - 3)
+
+x = 0.0
+lr = 0.2
+for step in range(12):
+    x = x - lr * df(x)
+    print(step + 1, round(x, 3))`}
+  solution={`def f(x):
+    return (x - 3) ** 2
+def df(x):
+    return 2 * (x - 3)
+x = 0.0
+lr = 0.2
+for step in range(12):
+    x = x - lr * df(x)
+    print(step + 1, round(x, 3))`}
+/>
+
+Each line is one step of "feel the slope, step downhill." That single idea, scaled to millions of weights, trains every neural network.
+
+## 4. The learning rate makes or breaks it
+
+The one knob, `lr`, decides everything. Run this to compare a tiny rate, a good rate, and one so big it **diverges**.
+
+<CodeExercise
+  id="gd-lr"
+  prompt="Run 15 steps for three learning rates and print the final x for each."
+  starter={`def df(x):
+    return 2 * (x - 3)
+
+for lr in [0.01, 0.2, 1.1]:
+    x = 0.0
+    for _ in range(15):
+        x = x - lr * df(x)
+    print("lr", lr, "->", round(x, 2))`}
+  solution={`def df(x):
+    return 2 * (x - 3)
+for lr in [0.01, 0.2, 1.1]:
+    x = 0.0
+    for _ in range(15):
+        x = x - lr * df(x)
+    print("lr", lr, "->", round(x, 2))`}
+/>
+
+lr=0.01 crawls and barely moves; lr=0.2 lands on 3; lr=1.1 overshoots and explodes. That's the whole story of tuning learning rates.
+
+<Homework>
+Extend it: (1) minimize a different function like `f(x) = x² + 2x` (work out its derivative); (2) record every x into a list and describe the shape of the path; (3) find, by trial, the largest learning rate that still converges for `(x−3)²`. What happens right at that boundary?
+</Homework>

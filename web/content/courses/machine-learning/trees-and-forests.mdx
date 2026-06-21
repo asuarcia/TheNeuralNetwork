@@ -1,0 +1,85 @@
+export const meta = {
+  title: "Decision Trees & Random Forests",
+  summary: "Some patterns need rules, not lines. A decision tree asks yes/no questions; a random forest asks a whole committee of them.",
+};
+
+Linear and logistic regression draw *straight* boundaries. But lots of real relationships are full of "it depends." Decision trees handle those by doing what humans do: asking a sequence of yes/no questions.
+
+## A tree is a flowchart it learns
+
+A **decision tree** splits the data with a question — "is income > $50k?" — sending examples down two branches. Each branch can split again. At the bottom (a **leaf**), the tree makes a prediction.
+
+The magic is that the tree *learns which questions to ask*. At each step it greedily picks the split that best separates the labels — the one that makes each branch as "pure" (single-class) as possible.
+
+The simplest tree is a single split, called a **stump**. Let's apply one.
+
+<CodeExercise
+  id="tree-stump"
+  prompt="A stump predicts 'high' when x > 5. Count how many values in xs are classified 'high'."
+  starter={`xs = [3, 7, 5, 9, 1]
+# Count how many values are 'high' (x > 5)
+`}
+  expected="2"
+  solution={`xs = [3, 7, 5, 9, 1]
+print(sum(1 for x in xs if x > 5))`}
+/>
+
+Two values (7 and 9) clear the split. Stack many such splits and a tree can carve the feature space into complex, non-linear regions.
+
+<Quiz
+  question="How does a decision tree make a prediction?"
+  options={[
+    "It fits a straight line through the data",
+    "It runs the input through a series of learned yes/no questions until it reaches a leaf",
+    "It averages all the labels",
+    "It computes a dot product"
+  ]}
+  answer={1}
+  explanation="A tree routes each example through learned splits (questions). The leaf it lands in determines the prediction. This lets it model non-linear, rule-like patterns."
+/>
+
+## The catch: trees overfit
+
+A single tree, left to grow deep, will keep splitting until it perfectly memorizes the training data — including its noise. Great on training, terrible on new data. That's **high variance**: tiny changes in the data produce wildly different trees. (We'll name this problem properly in the bias-variance lesson.)
+
+## Random forests: wisdom of the crowd
+
+The fix is delightfully simple: **don't trust one tree — grow hundreds and let them vote.** A **random forest** trains many trees, each on a random subset of the data and features, then aggregates their predictions: majority vote for classification, average for regression.
+
+Each tree overfits in its *own* way, so their errors are different — and averaging cancels out the noise while keeping the signal.
+
+<CodeExercise
+  id="forest-vote"
+  prompt="Three trees voted on one sample. Print the majority class."
+  starter={`from collections import Counter
+votes = ["spam", "ham", "spam"]
+# Print the most common vote
+`}
+  expected="spam"
+  solution={`from collections import Counter
+votes = ["spam", "ham", "spam"]
+print(Counter(votes).most_common(1)[0][0])`}
+/>
+
+<Callout type="tip">
+This "average many noisy models" trick is called <strong>ensembling</strong>, and it's everywhere — random forests, gradient boosting, even the self-consistency prompting you saw earlier (run a model several times, take the majority). Diverse, independent guesses beat one confident guess.
+</Callout>
+
+<Quiz
+  question="Why does a random forest usually beat a single deep decision tree?"
+  options={[
+    "It uses less memory",
+    "Averaging many diverse trees cancels out each tree's individual overfitting, reducing variance",
+    "Each tree is guaranteed to be perfect",
+    "Forests don't need training data"
+  ]}
+  answer={1}
+  explanation="One deep tree overfits (high variance). Many trees, each overfitting differently, average out their idiosyncratic errors — so the forest generalizes far better."
+/>
+
+You now have the three classic model families: linear (regression), sigmoid-based (logistic), and rule-based (trees/forests). Whichever you pick, the next question is the same and unavoidable: *is it actually any good?*
+
+
+<Homework>
+Write a two-question decision rule (e.g. "if age > 30 and income > 50k → approve") as nested ifs, and classify three example people. Then describe in a sentence how a **random forest** of many such rules would vote.
+</Homework>

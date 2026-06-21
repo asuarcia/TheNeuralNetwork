@@ -1,0 +1,90 @@
+export const meta = {
+  title: "Diffusion Models",
+  summary: "The technology behind today's image generators is almost paradoxical: teach a model to destroy an image with noise, and it learns to create one from nothing.",
+};
+
+**Diffusion models** power the image generators reshaping art and design. The core idea is beautifully counterintuitive: if a model can learn to *remove* a little noise from an image, you can run it over and over to turn **pure random noise into a brand-new image**.
+
+## Two directions
+
+- **Forward process (destroy):** start with a real image and add a little random **noise**, step by step, until it's pure static. This part needs no learning — it's just adding noise.
+- **Reverse process (create):** train a model to **undo** one step of noising — to predict and remove the noise. Run that learned denoiser repeatedly, starting from random static, and a coherent image gradually emerges.
+
+The model's entire job is: *given a noisy image, predict the noise that was added.* Subtract it, and you've taken one step back toward a clean image.
+
+Let's see the forward step — adding noise to an image (here, a 2-pixel "image").
+
+<CodeExercise
+  id="diff-addnoise"
+  prompt="Forward step: add the noise to the image, element by element."
+  starter={`image = [10, 20]
+noise = [1, -2]
+# Print the noisy image (element-wise sum)
+`}
+  expected="[11, 18]"
+  solution={`image = [10, 20]
+noise = [1, -2]
+print([a + b for a, b in zip(image, noise)])`}
+/>
+
+And the reverse step — if the model correctly predicts the noise, subtracting it recovers the clean image.
+
+<CodeExercise
+  id="diff-denoise"
+  prompt="Reverse step: subtract the predicted noise from the noisy image to recover the original."
+  starter={`noisy = [11, 18]
+predicted_noise = [1, -2]
+# Print the denoised image (noisy minus predicted noise)
+`}
+  expected="[10, 20]"
+  solution={`noisy = [11, 18]
+predicted_noise = [1, -2]
+print([a - b for a, b in zip(noisy, predicted_noise)])`}
+/>
+
+We recovered `[10, 20]`. Real generation does this over many small steps, each removing a bit of noise, until a detailed image appears from the static.
+
+<Quiz
+  question="What does a diffusion model actually learn to do?"
+  options={[
+    "Add noise to images",
+    "Predict and remove the noise from a noisy image, one step at a time",
+    "Classify images into categories",
+    "Compress images"
+  ]}
+  answer={1}
+  explanation="The model learns the reverse process: given a noisy image, predict the noise so it can be subtracted. Repeating this denoising turns random noise into a new image."
+/>
+
+## Why diffusion won
+
+Compared to GANs, diffusion models are:
+
+- **More stable to train** — no adversarial tug-of-war; it's a straightforward "predict the noise" objective.
+- **More diverse** — no mode collapse; they cover the full variety of the data.
+- **Higher quality** — the step-by-step refinement produces fine detail.
+
+The trade-off is **speed**: many denoising steps make generation slower than a GAN's single pass. **Latent diffusion** (used by Stable Diffusion) fixes most of this by running the whole process in a compact **latent space** (from the autoencoder lesson!) instead of on full-size pixels.
+
+<Callout type="tip">
+The denoiser network is usually a <strong>U-Net</strong> — the same shrink-then-expand architecture used for image segmentation in the Computer Vision track. Diffusion stitches together ideas from across this whole curriculum: latent spaces, U-Nets, and (next) embeddings for text guidance.
+</Callout>
+
+<Quiz
+  question="What is the main advantage of latent diffusion (e.g., Stable Diffusion)?"
+  options={[
+    "It removes the need for any training",
+    "It runs diffusion in a compact latent space instead of full pixels, making it much faster",
+    "It only generates black-and-white images",
+    "It uses a GAN instead"
+  ]}
+  answer={1}
+  explanation="Latent diffusion compresses images into a smaller latent space (via an autoencoder) and diffuses there, drastically cutting the compute of each step while keeping quality."
+/>
+
+So far diffusion generates *some* image from noise. But how do we make it generate the image *we asked for in words*? That's text-to-image, CLIP, and guidance — next.
+
+
+<Homework>
+Take a 3-number "image" `[5, 10, 15]`. Add a noise vector `[2, -3, 1]` (forward step), then subtract the same predicted noise (reverse step) and confirm you recover the original. Then explain why real diffusion needs **many** small steps rather than one.
+</Homework>

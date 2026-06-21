@@ -1,0 +1,87 @@
+export const meta = {
+  title: "GANs: Generator vs. Discriminator",
+  summary: "Pit two networks against each other — a forger and a detective — and let them push each other to greatness. That adversarial game is the GAN.",
+};
+
+A **Generative Adversarial Network (GAN)** generates startlingly realistic data through competition. Two networks play a game: one tries to fake data, the other tries to catch the fakes. As each improves, it forces the other to improve — until the fakes are indistinguishable from real.
+
+## The two players
+
+- **Generator** — the forger. Takes random noise and tries to produce realistic data (e.g., a fake face). It never sees real data directly; it only learns from the detective's feedback.
+- **Discriminator** — the detective. Sees both real data and the generator's fakes, and learns to tell them apart, outputting a probability "real."
+
+They train together in a tug-of-war: the discriminator gets better at spotting fakes, which pushes the generator to make better fakes, which pushes the discriminator again. This is **adversarial** training.
+
+The discriminator's verdict is just a thresholded probability.
+
+<CodeExercise
+  id="gan-discriminate"
+  prompt="The discriminator scored an image 0.7 (its probability of 'real'). With a 0.5 threshold, print its verdict."
+  starter={`score = 0.7
+# Print "real" if score > 0.5, else "fake"
+`}
+  expected="real"
+  solution={`score = 0.7
+print("real" if score > 0.5 else "fake")`}
+/>
+
+## The generator's goal: fool the detective
+
+The generator succeeds when the discriminator labels its fakes as "real." We can measure progress by counting how many fakes slipped past.
+
+<CodeExercise
+  id="gan-fooled"
+  prompt="The discriminator scored four generated fakes. Count how many fooled it (scored above 0.5 = 'real')."
+  starter={`scores = [0.6, 0.3, 0.8, 0.2]
+# Count how many fakes were classified as real (score > 0.5)
+`}
+  expected="2"
+  solution={`scores = [0.6, 0.3, 0.8, 0.2]
+print(sum(1 for s in scores if s > 0.5))`}
+/>
+
+Two of four fooled the detective — the generator is learning. At convergence, the discriminator can do no better than a coin flip (0.5 everywhere): the fakes have become indistinguishable from real.
+
+<Quiz
+  question="In a GAN, what does the generator learn from?"
+  options={[
+    "Real images directly",
+    "The discriminator's feedback — it improves by learning to fool the detective",
+    "Human labels on each fake",
+    "A reward table"
+  ]}
+  answer={1}
+  explanation="The generator never sees real data directly. It improves purely from the discriminator's judgments, gradually producing fakes good enough to be classified as real."
+/>
+
+## The catch: GANs are hard to train
+
+That elegant game is also temperamental:
+
+- **Instability** — the two networks can oscillate instead of converging; if one overpowers the other, learning stalls.
+- **Mode collapse** — the generator finds one or two outputs that reliably fool the discriminator and just produces those, losing variety (e.g., only ever generating one face).
+
+GANs produce sharp, impressive images and were state of the art for years. But their training headaches opened the door to a more stable approach that now dominates image generation — diffusion.
+
+<Callout type="tip">
+The GAN idea — two networks improving by opposition — is one of the most influential in deep learning, beyond images. But for text-to-image generation today, diffusion models have largely taken over because they're more stable and controllable.
+</Callout>
+
+<Quiz
+  question="What is 'mode collapse' in a GAN?"
+  options={[
+    "The discriminator crashes",
+    "The generator produces only a tiny variety of outputs (e.g., the same image) instead of diverse samples",
+    "Training becomes too fast",
+    "The latent space disappears"
+  ]}
+  answer={1}
+  explanation="Mode collapse is when the generator exploits a few outputs that fool the discriminator, sacrificing diversity — a common GAN failure mode."
+/>
+
+GANs forge images in one shot. The dominant method today does it gradually — starting from pure noise and refining. Time for diffusion.
+
+
+<Homework>
+The discriminator scored six generated fakes: `[0.7, 0.2, 0.6, 0.9, 0.4, 0.55]`. Count how many fooled it (score > 0.5). Then explain, in two sentences, what **mode collapse** would look like in a face generator and why it's bad.
+</Homework>

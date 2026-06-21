@@ -25,9 +25,9 @@ export const Navbar = () => {
   }, [pathname]);
 
   const navItems = [
-    { name: 'Courses', to: '/#courses' },
+    { name: 'Courses', to: '/courses' },
+    { name: 'Projects', to: '/projects' },
     { name: 'Learning Paths', to: '/#paths' },
-    { name: 'Resources', to: '/#resources' },
     { name: 'Community', to: '/#community' }
   ];
 

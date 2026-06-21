@@ -1,0 +1,72 @@
+export const meta = { title: "Markov-Chain Text Generator" };
+
+Before transformers, machines generated text with **Markov chains** — learning which words tend to follow which, then sampling. You'll build one here and watch it babble. It's generative AI stripped to its essence. Run the cells in order.
+
+## 1. Learn the transitions
+
+Walk through a corpus and record, for each word, the list of words that follow it. That table *is* the model.
+
+<CodeExercise
+  id="mk-table"
+  prompt="Build the transition table and print the words that follow 'the'."
+  starter={`corpus = "the cat sat the cat ran the dog sat".split()
+transitions = {}
+for current, nxt in zip(corpus, corpus[1:]):
+    transitions.setdefault(current, []).append(nxt)
+
+print(transitions["the"])`}
+  expected="['cat', 'cat', 'dog']"
+  solution={`corpus = "the cat sat the cat ran the dog sat".split()
+transitions = {}
+for current, nxt in zip(corpus, corpus[1:]):
+    transitions.setdefault(current, []).append(nxt)
+print(transitions["the"])`}
+/>
+
+After "the" the corpus goes to "cat", "cat", then "dog" — so the model will pick "cat" twice as often as "dog". Frequency *is* probability here.
+
+## 2. Generate text
+
+Start from a word and repeatedly sample the next one from its transition list. Run it (we seed the randomness so your result is reproducible).
+
+<CodeExercise
+  id="mk-generate"
+  prompt="Generate a short sequence by sampling the transition table."
+  starter={`import random
+random.seed(1)
+
+corpus = "the cat sat the cat ran the dog sat".split()
+transitions = {}
+for current, nxt in zip(corpus, corpus[1:]):
+    transitions.setdefault(current, []).append(nxt)
+
+word = "the"
+out = [word]
+for _ in range(6):
+    if word not in transitions:
+        break
+    word = random.choice(transitions[word])
+    out.append(word)
+
+print(" ".join(out))`}
+  solution={`import random
+random.seed(1)
+corpus = "the cat sat the cat ran the dog sat".split()
+transitions = {}
+for current, nxt in zip(corpus, corpus[1:]):
+    transitions.setdefault(current, []).append(nxt)
+word = "the"
+out = [word]
+for _ in range(6):
+    if word not in transitions:
+        break
+    word = random.choice(transitions[word])
+    out.append(word)
+print(" ".join(out))`}
+/>
+
+That's text generation: model the distribution of "what comes next," then sample from it — exactly what an LLM does, just with vastly more context and learned probabilities instead of raw counts.
+
+<Homework>
+Make it better: (1) paste in a few paragraphs of your favorite book as the corpus and generate from it; (2) use **two-word** history (trigrams) instead of one — coherence jumps; (3) weight the sampling by frequency explicitly; (4) compare your Markov output to a real LLM and note what context length buys you.
+</Homework>

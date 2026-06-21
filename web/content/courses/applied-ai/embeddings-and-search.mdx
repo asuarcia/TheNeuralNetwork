@@ -1,0 +1,102 @@
+export const meta = {
+  title: "Embeddings & Vector Search",
+  summary: "Keyword search finds the word 'car'; semantic search finds 'automobile' too. Embeddings are how. This is the engine inside real RAG.",
+};
+
+In the last lesson, retrieval used keyword matching — it only finds chunks that share *exact words* with the query. Ask "how do I reset my password?" and a doc titled "credential recovery steps" never surfaces. **Embeddings** fix this by searching on *meaning* instead of letters.
+
+## An embedding is a vector of meaning
+
+An embedding model converts a piece of text into a fixed-length **vector** (a list of numbers) such that texts with similar meaning land near each other in that space. "car" and "automobile" get nearby vectors; "car" and "banana" get distant ones.
+
+You met vectors and the dot product in the Python for AI track — this is where they pay off. Each document becomes a vector; the query becomes a vector; "relevant" becomes "geometrically close."
+
+<Callout type="note">
+The numbers in an embedding aren't human-readable — no single slot means "is about cars." Meaning is encoded across all the dimensions at once, learned during the embedding model's training.
+</Callout>
+
+## Cosine similarity: comparing direction
+
+To compare two embeddings we care about the **direction** they point, not their length. **Cosine similarity** is the dot product divided by both vectors' lengths — it ranges from -1 (opposite) to 1 (identical direction).
+
+<CodeExercise
+  id="emb-cosine"
+  prompt="Compute the cosine similarity between a and b. (They point the same way, so expect 1.0.)"
+  starter={`import math
+a = [1, 0]
+b = [1, 0]
+# cosine = dot(a,b) / (length(a) * length(b)). Print it.
+`}
+  expected="1.0"
+  solution={`import math
+a = [1, 0]
+b = [1, 0]
+dot = sum(x * y for x, y in zip(a, b))
+la = math.sqrt(sum(x * x for x in a))
+lb = math.sqrt(sum(x * x for x in b))
+print(dot / (la * lb))`}
+/>
+
+<Quiz
+  question="What is a text embedding?"
+  options={[
+    "The text compressed into a zip file",
+    "A vector of numbers positioned so that similar-meaning texts have nearby vectors",
+    "A list of the keywords in the text",
+    "The text translated to another language"
+  ]}
+  answer={1}
+  explanation="An embedding maps text to a point in vector space where distance reflects semantic similarity — enabling search by meaning rather than exact words."
+/>
+
+## Nearest-neighbor search
+
+Semantic retrieval is then just: embed the query, and find the document whose vector is *closest* (highest similarity). With a handful of docs you can compare against all of them; at scale, a **vector database** (FAISS, Pinecone, pgvector) does this in milliseconds over millions of vectors.
+
+<CodeExercise
+  id="emb-nn"
+  prompt="Find the document most similar to the query by dot product. Print the index of the best match."
+  starter={`query = [1, 1]
+docs = [[1, 0], [0, 1], [1, 1]]
+# Print the index of the doc with the highest dot product with query
+`}
+  expected="2"
+  solution={`query = [1, 1]
+docs = [[1, 0], [0, 1], [1, 1]]
+scores = [sum(q * d for q, d in zip(query, doc)) for doc in docs]
+print(scores.index(max(scores)))`}
+/>
+
+Document 2 (`[1, 1]`) points exactly the way the query does, so it wins. Swap "dot product" for "cosine similarity" and "this list" for "a vector database," and that's production semantic search.
+
+## Putting it together: real RAG
+
+Now the full picture, upgraded from the last lesson:
+
+1. **Offline:** chunk your docs, embed every chunk, store the vectors in a vector DB.
+2. **At query time:** embed the question, retrieve the top-k nearest chunks, stuff them into the prompt, and generate.
+
+The retrieval step went from "exact word match" to "meaning match" — that's the whole difference between a toy and a system people trust.
+
+<Callout type="tip">
+"top-k" is a tuning knob: too few chunks and you miss the answer; too many and you waste context and trigger "lost in the middle." Start around k=3–5 and adjust based on results.
+</Callout>
+
+<Quiz
+  question="Why use cosine similarity instead of raw vector distance for matching embeddings?"
+  options={[
+    "It's faster to compute, always",
+    "It compares direction (meaning) and ignores vector length, so longer texts aren't unfairly penalized",
+    "It only works on 2D vectors",
+    "Distance can't be computed for text"
+  ]}
+  answer={1}
+  explanation="Cosine focuses on orientation, not magnitude. Two texts about the same topic should match regardless of length, which is exactly what direction-based similarity gives you."
+/>
+
+You can now retrieve by meaning — the heart of every serious RAG system. But documents arrive as messy PDFs, HTML, and JSON. Turning that raw mess into clean, chunkable text is the next job: data pipelines.
+
+
+<Homework>
+Given a query vector and four document vectors, write code that returns the **top-2** most similar documents by dot product (not just the top one). Then swap dot product for cosine similarity and see whether the ranking changes.
+</Homework>

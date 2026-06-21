@@ -1,0 +1,102 @@
+export const meta = {
+  title: "The Transformer Architecture",
+  summary: "One architecture powers GPT, Claude, Gemini, and nearly every modern model. Here's what's inside the transformer — and why it changed everything.",
+};
+
+In 2017 a paper titled *"Attention Is All You Need"* introduced the **transformer**. Within a few years it had taken over language, vision, audio, and code. Every model you've chatted with is a transformer. This lesson is the map of what's inside one.
+
+## Why it replaced what came before
+
+Earlier sequence models (RNNs, LSTMs) read text one word at a time, left to right. Two problems: they were **slow** (no parallelism — each step waited for the last), and they **forgot** — information from early words faded by the end of a long sentence.
+
+The transformer's breakthrough: process *all* tokens **at once, in parallel**, and let every token directly look at every other token through a mechanism called **attention**. No more bottleneck, no more forgetting across distance.
+
+<Quiz
+  question="What was the transformer's key advantage over earlier RNN-based models?"
+  options={[
+    "It uses fewer parameters",
+    "It processes all tokens in parallel and lets every token attend directly to every other, avoiding slow sequential processing and long-range forgetting",
+    "It doesn't need training data",
+    "It removed the need for GPUs"
+  ]}
+  answer={1}
+  explanation="Transformers drop the left-to-right bottleneck: tokens are processed in parallel and attention connects any two positions directly, capturing long-range dependencies efficiently."
+/>
+
+## The pipeline, block by block
+
+Text flows through a transformer like this:
+
+1. **Tokenize & embed** — text becomes tokens, each mapped to a vector (the embeddings you learned in Applied AI).
+2. **Positional encoding** — since all tokens are processed at once, the model needs to know their *order*. Position information is added to each embedding.
+3. **Attention blocks** — each token gathers relevant information from other tokens (the next lesson, in full).
+4. **Feed-forward layers** — a standard MLP (which you just built!) processes each position.
+5. **Residual connections + normalization** — keep gradients flowing and training stable through deep stacks.
+6. **Output layer** — produces a probability distribution over the next token.
+
+Steps 3–5 form one "block," and a transformer stacks **dozens** of them.
+
+## Order matters: positional encoding
+
+Because attention sees all tokens simultaneously, "dog bites man" and "man bites dog" would look identical without position information. So each token's embedding gets its position folded in. Here's the idea in miniature — pairing each token with its position.
+
+<CodeExercise
+  id="tf-positions"
+  prompt="Tag each token with its position index. Print a list of (token, position) pairs."
+  starter={`tokens = ["the", "cat", "sat"]
+# Print [(token, position), ...] using the index of each token
+`}
+  expected="[('the', 0), ('cat', 1), ('sat', 2)]"
+  solution={`tokens = ["the", "cat", "sat"]
+print([(t, i) for i, t in enumerate(tokens)])`}
+/>
+
+## Residual connections keep it trainable
+
+Stacking dozens of blocks risks the signal (and gradient) getting lost. A **residual connection** fixes this by adding a layer's input back to its output: `output = x + sublayer(x)`. The original signal always has a clear path through, which is what makes very deep transformers trainable.
+
+<CodeExercise
+  id="tf-residual"
+  prompt="Apply a residual connection: output = x + sublayer_output. Print the result."
+  starter={`x = 1.0
+sublayer_output = 0.5
+# Residual connection adds the input back. Print x + sublayer_output.
+`}
+  expected="1.5"
+  solution={`x = 1.0
+sublayer_output = 0.5
+print(x + sublayer_output)`}
+/>
+
+## Encoder, decoder, or both
+
+Transformers come in three flavors:
+
+- **Encoder-only** (e.g., BERT) — reads a whole input to *understand* it. Great for classification, search, embeddings.
+- **Decoder-only** (e.g., GPT) — generates text left to right, predicting the next token. This is what powers chat models.
+- **Encoder-decoder** (e.g., T5) — reads an input, then generates an output. Great for translation and summarization.
+
+The decoder-only chat models are **autoregressive**: they predict the next token, append it, and feed the result back in to predict the next — the exact loop from "How LLMs Work," now you know what's generating each prediction.
+
+<Callout type="tip">
+Notice how much you already knew. Embeddings, MLP feed-forward layers, the next-token loop — they're all here. The transformer's one genuinely new idea is <strong>attention</strong>, and that's exactly where we're headed.
+</Callout>
+
+<Quiz
+  question="A chat model like GPT is 'decoder-only' and 'autoregressive'. What does that mean?"
+  options={[
+    "It reads input but can't generate text",
+    "It generates one token at a time, feeding each prediction back in to produce the next",
+    "It only works on images",
+    "It needs no training"
+  ]}
+  answer={1}
+  explanation="Decoder-only models generate text autoregressively: predict the next token, append it, and repeat — building the response one token at a time."
+/>
+
+You've got the full architecture in view. Now we open up its one essential, defining mechanism — and work it out by hand.
+
+
+<Homework>
+In your own words, write out the transformer pipeline from tokens to next-token prediction, naming each block. Then explain in two sentences **why positional encoding is necessary** when attention sees all tokens at once.
+</Homework>

@@ -1,0 +1,141 @@
+export const meta = { title: "Self-Taught Tic-Tac-Toe Agent" };
+
+You'll build the pieces of an agent that learns tic-tac-toe by playing itself — representing the board, detecting wins, and updating state values from outcomes. Run the cells in order, then take the final loop further in the homework.
+
+## 1. The board
+
+We'll represent the board as a list of 9 cells: `"X"`, `"O"`, or `" "` (empty). Run this to see a rendered board.
+
+<CodeExercise
+  id="ttt-board"
+  prompt="Render a board from a 9-cell list."
+  starter={`board = ["X", "O", "X",
+         " ", "X", " ",
+         "O", " ", "O"]
+
+def render(b):
+    rows = [" | ".join(b[i:i+3]) for i in range(0, 9, 3)]
+    return "\\n---------\\n".join(rows)
+
+print(render(board))`}
+  solution={`board = ["X", "O", "X", " ", "X", " ", "O", " ", "O"]
+def render(b):
+    rows = [" | ".join(b[i:i+3]) for i in range(0, 9, 3)]
+    return "\\n---------\\n".join(rows)
+print(render(board))`}
+/>
+
+## 2. Detecting a winner
+
+The agent needs to know when a game ends. Check all eight lines (3 rows, 3 columns, 2 diagonals).
+
+<CodeExercise
+  id="ttt-winner"
+  prompt="Write winner(board) and test it on a board where X has the top row."
+  starter={`lines = [(0,1,2),(3,4,5),(6,7,8),
+         (0,3,6),(1,4,7),(2,5,8),
+         (0,4,8),(2,4,6)]
+
+def winner(b):
+    for i, j, k in lines:
+        if b[i] == b[j] == b[k] != " ":
+            return b[i]
+    return None
+
+board = ["X", "X", "X",
+         " ", "O", " ",
+         "O", " ", " "]
+print(winner(board))`}
+  expected="X"
+  solution={`lines = [(0,1,2),(3,4,5),(6,7,8),(0,3,6),(1,4,7),(2,5,8),(0,4,8),(2,4,6)]
+def winner(b):
+    for i, j, k in lines:
+        if b[i] == b[j] == b[k] != " ":
+            return b[i]
+    return None
+board = ["X", "X", "X", " ", "O", " ", "O", " ", " "]
+print(winner(board))`}
+/>
+
+## 3. Learning from outcomes
+
+The agent keeps a **value** for each board state — its estimate of how good that state is. After a game, it nudges the values of states it visited toward the result (win = 1, loss = 0). Here's one such update.
+
+<CodeExercise
+  id="ttt-value"
+  prompt="A visited state had value 0.0; the game was won (reward 1). Apply one value update with alpha = 0.1."
+  starter={`value = 0.0
+reward = 1.0   # this line of play led to a win
+alpha = 0.1
+value = value + alpha * (reward - value)
+print(round(value, 2))`}
+  expected="0.1"
+  solution={`value = 0.0
+reward = 1.0
+alpha = 0.1
+value = value + alpha * (reward - value)
+print(round(value, 2))`}
+/>
+
+Do this after thousands of self-played games and the values converge so the agent always steers toward winning (or drawing) lines.
+
+## 4. Self-play (the engine)
+
+Here's the skeleton of the self-play loop that ties it together — a value table, random-but-improving moves, and value updates from each game's outcome. Run it to simulate games; the homework is to wire in the learning fully.
+
+<CodeExercise
+  id="ttt-selfplay"
+  prompt="Run a quick self-play simulation that counts game outcomes."
+  starter={`import random
+random.seed(0)
+lines = [(0,1,2),(3,4,5),(6,7,8),(0,3,6),(1,4,7),(2,5,8),(0,4,8),(2,4,6)]
+def winner(b):
+    for i, j, k in lines:
+        if b[i] == b[j] == b[k] != " ":
+            return b[i]
+    return None
+
+results = {"X": 0, "O": 0, "draw": 0}
+for game in range(500):
+    board = [" "] * 9
+    player = "X"
+    for move in range(9):
+        empty = [i for i in range(9) if board[i] == " "]
+        board[random.choice(empty)] = player
+        if winner(board):
+            results[winner(board)] += 1
+            break
+        player = "O" if player == "X" else "O" if player == "O" else "X"
+        player = "O" if move % 2 == 0 else "X"
+    else:
+        results["draw"] += 1
+print(results)`}
+  solution={`import random
+random.seed(0)
+lines = [(0,1,2),(3,4,5),(6,7,8),(0,3,6),(1,4,7),(2,5,8),(0,4,8),(2,4,6)]
+def winner(b):
+    for i, j, k in lines:
+        if b[i] == b[j] == b[k] != " ":
+            return b[i]
+    return None
+results = {"X": 0, "O": 0, "draw": 0}
+for game in range(500):
+    board = [" "] * 9
+    for move in range(9):
+        empty = [i for i in range(9) if board[i] == " "]
+        player = "X" if move % 2 == 0 else "O"
+        board[random.choice(empty)] = player
+        w = winner(board)
+        if w:
+            results[w] += 1
+            break
+    else:
+        results["draw"] += 1
+print(results)`}
+/>
+
+Right now both players move randomly. The leap to a *learning* agent is replacing "random move" with "the move that leads to the highest-value next state," and updating those values after each game.
+
+<Homework>
+Build the full agent: (1) maintain a value dict keyed by board string; (2) pick moves greedily by next-state value (with some exploration); (3) after each game, update every visited state toward the outcome; (4) train for 50,000 self-play games, then play against it — a well-trained agent should never lose.
+</Homework>

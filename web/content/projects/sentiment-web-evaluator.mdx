@@ -1,0 +1,83 @@
+export const meta = { title: "The Semantic Sentiment Evaluator" };
+
+You'll build a sentiment classifier that turns messy text into structured labels — the workhorse pattern of applied AI (LLMs as data engines). We'll start with a transparent lexicon approach you can fully see. Run the cells in order.
+
+## 1. The sentiment lexicon
+
+The simplest sentiment model scores text against lists of positive and negative words. Define them.
+
+<CodeExercise
+  id="se-lexicon"
+  prompt="Define the positive and negative word sets and print their sizes."
+  starter={`positive = {"love", "great", "amazing", "good", "happy", "best"}
+negative = {"hate", "bad", "terrible", "awful", "sad", "worst"}
+print(len(positive), len(negative))`}
+  expected="6 6"
+  solution={`positive = {"love", "great", "amazing", "good", "happy", "best"}
+negative = {"hate", "bad", "terrible", "awful", "sad", "worst"}
+print(len(positive), len(negative))`}
+/>
+
+## 2. Classify a piece of text
+
+Count positive minus negative words; the sign is the sentiment. Build it and test on a clearly positive review.
+
+<CodeExercise
+  id="se-classify"
+  prompt="Write sentiment(text) returning 'positive', 'negative', or 'neutral', and test it."
+  starter={`positive = {"love", "great", "amazing", "good", "happy", "best"}
+negative = {"hate", "bad", "terrible", "awful", "sad", "worst"}
+
+def sentiment(text):
+    words = text.lower().split()
+    score = sum(w in positive for w in words) - sum(w in negative for w in words)
+    return "positive" if score > 0 else "negative" if score < 0 else "neutral"
+
+print(sentiment("I love this it is great"))`}
+  expected="positive"
+  solution={`positive = {"love", "great", "amazing", "good", "happy", "best"}
+negative = {"hate", "bad", "terrible", "awful", "sad", "worst"}
+def sentiment(text):
+    words = text.lower().split()
+    score = sum(w in positive for w in words) - sum(w in negative for w in words)
+    return "positive" if score > 0 else "negative" if score < 0 else "neutral"
+print(sentiment("I love this it is great"))`}
+/>
+
+## 3. Process a batch into structured data
+
+The real value is turning *many* messy texts into clean, countable labels. Run the classifier over a batch and tally the results.
+
+<CodeExercise
+  id="se-batch"
+  prompt="Classify a batch of reviews and print the count of each sentiment."
+  starter={`from collections import Counter
+positive = {"love", "great", "amazing", "good", "happy", "best"}
+negative = {"hate", "bad", "terrible", "awful", "sad", "worst"}
+def sentiment(text):
+    words = text.lower().split()
+    score = sum(w in positive for w in words) - sum(w in negative for w in words)
+    return "positive" if score > 0 else "negative" if score < 0 else "neutral"
+
+reviews = ["love it great", "terrible and bad", "it is okay", "the best ever"]
+print(Counter(sentiment(r) for r in reviews))`}
+  solution={`from collections import Counter
+positive = {"love", "great", "amazing", "good", "happy", "best"}
+negative = {"hate", "bad", "terrible", "awful", "sad", "worst"}
+def sentiment(text):
+    words = text.lower().split()
+    score = sum(w in positive for w in words) - sum(w in negative for w in words)
+    return "positive" if score > 0 else "negative" if score < 0 else "neutral"
+reviews = ["love it great", "terrible and bad", "it is okay", "the best ever"]
+print(Counter(sentiment(r) for r in reviews))`}
+/>
+
+Unstructured text in, structured counts out — now you can chart it, alert on it, or track it over time.
+
+## 4. Upgrade to an LLM classifier
+
+The lexicon misses sarcasm, negation ("not bad"), and nuance. The modern approach: send each text to an LLM with a prompt like *"Classify the sentiment as positive/negative/neutral. Return only the label."* — using the model as a structured-output engine.
+
+<Homework>
+Level up: (1) handle negation — "not good" should flip to negative; (2) return a confidence score (how lopsided the word counts were); (3) replace the lexicon with an LLM call that returns strict JSON like `{"sentiment": "...", "confidence": 0.0}`, and parse it; (4) run it over real product reviews and chart the breakdown.
+</Homework>

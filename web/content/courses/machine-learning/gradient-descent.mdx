@@ -1,0 +1,105 @@
+export const meta = {
+  title: "How Models Learn: Gradient Descent",
+  summary: "Every model in this course — and every neural network in the next — learns the same way: measure the slope of the error, and step downhill.",
+};
+
+We've talked about "finding the best `w` and `b`" as if it just happens. It doesn't. There's one algorithm doing that work behind linear regression, logistic regression, and every neural network on Earth: **gradient descent**. Learn it once, and you understand how *all* of them train.
+
+## The loss is a landscape
+
+Picture the loss (MSE, log loss, whatever) as a function of the weights. As you change a weight, the loss goes up or down — tracing out a **surface** with hills and valleys. Training means finding the lowest valley: the weights where error is smallest.
+
+You're standing somewhere on that surface, in a thick fog. You can't see the valley. But you *can* feel the slope under your feet.
+
+## The gradient is the slope
+
+For any weight, the **gradient** is the slope of the loss with respect to that weight: "if I nudge this weight up a little, does the loss rise or fall, and how steeply?"
+
+To *reduce* loss, step in the **opposite** direction of the gradient — downhill. That single rule is gradient descent:
+
+```text
+w_new = w - learning_rate * gradient
+```
+
+The **learning rate** controls step size. Let's take one step minimizing the simplest loss, `f(w) = w²`, whose gradient is `2w`.
+
+<CodeExercise
+  id="gd-step"
+  prompt="Minimize f(w) = w². Its gradient is 2*w. Take one gradient-descent step from w = 4.0 with lr = 0.1, and print the new w."
+  starter={`w = 4.0
+lr = 0.1
+# gradient of w**2 is 2*w. Apply: w = w - lr * gradient. Print w.
+`}
+  expected="3.2"
+  solution={`w = 4.0
+lr = 0.1
+grad = 2 * w
+print(w - lr * grad)`}
+/>
+
+We moved from 4.0 toward 3.2 — closer to the minimum at 0. One step rarely gets you there; learning is this step, repeated.
+
+<Quiz
+  question="The gradient of the loss with respect to a weight is positive. To reduce the loss, you should:"
+  options={[
+    "Increase the weight",
+    "Decrease the weight (step opposite the gradient)",
+    "Leave it unchanged",
+    "Set it to zero"
+  ]}
+  answer={1}
+  explanation="A positive gradient means increasing the weight increases the loss. Gradient descent steps the opposite way, so you decrease the weight."
+/>
+
+## Iterate to convergence
+
+Run the update over and over and the weight slides down the curve toward the minimum. Watch it converge over three steps from `w = 10`:
+
+<CodeExercise
+  id="gd-loop"
+  prompt="Run 3 gradient-descent steps on f(w)=w² (gradient 2*w) from w=10.0 with lr=0.1. Print the final w rounded to 2."
+  starter={`w = 10.0
+lr = 0.1
+# Loop 3 times: grad = 2*w; w = w - lr*grad. Then print w rounded to 2.
+`}
+  expected="5.12"
+  solution={`w = 10.0
+lr = 0.1
+for _ in range(3):
+    grad = 2 * w
+    w = w - lr * grad
+print(round(w, 2))`}
+/>
+
+10 → 8 → 6.4 → 5.12, marching toward zero. Give it enough steps and it gets arbitrarily close.
+
+## The learning rate is everything
+
+That one knob makes or breaks training:
+
+- **Too small** — tiny steps; training crawls and may never arrive.
+- **Too large** — you overshoot the valley, bounce around, or *diverge* to infinity.
+- **Just right** — steady, efficient descent.
+
+<Callout type="note">
+Real models have millions of weights, and the gradient is computed for all of them at once. In neural networks, the algorithm that does this efficiently is <strong>backpropagation</strong> — the very first lesson of the Deep Learning track. But the update rule is exactly the one you just wrote.
+</Callout>
+
+<Quiz
+  question="You set the learning rate very high and the loss explodes to infinity instead of shrinking. Why?"
+  options={[
+    "The model ran out of memory",
+    "Steps are so large they overshoot the minimum and diverge",
+    "High learning rates always work better",
+    "The gradient was computed incorrectly"
+  ]}
+  answer={1}
+  explanation="An oversized step jumps past the valley to a point with even higher loss, then overshoots again — the weights spiral outward and diverge."
+/>
+
+You now understand the engine of machine learning. One last foundational idea ties the whole track together: knowing *when* your model has learned the real pattern versus just memorizing — the bias-variance tradeoff.
+
+
+<Homework>
+Minimize **f(x) = (x − 3)²** (gradient 2·(x−3)). Run 10 gradient-descent steps from x=0 with lr=0.1 and print x after each step. Watch it approach 3. Then set lr=1.1 and observe it diverge.
+</Homework>

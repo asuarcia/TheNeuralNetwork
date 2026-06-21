@@ -1,0 +1,83 @@
+export const meta = {
+  title: "A Spam Filter with Naive Bayes",
+  summary: "The classic spam filter is pure probability. Naive Bayes is simple, fast, surprisingly effective — and a perfect use of the probability you learned earlier.",
+};
+
+The original email spam filters ran on **Naive Bayes**, and it's still a great first classifier: it's fast, needs little data, and is easy to understand. It's also the probability lesson from the Math track, applied for real.
+
+## The idea
+
+For a new email, ask: is it more probable under "spam" or under "ham" (not spam)? We estimate, for each class, how likely its words are, then pick the class with the higher overall probability.
+
+The **"naive"** part is a simplifying assumption: we treat every word as **independent** of the others. That's not really true ("New York" isn't two unrelated words), but it makes the math easy — and it works shockingly well anyway.
+
+## Independence means multiply
+
+From the probability lesson: the chance of independent events all happening is the **product** of their probabilities. So an email's score under "spam" is the probabilities of its words *given spam*, all multiplied together.
+
+<CodeExercise
+  id="nb-product"
+  prompt="An email has 3 words. Under 'spam', their probabilities are 0.5, 0.4, and 0.5. Multiply them for the spam score."
+  starter={`word_probs = [0.5, 0.4, 0.5]
+score = 1.0
+# Multiply all the probabilities together. Print the result.
+`}
+  expected="0.1"
+  solution={`word_probs = [0.5, 0.4, 0.5]
+score = 1.0
+for p in word_probs:
+    score = score * p
+print(score)`}
+/>
+
+## Pick the bigger score
+
+Compute the same product under "ham", then choose whichever class scored higher. That comparison *is* the classification.
+
+<CodeExercise
+  id="nb-decide"
+  prompt="The email scored 0.1 under spam and 0.05 under ham. Print which class wins."
+  starter={`spam_score = 0.1
+ham_score = 0.05
+# Print "spam" if spam_score is higher, else "ham"
+`}
+  expected="spam"
+  solution={`spam_score = 0.1
+ham_score = 0.05
+print("spam" if spam_score > ham_score else "ham")`}
+/>
+
+<Quiz
+  question="What is the 'naive' assumption in Naive Bayes?"
+  options={[
+    "That the model is simple",
+    "That every word is independent of the others",
+    "That spam is rare",
+    "That all emails are the same length"
+  ]}
+  answer={1}
+  explanation="Naive Bayes assumes word independence so it can multiply per-word probabilities. The assumption is technically false but makes the model simple and effective."
+/>
+
+<Callout type="tip">
+Real implementations add two fixes: <strong>smoothing</strong> (so a never-before-seen word doesn't zero out the whole product) and working with <strong>log-probabilities</strong> (adding logs instead of multiplying tiny numbers, to avoid underflow). The core idea is exactly what you just coded.
+</Callout>
+
+<Quiz
+  question="Despite its 'naive' (often false) assumption, why is Naive Bayes still useful?"
+  options={[
+    "It's the most accurate model ever",
+    "It's fast, needs little data, is easy to interpret, and works well in practice for text",
+    "It never makes mistakes",
+    "It requires a GPU"
+  ]}
+  answer={1}
+  explanation="Even with the independence assumption, Naive Bayes is a strong, cheap, interpretable baseline — which is why it powered early spam filters and is still taught first."
+/>
+
+Counts and probabilities treat every word as unrelated to every other. To capture *meaning* — that "great" and "excellent" are similar — we need embeddings. That's next.
+
+
+<Homework>
+A 3-word email has word probabilities `[0.4, 0.5, 0.2]` under spam and `[0.1, 0.2, 0.6]` under ham. Multiply each set, compare the two products, and print the predicted class. Then explain why real systems add **log-probabilities** instead.
+</Homework>

@@ -1,0 +1,82 @@
+export const meta = {
+  title: "Agents, States & Rewards",
+  summary: "Reinforcement learning is how a program teaches itself by trial and error — the same way you'd learn a video game. It starts with one simple loop.",
+};
+
+The models so far learned from labeled examples. **Reinforcement learning (RL)** is different: there are no labels, just a goal and feedback. An **agent** tries things, gets **rewards**, and gradually learns which actions pay off. It's how AI mastered Go, Atari, robotics, and how chatbots get fine-tuned with human feedback.
+
+## The core loop
+
+RL is a conversation between an **agent** and an **environment**:
+
+1. The environment shows the agent a **state** (the current situation).
+2. The agent picks an **action**.
+3. The environment returns a **reward** (good or bad) and the next state.
+4. Repeat until the episode ends.
+
+The agent's goal: choose actions that **maximize total reward** over time. Think of a game — the state is the screen, actions are button presses, reward is the score.
+
+<Quiz
+  question="In reinforcement learning, what is a 'reward'?"
+  options={[
+    "The correct label for an input",
+    "A feedback signal telling the agent how good its action was",
+    "The agent's memory",
+    "The number of states"
+  ]}
+  answer={1}
+  explanation="There are no labels in RL. The reward is the only feedback — a number signaling how good (or bad) an action was, which the agent learns to maximize over time."
+/>
+
+## Measuring success: total reward
+
+An agent doesn't care about one step — it cares about the **total reward** over an episode (the *return*). Summing the rewards is how we score a run.
+
+<CodeExercise
+  id="rl-return"
+  prompt="An episode produced these step rewards. Print the total reward (the return)."
+  starter={`rewards = [1, 0, -1, 1, 1]
+# Print the total reward for the episode
+`}
+  expected="2"
+  solution={`rewards = [1, 0, -1, 1, 1]
+print(sum(rewards))`}
+/>
+
+## Choosing actions
+
+At each state the agent estimates how good each action is, and (usually) picks the best one. If it has value estimates for its options, choosing means taking the highest.
+
+<CodeExercise
+  id="rl-argmax"
+  prompt="The agent estimates these action values. Print the action with the highest value."
+  starter={`action_values = {"left": 1, "right": 3, "stay": 0}
+# Print the action with the highest estimated value
+`}
+  expected="right"
+  solution={`action_values = {"left": 1, "right": 3, "stay": 0}
+print(max(action_values, key=action_values.get))`}
+/>
+
+<Quiz
+  question="What is the agent ultimately trying to maximize?"
+  options={[
+    "The reward from the very next step only",
+    "The total reward accumulated over time (the return)",
+    "The number of actions it takes",
+    "The size of the state"
+  ]}
+  answer={1}
+  explanation="RL optimizes long-term return, not just immediate reward. An action with low immediate reward can be best if it leads to more reward later."
+/>
+
+<Callout type="tip">
+The hard part of RL is that rewards can be <strong>delayed</strong>. A chess move's value isn't clear until the game ends. Figuring out which earlier actions deserve credit for a later reward — the "credit assignment problem" — is what the next lessons tackle.
+</Callout>
+
+You can frame a problem as states, actions, and rewards. Next: how an agent values the *future*, not just the present — return and discounting.
+
+
+<Homework>
+Invent a tiny RL problem from your own life (commute, a game, studying). Write down its **states**, the **actions** available, and the **reward** signal. Then code: given `rewards=[2,-1,3,1]`, print the total return and, from a dict of action values, the best action.
+</Homework>

@@ -3,6 +3,7 @@ import type { ComponentPropsWithoutRef } from "react";
 import { Callout } from "./Callout";
 import { Quiz } from "./Quiz";
 import { CodeExercise } from "./CodeExercise";
+import { Homework } from "./Homework";
 
 // Maps markdown elements to brand-styled components, plus the interactive
 // lesson primitives usable directly in MDX.
@@ -51,4 +52,5 @@ export const mdxComponents = {
   Callout,
   Quiz,
   CodeExercise,
+  Homework,
 };

@@ -1,0 +1,90 @@
+export const meta = {
+  title: "Detection & Segmentation",
+  summary: "Classification says what's in an image. Detection says where. Segmentation traces the exact shape. Here's how vision goes from a label to understanding a whole scene.",
+};
+
+So far our models answer "**what** is this image?" — a single label. Real scenes have many objects, and we often need to know **where** they are. That's the jump from classification to detection and segmentation.
+
+## Three levels of vision
+
+- **Classification** — one label for the whole image. *"This is a cat."*
+- **Object detection** — find each object and draw a **bounding box** around it, with a label. *"Cat here, dog there."*
+- **Segmentation** — label **every pixel**, tracing the exact outline of each object. *"These exact pixels are cat."*
+
+Each level is more detailed — and more useful for things like self-driving cars (where is each pedestrian?) and medical imaging (which pixels are the tumor?).
+
+## Bounding boxes are just coordinates
+
+A detection box is four numbers — two corners — so its area is plain arithmetic.
+
+<CodeExercise
+  id="det-area"
+  prompt="A bounding box runs from (0, 0) to (4, 3). Print its area: width × height."
+  starter={`x1, y1 = 0, 0
+x2, y2 = 4, 3
+# Print the box area: (x2 - x1) * (y2 - y1)
+`}
+  expected="12"
+  solution={`x1, y1 = 0, 0
+x2, y2 = 4, 3
+print((x2 - x1) * (y2 - y1))`}
+/>
+
+## Measuring a detection: IoU
+
+How do we know if a predicted box is *good*? We compare it to the true box with **Intersection over Union (IoU)** — the area where they overlap divided by the total area they cover together. IoU of 1.0 is a perfect match; near 0 means they barely overlap.
+
+<CodeExercise
+  id="det-iou"
+  prompt="A predicted box and the true box overlap by an area of 20, and together cover 80. Print the IoU."
+  starter={`intersection = 20
+union = 80
+# IoU = intersection / union
+`}
+  expected="0.25"
+  solution={`intersection = 20
+union = 80
+print(intersection / union)`}
+/>
+
+<Quiz
+  question="What's the difference between object detection and segmentation?"
+  options={[
+    "Detection labels every pixel; segmentation draws boxes",
+    "Detection draws bounding boxes around objects; segmentation labels each individual pixel",
+    "They are the same thing",
+    "Segmentation only works on grayscale images"
+  ]}
+  answer={1}
+  explanation="Detection localizes objects with boxes; segmentation is finer-grained, classifying every pixel to trace exact object outlines."
+/>
+
+## How it's done (in brief)
+
+Modern systems build on the CNN features you already understand:
+
+- **Detection** — models like **YOLO** ("You Only Look Once") split the image into a grid and predict boxes + classes in a single fast pass, which is why they run in real time.
+- **Segmentation** — models like **U-Net** (also used in diffusion!) shrink the image down to understand it, then expand it back up to label every pixel.
+
+<Callout type="tip">
+Notice the throughline: it's CNN features all the way down. Detection and segmentation add a "where" head on top of the same feature extractor you learned to build. Master convolution and the whole field opens up.
+</Callout>
+
+<Quiz
+  question="Why is IoU useful for evaluating object detection?"
+  options={[
+    "It measures the image's brightness",
+    "It scores how well a predicted box overlaps the true box (1.0 = perfect, ~0 = poor)",
+    "It counts the number of objects",
+    "It measures training speed"
+  ]}
+  answer={1}
+  explanation="IoU (intersection over union) quantifies overlap between predicted and ground-truth boxes, giving a single 0–1 score for localization quality."
+/>
+
+**That completes Computer Vision.** From pixels to convolution to CNNs, transfer learning, and full-scene understanding, you now know how machines see. Next, the other great branch of perception — teaching machines to read, in Natural Language Processing.
+
+
+<Homework>
+Two boxes: prediction (0,0)–(4,4) and truth (2,2)–(6,6). Compute each area, their **intersection** area, the **union**, and the **IoU**. Is this a good detection (IoU above 0.5)?
+</Homework>

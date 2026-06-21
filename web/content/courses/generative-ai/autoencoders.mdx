@@ -1,0 +1,91 @@
+export const meta = {
+  title: "Autoencoders & Latent Space",
+  summary: "Squeeze data through a bottleneck and force a model to rebuild it. What it learns in that bottleneck — the latent space — is the key to generation.",
+};
+
+An **autoencoder** is a network that learns to copy its input to its output — which sounds pointless until you see the trick: it must pass everything through a tiny **bottleneck** in the middle. To rebuild the data from so few numbers, it's forced to learn the *essence* of it.
+
+## Encoder, bottleneck, decoder
+
+```text
+input → [encoder] → latent code → [decoder] → reconstruction
+        (compress)   (bottleneck)   (rebuild)
+```
+
+- The **encoder** compresses the input into a small **latent code** (a short vector).
+- The **decoder** tries to reconstruct the original from that code.
+- Training minimizes **reconstruction error** — how different the output is from the input.
+
+Because the bottleneck is small, the model can't just memorize; it has to capture the meaningful structure. A 100-number image squeezed to 10 numbers means a 10× compression.
+
+<CodeExercise
+  id="ae-ratio"
+  prompt="An autoencoder compresses a 100-dimensional input into a 10-dimensional latent code. Print the compression ratio."
+  starter={`input_dim = 100
+latent_dim = 10
+# Print how many times smaller the latent code is
+`}
+  expected="10"
+  solution={`input_dim = 100
+latent_dim = 10
+print(input_dim // latent_dim)`}
+/>
+
+## Measuring reconstruction
+
+How well did it rebuild the input? Same as always — squared error between input and output.
+
+<CodeExercise
+  id="ae-recon"
+  prompt="Compute the reconstruction error (mean squared error) between the input and its reconstruction. Round to 2 decimals."
+  starter={`inp   = [1, 2, 3]
+recon = [1, 2, 2]
+# Mean of (inp[i] - recon[i])**2. Print rounded to 2.
+`}
+  expected="0.33"
+  solution={`inp   = [1, 2, 3]
+recon = [1, 2, 2]
+mse = sum((a - b) ** 2 for a, b in zip(inp, recon)) / len(inp)
+print(round(mse, 2))`}
+/>
+
+<Quiz
+  question="Why does the bottleneck (small latent code) matter in an autoencoder?"
+  options={[
+    "It makes training slower",
+    "It forces the model to learn a compact, meaningful representation instead of just copying the input",
+    "It adds more parameters",
+    "It stores the labels"
+  ]}
+  answer={1}
+  explanation="A narrow bottleneck prevents memorization. To reconstruct well from few numbers, the encoder must capture the data's essential structure — the useful representation."
+/>
+
+## Latent space: where generation happens
+
+That compressed code lives in a **latent space** — a compact map of the data where nearby points mean similar things. Here's the generative payoff: if you pick a *new* point in latent space and run it through the **decoder**, you get a *new* output that never existed. Move smoothly through latent space and the decoded images morph smoothly (a face slowly aging, a digit 3 becoming an 8).
+
+A **Variational Autoencoder (VAE)** refines this so the latent space is smooth and well-organized, making it genuinely good for generating new samples.
+
+<Callout type="tip">
+"Latent space" is one of the most important ideas in generative AI. It's the same concept as embeddings: a compressed space where meaning is geometry. Modern image generators (latent diffusion) do their work in latent space precisely because it's smaller and more meaningful than raw pixels.
+</Callout>
+
+<Quiz
+  question="How can an autoencoder generate something new?"
+  options={[
+    "By copying a training image",
+    "By decoding a new point in latent space into a fresh output",
+    "By increasing the reconstruction error",
+    "It can't generate anything"
+  ]}
+  answer={1}
+  explanation="The decoder maps latent points to outputs. Choosing a new latent point (not from any training example) and decoding it produces a novel, plausible sample."
+/>
+
+Autoencoders can generate, but their outputs are often blurry. The next idea made generated images sharp and shockingly realistic by turning generation into a game: GANs.
+
+
+<Homework>
+An autoencoder compresses a 784-pixel image to a 32-number latent code. Compute the **compression ratio**. Then compute the reconstruction MSE between `[1, 2, 3, 4]` and a reconstruction `[1, 2, 2, 5]`, rounded to 2 decimals.
+</Homework>

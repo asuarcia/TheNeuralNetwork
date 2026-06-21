@@ -1,0 +1,102 @@
+export const meta = {
+  title: "Tokens, Cost & the Context Window",
+  summary: "Tokens are the currency and the container of LLM apps. Get them right and you control your bill, your latency, and your reliability.",
+};
+
+Two things in an LLM app are measured in **tokens**: what you *pay*, and what *fits*. Everything in this lesson comes back to those two facts.
+
+## A quick refresher
+
+A token is a word-piece — roughly ¾ of a word on average. "Hello" is one token; "internationalization" might be four. A useful rule of thumb:
+
+> **~1,000 tokens ≈ 750 words ≈ 1.5 pages of text.**
+
+Both your input (the prompt) and the model's output count as tokens, and they're usually priced differently — output tokens often cost 2–4× more than input.
+
+## Estimating cost
+
+Pricing is quoted per 1,000 tokens (or per million). To estimate a call's cost: convert each side to thousands, multiply by its price, and add.
+
+<CodeExercise
+  id="cost-calc"
+  prompt="Compute the total cost of one call and print it rounded to 4 decimals."
+  starter={`input_tokens = 1500
+output_tokens = 500
+in_price = 0.005    # dollars per 1,000 input tokens
+out_price = 0.015   # dollars per 1,000 output tokens
+# Print the total cost, rounded to 4 decimals
+`}
+  expected="0.015"
+  solution={`input_tokens = 1500
+output_tokens = 500
+in_price = 0.005
+out_price = 0.015
+cost = (input_tokens / 1000) * in_price + (output_tokens / 1000) * out_price
+print(round(cost, 4))`}
+/>
+
+That's 1.5¢ for one call. Trivial — until you multiply by a million users. Cost modeling *before* you ship is how you avoid a five-figure surprise.
+
+<Quiz
+  question="You can cut cost the most by:"
+  options={[
+    "Always using the biggest model available",
+    "Trimming unnecessary context from the prompt and capping output length, since you pay per token both ways",
+    "Sending requests more slowly",
+    "Using longer variable names in your code"
+  ]}
+  answer={1}
+  explanation="You pay per input and output token. Shorter, focused prompts and bounded outputs (and a right-sized model) are the biggest levers on cost."
+/>
+
+## The context window: a hard ceiling
+
+A model can only "see" a fixed number of tokens at once — its **context window** (e.g., 8K, 128K, or more). That window must hold *everything*: the system prompt, the conversation history, any retrieved documents, **and** room for the reply. Exceed it and the call fails or silently truncates.
+
+<CodeExercise
+  id="cost-fit"
+  prompt="Check whether the prompt plus the reply budget fit inside the context window. Print True or False."
+  starter={`context_limit = 8000
+prompt_tokens = 6000
+reply_budget = 1500
+# Print whether prompt + reply fit within the limit
+`}
+  expected="True"
+  solution={`context_limit = 8000
+prompt_tokens = 6000
+reply_budget = 1500
+print(prompt_tokens + reply_budget <= context_limit)`}
+/>
+
+## "Lost in the middle"
+
+A bigger window isn't a free lunch. Models attend most reliably to the **beginning** and **end** of their context, and can overlook facts buried in the **middle** of a long prompt — the "lost in the middle" effect.
+
+Practical consequences:
+
+- Put the most important instructions and the most relevant retrieved chunks near the **top or bottom**, not the middle.
+- Don't dump your entire knowledge base into the prompt "just in case." More context can mean *worse* answers and a bigger bill.
+- Retrieving the *few* right chunks beats stuffing in *all* of them — which is exactly why RAG exists.
+
+<Callout type="tip">
+Think of the context window like RAM, not a hard drive. It's fast, finite, and you actively manage what's loaded. The skill of LLM engineering is deciding what earns a spot in that window on each call.
+</Callout>
+
+<Quiz
+  question="A model has a 128K-token window but keeps ignoring a key fact you placed halfway through a long document. The likely cause?"
+  options={[
+    "The window is too small",
+    "The 'lost in the middle' effect — models attend less reliably to the middle of long contexts",
+    "The model is broken",
+    "Temperature is too low"
+  ]}
+  answer={1}
+  explanation="Even with huge windows, attention is strongest at the start and end. Move critical content there, and retrieve only what's relevant rather than padding the middle."
+/>
+
+You now control the budget and the container. The natural next move is to stop pasting documents by hand and let the system *fetch* the right ones — retrieval-augmented generation.
+
+
+<Homework>
+Estimate a real bill: assume **10,000 calls/day**, 800 input tokens and 400 output tokens each, at $0.005 / $0.015 per 1k. Compute the **daily and monthly** cost. Then find one change to the prompt that would cut it by a third.
+</Homework>

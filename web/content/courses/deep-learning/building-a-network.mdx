@@ -1,0 +1,137 @@
+export const meta = {
+  title: "Building a Network from Scratch",
+  summary: "Neuron, activation, layer, loss, backprop — you have every piece. Now snap them together into a real multi-layer network and run a forward pass.",
+};
+
+You've built each part in isolation. Time to assemble them. A **multi-layer perceptron** (MLP) — the classic neural network — is just layers of neurons, with a non-linearity between them, stacked input to output.
+
+## The shape of a network
+
+```text
+input → [hidden layer] → activation → [output layer] → prediction
+```
+
+- The **input** is your feature vector.
+- Each **hidden layer** transforms it into a new vector (one value per neuron).
+- An **activation** (ReLU) bends it between layers.
+- The **output layer** produces the final prediction.
+
+## One layer, in code
+
+A layer is just "every neuron computes its weighted sum." You wrote this for a single layer already — here it is as the building block.
+
+<CodeExercise
+  id="net-layer"
+  prompt="Run inputs through one layer of 2 neurons. Print the output vector [z0, z1]."
+  starter={`inputs = [1.0, 2.0]
+weights = [[1.0, 0.0], [0.0, 1.0]]   # one weight-row per neuron
+bias = [0.0, 0.0]
+# Print each neuron's weighted sum plus its bias
+`}
+  expected="[1.0, 2.0]"
+  solution={`inputs = [1.0, 2.0]
+weights = [[1.0, 0.0], [0.0, 1.0]]
+bias = [0.0, 0.0]
+print([sum(i * w for i, w in zip(inputs, wn)) + b for wn, b in zip(weights, bias)])`}
+/>
+
+## The full forward pass
+
+Now chain two layers with a ReLU in the middle. This is a complete (tiny) neural network making a prediction — the **forward pass**.
+
+<CodeExercise
+  id="net-forward"
+  prompt="Forward pass: hidden = ReLU(W1·x + b1), then output = W2·hidden + b2. Print the output."
+  starter={`x  = [1.0, 1.0]
+W1 = [[1.0, 1.0], [1.0, -1.0]]   # hidden layer: 2 neurons
+b1 = [0.0, 0.0]
+W2 = [1.0, 1.0]                  # output layer: 1 neuron
+b2 = 0.0
+
+def relu(z):
+    return max(0.0, z)
+
+# 1) hidden = [relu(neuron) for each row in W1]
+# 2) output = dot(hidden, W2) + b2
+# Print output
+`}
+  expected="2.0"
+  solution={`x  = [1.0, 1.0]
+W1 = [[1.0, 1.0], [1.0, -1.0]]
+b1 = [0.0, 0.0]
+W2 = [1.0, 1.0]
+b2 = 0.0
+
+def relu(z):
+    return max(0.0, z)
+
+hidden = [relu(sum(i * w for i, w in zip(x, wn)) + b) for wn, b in zip(W1, b1)]
+output = sum(h * w for h, w in zip(hidden, W2)) + b2
+print(output)`}
+/>
+
+Trace it: hidden neuron 0 = ReLU(1+1) = 2, neuron 1 = ReLU(1−1) = 0, so hidden = `[2, 0]`; output = 2·1 + 0·1 = **2.0**. You just ran a neural network by hand.
+
+<Quiz
+  question="What is the 'forward pass'?"
+  options={[
+    "Updating the weights",
+    "Running the input through the layers to produce a prediction",
+    "Computing the gradients",
+    "Loading the training data"
+  ]}
+  answer={1}
+  explanation="The forward pass feeds the input through each layer (weighted sums + activations) to produce the output. The backward pass then computes gradients to learn."
+/>
+
+## Counting parameters
+
+A network's capacity is roughly its number of **parameters** — all the weights plus biases. For one layer: `inputs × neurons` weights, plus one bias per neuron.
+
+<CodeExercise
+  id="net-params"
+  prompt="A layer has 4 inputs and 3 neurons. Print its total parameter count (weights + biases)."
+  starter={`inputs = 4
+neurons = 3
+# weights = inputs * neurons, biases = neurons. Print the total.
+`}
+  expected="15"
+  solution={`inputs = 4
+neurons = 3
+print(inputs * neurons + neurons)`}
+/>
+
+Twelve weights plus three biases — 15 parameters in one small layer. Stack a few wide layers and you're quickly into millions; modern language models reach into the *billions*.
+
+## The training loop, assembled
+
+Put every piece together and you get the loop that trains every deep network:
+
+1. **Forward pass** → prediction.
+2. **Loss** → how wrong it was.
+3. **Backward pass** (backprop) → gradient for every weight.
+4. **Update** → step each weight downhill.
+5. Repeat for many batches, many times (epochs).
+
+<Callout type="note">
+That's the entire engine of deep learning — and you understand every step. Real training swaps your hand-written loops for vectorized GPU math in PyTorch, but conceptually it's identical. A great next step is to recreate this network in a PyTorch notebook and watch it train on real data.
+</Callout>
+
+<Quiz
+  question="Why does adding hidden layers (with non-linear activations) make a network more powerful?"
+  options={[
+    "More layers always run faster",
+    "Each non-linear layer lets the network compose features into more abstract ones, modeling far more complex functions",
+    "Layers reduce the parameter count",
+    "It removes the need for a loss function"
+  ]}
+  answer={1}
+  explanation="Stacked non-linear layers build hierarchical features — edges → shapes → objects, or letters → words → meaning — letting the network represent complex relationships a single layer can't."
+/>
+
+You've built a neural network from first principles. But the architecture powering today's AI revolution isn't a plain MLP — it's the **transformer**. Let's see what makes it special.
+
+
+<Homework>
+Take the two-layer forward pass from this lesson and add a **second neuron** to the hidden layer (give it your own weights). Recompute the output by hand in code. Then count the network's total parameters.
+</Homework>

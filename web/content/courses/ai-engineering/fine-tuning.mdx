@@ -1,0 +1,92 @@
+export const meta = {
+  title: "Fine-Tuning & Transfer Learning",
+  summary: "Sometimes prompting isn't enough and you need to change the model itself. Fine-tuning teaches a pretrained model new behavior — without starting from zero.",
+};
+
+Training a large model from scratch costs millions of dollars and oceans of data. Almost nobody does it. Instead, you take a model that already learned language and **adapt** it to your task — that's **transfer learning**, and **fine-tuning** is how you do it.
+
+## First: do you even need to fine-tune?
+
+This is the most important engineering decision in the track. There's a ladder, cheapest first:
+
+1. **Prompting** — change the instructions. Free, instant. Try this first, always.
+2. **RAG** — inject knowledge the model lacks (your docs, fresh facts). Fixes *"it doesn't know X."*
+3. **Fine-tuning** — change the model's *behavior, style, or format* by training on examples. Fixes *"it won't reliably act the way I need."*
+
+Fine-tuning is **not** for teaching facts (use RAG) — it's for teaching a consistent *skill or style*: always output valid JSON, adopt a brand voice, classify in your taxonomy, speak a niche domain's dialect.
+
+<Quiz
+  question="Your model gives correct answers but in the wrong format and tone for your product. Best tool?"
+  options={[
+    "RAG, to add more documents",
+    "Fine-tuning, to teach a consistent behavior/style from examples",
+    "A bigger context window",
+    "Nothing can fix this"
+  ]}
+  answer={1}
+  explanation="Format and tone are behavior, not missing knowledge. Fine-tuning on examples of the desired output is the right fix; RAG addresses missing facts instead."
+/>
+
+## How transfer learning works
+
+A pretrained model already encodes enormous general knowledge in its weights. Fine-tuning **freezes** most of that and gently adjusts the model on your (much smaller) dataset, so it keeps what it learned while specializing. You're not teaching English — you're nudging an English-speaker toward your task.
+
+<CodeExercise
+  id="ft-trainable"
+  prompt="In transfer learning, the base layers are frozen. If 950 of 1000 parameters are frozen, print how many are trainable."
+  starter={`total = 1000
+frozen = 950
+# Print the number of trainable parameters
+`}
+  expected="50"
+  solution={`total = 1000
+frozen = 950
+print(total - frozen)`}
+/>
+
+## The dataset is the product
+
+Fine-tuning is only as good as its examples. You prepare **instruction pairs** — input and the ideal output — usually hundreds to thousands of them. Quality and consistency matter far more than raw quantity.
+
+<CodeExercise
+  id="ft-format"
+  prompt="Format the training pairs as 'Q: <prompt> A: <answer>', one per line."
+  starter={`pairs = [("Translate: hello", "hola"), ("Translate: bye", "adios")]
+# Print each pair as "Q: <prompt> A: <answer>"
+`}
+  expected={`Q: Translate: hello A: hola
+Q: Translate: bye A: adios`}
+  solution={`pairs = [("Translate: hello", "hola"), ("Translate: bye", "adios")]
+print("\\n".join(f"Q: {p} A: {a}" for p, a in pairs))`}
+/>
+
+## The dangers
+
+Fine-tuning a giant model on a small dataset is a minefield the ML track prepared you for:
+
+- **Overfitting** — too few examples and the model memorizes them instead of generalizing (high variance — sound familiar?).
+- **Catastrophic forgetting** — train too aggressively and the model loses general abilities it had before.
+- **Cost & lock-in** — full fine-tuning is expensive to run and produces a whole new copy of the model to host.
+
+<Callout type="warning">
+That last point — full fine-tuning means updating and storing <em>billions</em> of weights — is so painful that almost nobody does it the naive way anymore. The next lesson is the technique that made fine-tuning cheap enough for everyone: LoRA.
+</Callout>
+
+<Quiz
+  question="What is 'transfer learning'?"
+  options={[
+    "Copying data between servers",
+    "Adapting a model that already learned general patterns to a new, specific task — instead of training from scratch",
+    "Translating a model to another language",
+    "Moving a model to a faster GPU"
+  ]}
+  answer={1}
+  explanation="Transfer learning reuses the knowledge baked into a pretrained model, specializing it on a smaller task-specific dataset — vastly cheaper and more data-efficient than starting over."
+/>
+
+You know *when* and *why* to fine-tune. Now the *how* that made it practical at scale — parameter-efficient tuning with LoRA.
+
+
+<Homework>
+For three scenarios, decide **prompt**, **RAG**, or **fine-tune** and justify each: (1) the model doesn't know your company's internal docs; (2) the model won't reliably output your exact JSON format; (3) you just need a slightly clearer instruction. 
+</Homework>

@@ -1,0 +1,114 @@
+export const meta = {
+  title: "Self-Attention, Step by Step",
+  summary: "Attention is the one idea that makes transformers work. It sounds mystical; it's really just dot products and a weighted average. Let's build it.",
+};
+
+Every token in a transformer asks the same question: *"which other tokens should I pay attention to?"* The answer is computed by **self-attention** — and despite its reputation, it's a short sequence of operations you already know: dot products, scaling, softmax, and a weighted sum.
+
+## Query, Key, Value
+
+Each token is projected into three vectors:
+
+- **Query (Q)** — what this token is *looking for*.
+- **Key (K)** — what each token *offers* / advertises.
+- **Value (V)** — the actual *information* a token carries.
+
+The metaphor: it's a lookup. Your **query** is matched against every **key** to decide relevance, and you retrieve a blend of the matching **values**. The better a query matches a key, the more of that token's value you pull in.
+
+## Step 1: score = Query · Key
+
+Relevance between two tokens is their dot product — large when the vectors align (you saw this in the Python for AI track). A token's query is dotted with every key to score how much to attend to each.
+
+<CodeExercise
+  id="attn-score"
+  prompt="Compute the attention score between a query and a key: their dot product."
+  starter={`q = [1, 0, 1]
+k = [1, 1, 0]
+# Attention score = dot product of q and k
+`}
+  expected="1"
+  solution={`q = [1, 0, 1]
+k = [1, 1, 0]
+print(sum(a * b for a, b in zip(q, k)))`}
+/>
+
+## Step 2: scale by √(dimension)
+
+Dot products grow with vector dimension, which can push the next step (softmax) into extremes. So we divide each score by the square root of the key dimension — **scaled** dot-product attention.
+
+<CodeExercise
+  id="attn-scale"
+  prompt="Scale a raw score by the square root of the key dimension. Print the scaled score."
+  starter={`import math
+score = 8.0
+d = 4   # key dimension
+# Scaled score = score / sqrt(d). Print it.
+`}
+  expected="4.0"
+  solution={`import math
+score = 8.0
+d = 4
+print(score / math.sqrt(d))`}
+/>
+
+## Step 3: softmax → attention weights
+
+The scaled scores are passed through **softmax**, turning them into positive weights that sum to 1 — the token's "attention budget" spread across all other tokens. A high score becomes a large slice of attention; a low one, a sliver.
+
+## Step 4: weighted sum of Values
+
+Finally, the token's output is the **weighted sum of all Value vectors**, using those attention weights. The tokens it attended to most contribute most. That blended vector — rich with context pulled from the whole sequence — is what moves on to the next layer.
+
+<CodeExercise
+  id="attn-weighted"
+  prompt="Combine the value vectors using the attention weights: out = w0*v0 + w1*v1 (element-wise). Print the result."
+  starter={`weights = [0.2, 0.8]        # attention weights (sum to 1)
+values  = [[1, 0], [0, 1]]  # value vector per token
+# Element-wise weighted sum of the value vectors
+`}
+  expected="[0.2, 0.8]"
+  solution={`weights = [0.2, 0.8]
+values  = [[1, 0], [0, 1]]
+print([sum(w * v[j] for w, v in zip(weights, values)) for j in range(len(values[0]))])`}
+/>
+
+Most of the attention (0.8) went to the second token, so the output leans heavily toward its value. That's attention in one line: **a context-weighted average of values.**
+
+<Quiz
+  question="In self-attention, what role does the Query vector play?"
+  options={[
+    "It stores the token's final output",
+    "It represents what a token is looking for, and is matched against every Key to decide how much to attend to each token",
+    "It's the loss function",
+    "It holds the model's weights"
+  ]}
+  answer={1}
+  explanation="The Query says what a token wants. Dotting it with each Key scores relevance; those scores (after scaling + softmax) weight the Values that get summed into the output."
+/>
+
+## Multi-head attention
+
+One more wrinkle: transformers don't run attention once — they run it many times in parallel, as multiple **heads**. Each head learns to focus on a different kind of relationship: one tracks grammar, another long-range references, another topic. Their outputs are concatenated, giving the model several "views" of the sequence at once.
+
+<Callout type="tip">
+That's the whole transformer revolution: <strong>score with dot products, scale, softmax, weighted-sum the values</strong> — repeated across heads and stacked across layers. You just implemented every step of the mechanism behind modern AI.
+</Callout>
+
+<Quiz
+  question="Why scale the attention scores by the square root of the key dimension before softmax?"
+  options={[
+    "To make the math look harder",
+    "Dot products grow with dimension; scaling keeps them in a range where softmax stays smooth instead of saturating to 0/1",
+    "To convert them to integers",
+    "It has no real effect"
+  ]}
+  answer={1}
+  explanation="Without scaling, high-dimensional dot products get large, pushing softmax to near one-hot outputs with tiny gradients. Dividing by √d keeps the distribution well-behaved and trainable."
+/>
+
+**That completes Deep Learning.** From a single neuron to the full self-attention mechanism, you've built the modern stack by hand. The final track takes these models into the real world: adapting, shrinking, evaluating, and shipping them — AI Engineering.
+
+
+<Homework>
+Given a query `[1, 0, 1]` and three keys `[1,0,1]`, `[0,1,0]`, `[1,1,1]`, compute the attention **score** (dot product) for each key. Which key does the query attend to most, and why does that make sense?
+</Homework>

@@ -1,0 +1,106 @@
+export const meta = {
+  title: "Data, Numbers & Vectors",
+  summary: "AI turns everything — words, images, clicks — into lists of numbers. Understand that one move and the magic gets a lot less mysterious.",
+};
+
+A model can't read text or see a picture. It only does arithmetic. So the first step in every AI system is turning real things into **numbers**.
+
+## A vector is just a list of numbers
+
+When we line numbers up, we call it a **vector**. A movie might become `[4.5, 0, 1, 120]` (rating, is-horror, is-sequel, minutes). A word becomes a long vector of numbers that captures its meaning. Same idea, every time.
+
+```python
+movie = [4.5, 0, 1, 120]
+```
+
+Each slot is a **feature** — one measurable aspect of the thing. Stack many examples and you have a dataset: a list of vectors.
+
+<Callout type="note">
+"Turn it into numbers, then do math on the numbers." That sentence describes nearly all of machine learning.
+</Callout>
+
+## Summarizing a vector: the average
+
+The simplest thing you can do with a vector is collapse it to one number. The **average** (mean) shows up everywhere — normalizing data, computing loss, reporting results.
+
+<CodeExercise
+  id="vec-mean"
+  prompt="ratings is a list of user ratings. Print the average, rounded to 2 decimal places."
+  starter={`ratings = [4.5, 3.0, 5.0, 4.0]
+# Print the average rounded to 2 decimals (use round(value, 2))
+`}
+  expected="4.12"
+  solution={`ratings = [4.5, 3.0, 5.0, 4.0]
+print(round(sum(ratings) / len(ratings), 2))`}
+/>
+
+## Comparing two vectors: the dot product
+
+Here's the operation that powers search, recommendations, and attention inside transformers: the **dot product**. Multiply two vectors slot-by-slot and add it all up. The bigger the result, the more the two vectors "point the same way" — i.e., the more similar they are.
+
+```text
+a · b = a1*b1 + a2*b2 + a3*b3 + ...
+```
+
+<CodeExercise
+  id="vec-dot"
+  prompt="Print the dot product of a and b (1*4 + 2*5 + 3*6)."
+  starter={`a = [1, 2, 3]
+b = [4, 5, 6]
+# Print the dot product of a and b
+`}
+  expected="32"
+  solution={`a = [1, 2, 3]
+b = [4, 5, 6]
+print(sum(x * y for x, y in zip(a, b)))`}
+/>
+
+<Quiz
+  question="Two word-vectors have a large positive dot product. What does that suggest?"
+  options={[
+    "The words are unrelated",
+    "The vectors point in similar directions — the words are likely related",
+    "One vector is longer than the other, nothing more",
+    "There was a computation error"
+  ]}
+  answer={1}
+  explanation="A large dot product means the vectors align. In embedding space, aligned vectors mean similar meaning — the basis of semantic search."
+/>
+
+## How long is a vector?
+
+A vector also has a **length** (magnitude): the square root of the sum of its squares. For `[3, 4]` the sum of squares is `9 + 16 = 25`, so the length is `5`. Length is how we *normalize* vectors so we compare direction, not size.
+
+<CodeExercise
+  id="vec-sqsum"
+  prompt="Print the sum of squares of v (the part inside the square root of its length)."
+  starter={`v = [3, 4]
+# Print the sum of each element squared
+`}
+  expected="25"
+  solution={`v = [3, 4]
+print(sum(x * x for x in v))`}
+/>
+
+<Callout type="tip">
+Mean, dot product, length. Those three operations on lists of numbers underlie an astonishing amount of AI — from a recommendation feed to the self-attention inside GPT. You just implemented all three.
+</Callout>
+
+<Quiz
+  question="Why do we convert text and images into vectors of numbers?"
+  options={[
+    "To compress them and save disk space",
+    "Because models only operate on numbers, so we can do math like comparing and combining",
+    "To encrypt them for privacy",
+    "It's a historical convention with no real reason"
+  ]}
+  answer={1}
+  explanation="Models are math machines. Representing everything as numbers lets them measure similarity (dot product), normalize (length), and learn patterns."
+/>
+
+You can now represent data as vectors and do the core operations on them. Time to put it together and build something that makes an actual prediction.
+
+
+<Homework>
+Write code that takes two 3-number vectors and prints their dot product **and** each vector's length (magnitude). Try it on `[1, 2, 2]` and `[2, 0, 1]`. Bonus: divide the dot product by the two lengths to get their cosine similarity.
+</Homework>

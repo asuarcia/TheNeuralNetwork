@@ -1,0 +1,116 @@
+export const meta = { title: "Q-Learning Agent for FrozenLake" };
+
+You'll train an agent to cross a frozen lake — from knowing nothing to reliably reaching the goal — using tabular Q-learning, built from scratch. Run the cells in order.
+
+## 1. The world and the Q-table
+
+Our lake is a 5-tile corridor: start at tile 0, goal at tile 4 (reward 1). Actions are **left** and **right**. The agent's brain is a **Q-table**: a value for every (state, action), all starting at 0.
+
+<CodeExercise
+  id="ql-setup"
+  prompt="Set up the environment and Q-table, then print the starting Q-value for (state 0, 'right')."
+  starter={`states = [0, 1, 2, 3, 4]
+actions = ["left", "right"]
+goal = 4
+Q = {(s, a): 0.0 for s in states for a in actions}
+
+def step(s, a):
+    ns = min(4, s + 1) if a == "right" else max(0, s - 1)
+    reward = 1.0 if ns == goal else 0.0
+    return ns, reward
+
+print(Q[(0, "right")])`}
+  expected="0.0"
+  solution={`states = [0, 1, 2, 3, 4]
+actions = ["left", "right"]
+goal = 4
+Q = {(s, a): 0.0 for s in states for a in actions}
+def step(s, a):
+    ns = min(4, s + 1) if a == "right" else max(0, s - 1)
+    reward = 1.0 if ns == goal else 0.0
+    return ns, reward
+print(Q[(0, "right")])`}
+/>
+
+## 2. The learning rule
+
+Q-learning nudges each value toward `reward + γ · (best next value)`. Apply one update for stepping right from tile 3 (which reaches the goal, reward 1).
+
+<CodeExercise
+  id="ql-update"
+  prompt="Apply one Q-update: Q=0, alpha=0.5, reward=1, gamma=0.9, best_next=0. Print the new value."
+  starter={`Q_sa = 0.0
+alpha, gamma = 0.5, 0.9
+reward, best_next = 1.0, 0.0
+Q_sa = Q_sa + alpha * (reward + gamma * best_next - Q_sa)
+print(Q_sa)`}
+  expected="0.5"
+  solution={`Q_sa = 0.0
+alpha, gamma = 0.5, 0.9
+reward, best_next = 1.0, 0.0
+Q_sa = Q_sa + alpha * (reward + gamma * best_next - Q_sa)
+print(Q_sa)`}
+/>
+
+## 3. Train the agent
+
+Now run many episodes with **epsilon-greedy** exploration. After training, ask the agent its best move from the start — it should have learned to go **right**.
+
+<CodeExercise
+  id="ql-train"
+  prompt="Train over 300 episodes, then print the best learned action from state 0."
+  starter={`import random
+random.seed(0)
+
+states = [0, 1, 2, 3, 4]
+actions = ["left", "right"]
+goal = 4
+Q = {(s, a): 0.0 for s in states for a in actions}
+def step(s, a):
+    ns = min(4, s + 1) if a == "right" else max(0, s - 1)
+    return ns, (1.0 if ns == goal else 0.0)
+
+alpha, gamma, epsilon = 0.5, 0.9, 0.2
+for episode in range(300):
+    s = 0
+    while s != goal:
+        if random.random() < epsilon:
+            a = random.choice(actions)
+        else:
+            a = max(actions, key=lambda x: Q[(s, x)])
+        ns, r = step(s, a)
+        best_next = max(Q[(ns, x)] for x in actions)
+        Q[(s, a)] += alpha * (r + gamma * best_next - Q[(s, a)])
+        s = ns
+
+print(max(actions, key=lambda a: Q[(0, a)]))`}
+  expected="right"
+  solution={`import random
+random.seed(0)
+states = [0, 1, 2, 3, 4]
+actions = ["left", "right"]
+goal = 4
+Q = {(s, a): 0.0 for s in states for a in actions}
+def step(s, a):
+    ns = min(4, s + 1) if a == "right" else max(0, s - 1)
+    return ns, (1.0 if ns == goal else 0.0)
+alpha, gamma, epsilon = 0.5, 0.9, 0.2
+for episode in range(300):
+    s = 0
+    while s != goal:
+        if random.random() < epsilon:
+            a = random.choice(actions)
+        else:
+            a = max(actions, key=lambda x: Q[(s, x)])
+        ns, r = step(s, a)
+        best_next = max(Q[(ns, x)] for x in actions)
+        Q[(s, a)] += alpha * (r + gamma * best_next - Q[(s, a)])
+        s = ns
+print(max(actions, key=lambda a: Q[(0, a)]))`}
+/>
+
+The agent learned to head for the goal — purely from rewards, with no one telling it the rules. Print the whole Q-table to see value propagate back from the goal toward the start.
+
+<Homework>
+Make the lake real: (1) build a 4×4 grid with "holes" that end the episode with reward 0; (2) print the learned policy as arrows on the grid; (3) plot the success rate every 50 episodes and watch it climb; (4) add slippery ice (actions sometimes go sideways) and see how the agent adapts.
+</Homework>

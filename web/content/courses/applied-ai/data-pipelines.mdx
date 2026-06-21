@@ -1,0 +1,103 @@
+export const meta = {
+  title: "Building Data Pipelines",
+  summary: "Real documents are messy — PDFs, HTML, JSON, half-empty rows. Before a model can use your data, you have to ingest, parse, and clean it.",
+};
+
+Every impressive AI demo hides an unglamorous truth: most of the work is getting data into a usable shape. Garbage in, garbage out applies double to LLMs. A pipeline turns raw, messy sources into clean, structured text ready to embed or prompt.
+
+## The stages of a pipeline
+
+1. **Ingest** — pull raw bytes from somewhere: a file, a database, an API, a web page.
+2. **Parse** — extract the actual text from its format (PDF, HTML, Markdown, JSON).
+3. **Clean** — strip noise: whitespace, boilerplate, duplicates, empty records.
+4. **Normalize** — standardize casing, dates, encodings so things compare equally.
+5. **Chunk & embed** — split into pieces and vectorize (from the RAG lessons).
+
+## Parsing structured formats
+
+JSON is everywhere — API responses, config, exports. Python's `json` module turns a JSON string into a dictionary you can index.
+
+<CodeExercise
+  id="pipe-json"
+  prompt="Parse the JSON string and print the value of the 'body' field."
+  starter={`import json
+raw = '{"title": "Welcome", "body": "hello world"}'
+# Parse raw into a dict and print the body field
+`}
+  expected="hello world"
+  solution={`import json
+raw = '{"title": "Welcome", "body": "hello world"}'
+doc = json.loads(raw)
+print(doc["body"])`}
+/>
+
+<Callout type="note">
+PDFs and HTML need dedicated parsers (like <code>pypdf</code> or <code>BeautifulSoup</code>) that aren't bundled here, but they all produce the same end product: a string of text you then clean and chunk exactly like this.
+</Callout>
+
+## Cleaning the mess
+
+Raw text arrives with leading/trailing spaces, inconsistent casing, and empty entries. A cleaning pass fixes all of it in one comprehension — strip, lowercase, and drop the blanks.
+
+<CodeExercise
+  id="pipe-clean"
+  prompt="Clean the lines: strip whitespace, lowercase, and remove any empty entries. Print the result."
+  starter={`lines = ["  Hello ", "", "WORLD  ", "   "]
+# Print a cleaned list: stripped, lowercased, no empty strings
+`}
+  expected="['hello', 'world']"
+  solution={`lines = ["  Hello ", "", "WORLD  ", "   "]
+print([l.strip().lower() for l in lines if l.strip()])`}
+/>
+
+<Quiz
+  question="Why does cleaning matter so much before embedding or prompting?"
+  options={[
+    "It makes files smaller",
+    "Noise and inconsistency (whitespace, casing, duplicates, boilerplate) degrade retrieval quality and waste tokens",
+    "Models can't read uppercase letters",
+    "It's only a style preference"
+  ]}
+  answer={1}
+  explanation="Dirty text produces dirty embeddings and bloated prompts. Consistent, noise-free input means more accurate retrieval and lower cost."
+/>
+
+## Normalizing and deduplicating
+
+The same concept can appear as "AI", "ai", and "Ai". If you don't normalize, you'll store three copies and split your retrieval across them. Lowercasing then deduplicating collapses them into one.
+
+<CodeExercise
+  id="pipe-dedupe"
+  prompt="Normalize tags to lowercase, then print the number of unique tags."
+  starter={`tags = ["AI", "ai", "ML", "ml", "ai"]
+# Print the count of unique, lowercased tags
+`}
+  expected="2"
+  solution={`tags = ["AI", "ai", "ML", "ml", "ai"]
+print(len(set(t.lower() for t in tags)))`}
+/>
+
+Five raw tags collapse to two real ones. That same move — normalize, then dedupe — keeps a knowledge base clean as it grows.
+
+<Callout type="tip">
+A good pipeline is <strong>idempotent</strong> and <strong>incremental</strong>: re-running it shouldn't create duplicates, and adding one new document shouldn't force you to re-process everything. Design for the second document, not just the first.
+</Callout>
+
+<Quiz
+  question="What's the right order for a document pipeline?"
+  options={[
+    "Embed, then parse, then ingest",
+    "Ingest raw data, parse out the text, clean and normalize it, then chunk and embed",
+    "Chunk first, then ingest",
+    "Clean, then ingest, then parse"
+  ]}
+  answer={1}
+  explanation="You can't parse what you haven't ingested, can't clean what you haven't parsed, and shouldn't embed dirty text. Ingest → parse → clean/normalize → chunk → embed."
+/>
+
+You can now turn raw sources into clean, retrievable text. The final step of this track is the most ambitious: giving a model the ability to *act* — to call tools and pursue goals on its own. Agents, next.
+
+
+<Homework>
+Write a small cleaning function that takes a messy list of strings and returns them stripped, lowercased, de-duplicated, and with blanks removed. Then parse a JSON record string and pull out two fields. Run it twice on the same input to confirm it's **idempotent**.
+</Homework>

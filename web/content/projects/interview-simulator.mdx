@@ -1,0 +1,52 @@
+export const meta = { title: "The Persona-Driven Interview Simulator" };
+
+You'll turn an AI into a strict, in-character interviewer that runs you through a realistic mock interview and scores your answers. It's a practical study in reliable, bounded roleplay. The interview happens in a real chat assistant; this notebook helps you design the rubric and tally the result.
+
+## 1. Define the interviewer
+
+The magic is a system prompt that locks the model into a role *and* a process. Build the core instruction.
+
+<CodeExercise
+  id="is-prompt"
+  prompt="Assemble the interviewer's system prompt from its rules."
+  starter={`role = "You are a senior interviewer for a data analyst role."
+rules = "Ask one question at a time. Wait for my answer. Never reveal the answer."
+scoring = "After 5 questions, score each answer 1-5 and give brief feedback."
+system_prompt = f"{role} {rules} {scoring}"
+print(system_prompt)`}
+  solution={`role = "You are a senior interviewer for a data analyst role."
+rules = "Ask one question at a time. Wait for my answer. Never reveal the answer."
+scoring = "After 5 questions, score each answer 1-5 and give brief feedback."
+system_prompt = f"{role} {rules} {scoring}"
+print(system_prompt)`}
+/>
+
+<Callout type="tip">
+**Do this now:** Paste that prompt into your chat tool and answer its questions one at a time. Test the boundaries: try asking it for the answer, or to skip ahead. A well-built persona will politely refuse and stay in role — that reliability *is* the project.
+</Callout>
+
+## 2. Score the session
+
+When the interview ends, collect the per-question scores and compute your overall result.
+
+<CodeExercise
+  id="is-score"
+  prompt="The interviewer scored your five answers. Print the average, rounded to 2 decimals."
+  starter={`scores = [4, 3, 5, 4, 4]
+average = sum(scores) / len(scores)
+print(round(average, 2))`}
+  expected="4.0"
+  solution={`scores = [4, 3, 5, 4, 4]
+average = sum(scores) / len(scores)
+print(round(average, 2))`}
+/>
+
+An average of 4.0 across five questions — and because the persona scored consistently against a rubric, you can re-run it and track improvement over time.
+
+## 3. Make it adaptive
+
+A great simulator gets *harder* when you do well. Add to the system prompt: "If my last answer scored 4 or 5, make the next question harder; if it scored 1 or 2, ask a simpler follow-up." Now the difficulty tracks your skill.
+
+<Homework>
+Build it out: (1) run a full 5-question mock interview and save the transcript; (2) add the adaptive-difficulty rule and see if you notice the ramp; (3) have it produce a final scored debrief with one improvement tip per question; (4) swap the role (designer, nurse, PM) by changing only the system prompt — proof that the whole behavior is prompt-driven.
+</Homework>

@@ -1,0 +1,87 @@
+export const meta = {
+  title: "Transfer Learning for Vision",
+  summary: "You don't need a million images or a data center. Transfer learning lets you stand on the shoulders of a model that already learned to see.",
+};
+
+Training a strong vision model from scratch takes millions of labeled images and serious compute. Almost nobody does that. Instead they use **transfer learning** — take a model that already learned to see, and adapt it to your task with a tiny fraction of the data.
+
+## Why it works
+
+Remember the feature hierarchy: early CNN layers learn **general** patterns (edges, textures, shapes) that are useful for *any* image task. Only the final layers are specific to the original goal. So you can keep the general feature-extractor and just replace the part that makes the decision.
+
+The recipe:
+
+1. Take a model pretrained on a huge dataset (like ImageNet).
+2. **Freeze** the early layers — keep their learned filters as-is.
+3. **Replace the final layer(s)** with new ones for your classes (e.g., "cat vs. dog").
+4. **Train only those new layers** on your small dataset.
+
+<CodeExercise
+  id="tl-trainable"
+  prompt="A pretrained model has 1000 parameters; you freeze 900 of them. Print how many are trainable."
+  starter={`total = 1000
+frozen = 900
+# Print the number of trainable parameters
+`}
+  expected="100"
+  solution={`total = 1000
+frozen = 900
+print(total - frozen)`}
+/>
+
+Training 100 parameters instead of 1000 is faster, needs far less data, and is much harder to overfit.
+
+<CodeExercise
+  id="tl-fraction"
+  prompt="What fraction of the model is frozen? Print frozen / total."
+  starter={`total = 1000
+frozen = 900
+# Print the fraction of parameters that are frozen
+`}
+  expected="0.9"
+  solution={`total = 1000
+frozen = 900
+print(frozen / total)`}
+/>
+
+<Quiz
+  question="Why can transfer learning work with only a few hundred images?"
+  options={[
+    "It memorizes the images",
+    "The pretrained early layers already know general visual features; you only train a small new head on top",
+    "It doesn't actually need to learn anything",
+    "Small datasets are always easier"
+  ]}
+  answer={1}
+  explanation="The reusable feature extractor was learned from millions of images. You only train the final task-specific layers, so a small dataset is enough."
+/>
+
+## Freeze vs. fine-tune
+
+There are two dials:
+
+- **Feature extraction** — freeze everything, train only the new head. Fastest, best when your data is small or similar to the original.
+- **Fine-tuning** — unfreeze some later layers too and train them gently (low learning rate). Better when you have more data or a different domain (e.g., medical scans vs. everyday photos).
+
+<Callout type="tip">
+Transfer learning is the single most practical idea in applied computer vision — and the same principle powers fine-tuning large language models (the AI Engineering track). "Don't start from zero; adapt something that already learned" is one of the most valuable habits in all of AI.
+</Callout>
+
+<Quiz
+  question="When would you fine-tune (unfreeze some layers) rather than just train a new head?"
+  options={[
+    "Never — freezing is always best",
+    "When you have more data or your domain differs a lot from the original training data",
+    "Only when you have very little data",
+    "Only for grayscale images"
+  ]}
+  answer={1}
+  explanation="With more data or a domain shift (e.g., X-rays vs. photos), gently fine-tuning deeper layers helps them adapt — beyond what a new head alone can do."
+/>
+
+You can now adapt a powerful model to your own images. The last stop: going beyond "what is this?" to "where is it?" — detection and segmentation.
+
+
+<Homework>
+A pretrained base outputs a 512-feature vector; you attach a new head to classify **3** classes. Compute the head's parameter count (512×3 weights + 3 biases). Then decide: with only 200 training images, would you freeze the base or fine-tune it, and why?
+</Homework>

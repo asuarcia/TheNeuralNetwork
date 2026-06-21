@@ -1,0 +1,78 @@
+export const meta = {
+  title: "What 'Generative' Really Means",
+  summary: "Most models you've built tell things apart. Generative models do the opposite — they make new things. Understanding that flip unlocks GANs, diffusion, and LLMs.",
+};
+
+Every model so far has been **discriminative** — it draws boundaries to tell classes apart ("spam or ham?", "cat or dog?"). **Generative** models flip the goal: instead of labeling existing data, they **create new data** that looks like the training set. This is the family behind image generators, music AI, and the LLMs at the heart of this platform.
+
+## Discriminative vs. generative
+
+- **Discriminative** — learns the *boundary* between classes. Given an image, output "cat." Answers: *which class is this?*
+- **Generative** — learns the *distribution* of the data itself. Asked for "a cat," produce a brand-new cat image. Answers: *what does this kind of data look like, and can I make more?*
+
+Learning the distribution is much harder — the model has to capture what makes data *plausible*, not just where to slice between labels.
+
+<Quiz
+  question="What's the key difference between a discriminative and a generative model?"
+  options={[
+    "Discriminative models are always bigger",
+    "Discriminative models tell classes apart; generative models create new data resembling the training set",
+    "Generative models can't use neural networks",
+    "There is no real difference"
+  ]}
+  answer={1}
+  explanation="Discriminative models learn decision boundaries (classify). Generative models learn the data distribution so they can sample new, realistic examples."
+/>
+
+## Learning a distribution, then sampling
+
+A generative model learns the *distribution* of its training data — which values are common, which combinations are plausible. To create something new, it **samples** from that learned distribution. The simplest possible "generator" just outputs the most likely value it learned.
+
+<CodeExercise
+  id="gen-argmax"
+  prompt="A model learned this distribution over pixel values. Print the most likely value it would generate."
+  starter={`distribution = {0: 0.1, 128: 0.2, 255: 0.7}
+# Print the value with the highest probability
+`}
+  expected="255"
+  solution={`distribution = {0: 0.1, 128: 0.2, 255: 0.7}
+print(max(distribution, key=distribution.get))`}
+/>
+
+A real generator doesn't just repeat the single most likely value (that would be boring and identical every time) — it **samples**, producing variety. But the principle holds: model the distribution, then draw from it.
+
+<CodeExercise
+  id="gen-mode"
+  prompt="As a naive generator, output the most common value in the training data."
+  starter={`from collections import Counter
+data = [1, 1, 2, 3, 1]
+# Print the most common value
+`}
+  expected="1"
+  solution={`from collections import Counter
+data = [1, 1, 2, 3, 1]
+print(Counter(data).most_common(1)[0][0])`}
+/>
+
+<Quiz
+  question="To generate a new sample, a generative model does what?"
+  options={[
+    "Copies a training example exactly",
+    "Samples from the data distribution it learned",
+    "Picks a random class label",
+    "Computes the accuracy"
+  ]}
+  answer={1}
+  explanation="Generation means drawing a new sample from the learned distribution — not copying data, but producing something fresh that fits the same patterns."
+/>
+
+<Callout type="tip">
+You've already built generative models without naming them. A language model that predicts the next token <em>is</em> generative — it learned the distribution of text and samples from it. This track is about doing the same for images, where the cleverest methods are GANs and diffusion.
+</Callout>
+
+The big question is *how* to learn a rich distribution like "all realistic faces." The journey starts with a model that learns to compress and reconstruct — the autoencoder.
+
+
+<Homework>
+Give your own concrete example of a **discriminative** task and a **generative** task in the same domain (e.g. for email: "is this spam?" vs "write a reply"). Then in code, build a naive generator that outputs the most common value from `[3, 1, 3, 2, 3]`.
+</Homework>

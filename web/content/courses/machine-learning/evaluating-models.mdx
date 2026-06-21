@@ -1,39 +1,19 @@
 export const meta = {
   title: "Is My Model Any Good?",
-  summary: "A model you can't measure is a model you can't trust. Meet error metrics — the scoreboard of machine learning.",
+  summary: "A model you can't measure is a model you can't trust. Meet the metrics — and learn why accuracy alone will lie to you.",
 };
 
-You can't improve what you don't measure. Before tuning anything, you need a single number that says how wrong your predictions are. The most intuitive one is **Mean Absolute Error (MAE)**.
+You can't improve what you don't measure. Before tuning anything, you need numbers that say how wrong your predictions are. The right number depends on whether you're predicting values (regression) or categories (classification).
 
-## Mean Absolute Error
+## Regression: Mean Absolute Error
 
-For each example, take the gap between prediction and truth, drop the sign, and average:
+For predicting numbers, the most intuitive metric is **Mean Absolute Error (MAE)**: for each example, take the gap between prediction and truth, drop the sign, and average.
 
 ```text
-MAE = average of |prediction - actual|, over all examples
+MAE = average of |prediction - actual|
 ```
 
-Lower is better. MAE of 0 means perfect predictions. Its units match your label, so "MAE of 3" literally means "off by 3 on average."
-
-<Callout type="warning">
-Always measure error on data the model did <strong>not</strong> train on (a held-out test set). A model graded on its own study notes always looks smarter than it is.
-</Callout>
-
-<Quiz
-  question="Model A has MAE 2.0, Model B has MAE 5.0, on the same test set. Which is better?"
-  options={[
-    "Model B — higher numbers are better",
-    "Model A — lower average error means closer predictions",
-    "They're equivalent",
-    "You can't tell from MAE alone"
-  ]}
-  answer={1}
-  explanation="MAE is average distance from the truth, so lower is better. Model A is off by 2 on average; Model B by 5."
-/>
-
-## Your turn
-
-Compute MAE between your model's predictions and the actual values.
+Lower is better. Its units match your label, so "MAE of 3" literally means "off by 3 on average."
 
 <CodeExercise
   id="eval-mae"
@@ -49,4 +29,85 @@ errors = [abs(p - a) for p, a in zip(preds, actual)]
 print(round(sum(errors) / len(errors), 2))`}
 />
 
-Now you can rank any two models objectively. Optimizing that number is exactly what training a neural network does — next course.
+<Quiz
+  question="Model A has MAE 2.0, Model B has MAE 5.0, on the same test set. Which is better?"
+  options={[
+    "Model B — higher numbers are better",
+    "Model A — lower average error means closer predictions",
+    "They're equivalent",
+    "You can't tell from MAE alone"
+  ]}
+  answer={1}
+  explanation="MAE is average distance from the truth, so lower is better. Model A is off by 2 on average; Model B by 5."
+/>
+
+## Classification: why accuracy lies
+
+For categories, the obvious metric is **accuracy** — fraction predicted correctly. But accuracy is dangerously misleading when classes are **imbalanced**.
+
+Imagine a fraud detector where 99% of transactions are legit. A model that screams "legit!" for *everything* scores **99% accuracy** — and catches zero fraud. Useless, but it looks great. To see the truth, we break results into four buckets (the **confusion matrix**):
+
+- **True Positive (TP)** — predicted fraud, was fraud. ✓
+- **False Positive (FP)** — predicted fraud, was legit. (false alarm)
+- **False Negative (FN)** — predicted legit, was fraud. (missed it)
+- **True Negative (TN)** — predicted legit, was legit. ✓
+
+## Precision and recall
+
+Two metrics built from those buckets tell the real story:
+
+- **Precision** = `TP / (TP + FP)` — of everything you *flagged*, how much was right? (Low precision = lots of false alarms.)
+- **Recall** = `TP / (TP + FN)` — of everything that *was* positive, how much did you catch? (Low recall = lots of misses.)
+
+<CodeExercise
+  id="eval-precision"
+  prompt="The model flagged 10 transactions: 8 were truly fraud (TP), 2 were false alarms (FP). Print precision, rounded to 2."
+  starter={`tp = 8
+fp = 2
+# precision = tp / (tp + fp). Print it rounded to 2 decimals.
+`}
+  expected="0.8"
+  solution={`tp = 8
+fp = 2
+print(round(tp / (tp + fp), 2))`}
+/>
+
+<CodeExercise
+  id="eval-recall"
+  prompt="There were 12 real fraud cases; the model caught 8 (TP) and missed 4 (FN). Print recall, rounded to 2."
+  starter={`tp = 8
+fn = 4
+# recall = tp / (tp + fn). Print it rounded to 2 decimals.
+`}
+  expected="0.67"
+  solution={`tp = 8
+fn = 4
+print(round(tp / (tp + fn), 2))`}
+/>
+
+## The tradeoff and F1
+
+Precision and recall pull against each other. Flag everything and recall is high but precision craters; flag only the sure things and precision is high but you miss cases. The **F1 score** balances them into one number (the harmonic mean), and the **ROC curve** plots the tradeoff as you slide the decision threshold.
+
+<Callout type="warning">
+Always measure on a held-out test set, and pick the metric that matches the <em>cost of being wrong</em>. For cancer screening, missing a case (recall) is catastrophic — tolerate false alarms. For spam, a false alarm (precision) annoys users — be more conservative.
+</Callout>
+
+<Quiz
+  question="A disease affects 1% of patients. Your model predicts 'healthy' for everyone and scores 99% accuracy. What's the problem?"
+  options={[
+    "Nothing — 99% is excellent",
+    "Accuracy hides total failure on the rare class; its recall for sick patients is 0%",
+    "The accuracy was computed wrong",
+    "It needs a bigger test set"
+  ]}
+  answer={1}
+  explanation="With imbalanced classes, accuracy is dominated by the majority. The model catches none of the sick patients — recall is 0. Precision/recall expose what accuracy conceals."
+/>
+
+You can now judge any model honestly — and you know which metric to trust. But *how* does a model actually find good weights in the first place? Time to meet the engine that powers all of it: gradient descent.
+
+
+<Homework>
+From `TP=8, FP=2, FN=4`, compute **precision**, **recall**, and the **F1 score** (the harmonic mean: 2·P·R/(P+R)). Then say which metric you'd optimize for a cancer screen, and which for a spam filter.
+</Homework>

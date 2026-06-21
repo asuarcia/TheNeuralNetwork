@@ -1,0 +1,79 @@
+export const meta = {
+  title: "Advanced Prompting",
+  summary: "Examples, step-by-step thinking, custom instructions, and second opinions — the techniques that turn an AI from hit-or-miss into reliable. Still no code.",
+};
+
+You know the basics: be specific, give context, show the format. Now the techniques people who get consistently great results reach for. None of them require coding — they're all just smarter ways to arrange what you tell the AI.
+
+## Show examples (teach by demonstration)
+
+Instead of *describing* what you want, **show a couple of examples** and let the AI copy the pattern. This is the most powerful trick most people never use.
+
+> Turn these notes into polite one-line replies.
+> Note: "can't make Tuesday" → Reply: "Thanks for letting me know — Tuesday won't work, shall we find another day?"
+> Note: "running 10 min late" → Reply: "No problem at all, see you shortly!"
+> Note: "need to reschedule the call" →
+
+The AI sees the pattern and produces a matching reply. Examples pin down a style that words alone struggle to capture.
+
+<Quiz
+  question="What's the benefit of putting a couple of examples in your prompt?"
+  options={[
+    "It makes the prompt look more professional",
+    "The AI copies the pattern in your examples, matching your style and format closely",
+    "It makes the AI respond faster",
+    "It uses fewer words"
+  ]}
+  answer={1}
+  explanation="Examples show the AI the exact pattern you want. It continues that pattern — far more reliable than describing the style in words."
+/>
+
+## Ask it to think step by step
+
+Remember the AI commits one word at a time. If you demand an instant answer to a tricky question, it has no room to work things out. The fix is almost absurdly simple: add **"think step by step"** (or "show your reasoning").
+
+> "I have a $2,000 budget. Flights are $600, the hotel is $90 a night for 5 nights, and I want $400 for food. How much is left for activities? **Think step by step.**"
+
+By laying out the steps, the AI is far more likely to get the final number right — especially for anything involving math, logic, or multiple stages.
+
+<Callout type="tip">
+**Try this:** Ask an AI a multi-step word problem twice — once plainly, once ending with "think through it step by step." Compare the answers. The step-by-step version is usually clearer and more accurate.
+</Callout>
+
+## Get a second opinion
+
+For something important, don't trust a single try. Ask the **same question a few times** (or in a couple of different tools) and see whether the answers agree. When several independent attempts land on the same conclusion, you can trust it more. When they disagree, that's your signal to dig deeper or verify.
+
+<Quiz
+  question="You got an important answer from an AI and want to trust it more. A good move is to:"
+  options={[
+    "Assume it's right because it sounded confident",
+    "Ask the same question again (or in another tool) and see if the answers agree",
+    "Make the question longer",
+    "Accept it only if it's the first answer"
+  ]}
+  answer={1}
+  explanation="Independent tries that agree are more trustworthy; disagreement flags something to verify. Confidence alone is not evidence of correctness."
+/>
+
+## Set standing instructions
+
+Most assistants let you save **custom instructions** (sometimes called a "system prompt" or "personalization") — standing rules that apply to every chat. Set things like "I'm a nurse; keep medical explanations practical," or "Always answer briefly first, then offer detail." Now you don't have to repeat yourself every time.
+
+## Remember: it only knows what's in the conversation
+
+A chat *feels* like the AI remembers you, but really it only sees the current conversation's text. So:
+
+- If something important scrolled far up, **restate it** — don't assume it's remembered.
+- If the chat went down a bad path, don't argue in circles — **start fresh** with a cleaner prompt.
+
+<Callout type="note">
+These stack. A strong real-world prompt is often: a clear **role**, one or two **examples**, a **"think step by step"** nudge, and a shown **format**. Combine them and you'll get results most people never do.
+</Callout>
+
+You can now steer any AI tool with intent. Next, let's put it to work on the everyday tasks that actually fill your day.
+
+
+<Homework>
+Find a question the AI gets wrong on the first try. Improve it two ways: add **two worked examples** (few-shot), and add **"think step by step."** Compare all three answers (plain, few-shot, step-by-step) and note which technique helped most.
+</Homework>

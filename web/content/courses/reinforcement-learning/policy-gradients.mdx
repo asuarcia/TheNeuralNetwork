@@ -1,0 +1,78 @@
+export const meta = {
+  title: "Policy Gradients & RLHF",
+  summary: "Instead of learning the value of actions, learn the actions directly. Policy methods power game-playing AIs — and, crucially, how chatbots are aligned with RLHF.",
+};
+
+Q-learning learns *values* and picks the highest. **Policy methods** take a different route: learn the **policy** directly — a function that maps a state straight to action probabilities. This family powers modern deep RL and, importantly for this platform, the fine-tuning of language models.
+
+## What is a policy?
+
+A **policy** is the agent's strategy: given a state, it outputs a probability for each action. Good actions get high probability; bad ones get low. To make a set of scores into a valid policy, we normalize them so they sum to 1 (the softmax idea from earlier tracks does exactly this).
+
+<CodeExercise
+  id="pg-policy"
+  prompt="Turn these action scores into a policy: divide each by the total so they sum to 1."
+  starter={`scores = [1, 3]
+total = sum(scores)
+# Print each score divided by the total (the action probabilities)
+`}
+  expected="[0.25, 0.75]"
+  solution={`scores = [1, 3]
+total = sum(scores)
+print([s / total for s in scores])`}
+/>
+
+The agent then **samples** an action from these probabilities — usually taking the likely one, but keeping some natural exploration built in.
+
+## Policy gradients: nudge toward what worked
+
+Training a policy uses a wonderfully intuitive rule (the **REINFORCE** idea): play out an episode, and if it earned high reward, **increase** the probability of the actions you took; if it earned low reward, **decrease** them. Over many episodes, the policy drifts toward reward-maximizing behavior. It's gradient ascent on expected reward — the same calculus engine as the rest of deep learning, pointed at a new goal.
+
+<Quiz
+  question="What does a 'policy' output?"
+  options={[
+    "The value of the current state",
+    "A probability for each action the agent could take",
+    "The total reward so far",
+    "The discount factor"
+  ]}
+  answer={1}
+  explanation="A policy maps a state to action probabilities — the agent's strategy. Policy-gradient methods adjust those probabilities to favor actions that led to higher reward."
+/>
+
+## Deep RL
+
+Swap the simple table/policy for a **neural network** and you get **deep reinforcement learning** — the approach behind DeepMind's Atari agents, **AlphaGo** (which beat the world Go champion), and robotic control. The network maps high-dimensional states (like raw pixels) to values or action probabilities, trained with the same ideas you just learned.
+
+## RLHF: how chatbots get aligned
+
+Here's why this matters for everything else you've studied. **RLHF — Reinforcement Learning from Human Feedback** — is how raw language models become helpful assistants:
+
+1. The model generates several responses.
+2. Humans rank which is best, training a **reward model** to imitate those preferences.
+3. The language model is then improved with **policy-gradient RL**, where the "reward" is the human-preference score — increasing the probability of responses people prefer.
+
+The chatbot *is* the policy; "be more helpful and harmless" is the reward. The alignment you learned about in Foundations is reinforcement learning under the hood.
+
+<Callout type="tip">
+This closes a big loop across the curriculum: the "alignment" from AI Foundations, the "policy gradients" here, and the assistants from Applied AI are all the same story. RL didn't just master games — it's how modern AI is taught to behave.
+</Callout>
+
+<Quiz
+  question="How does RLHF use reinforcement learning to improve a chatbot?"
+  options={[
+    "It labels every correct answer by hand",
+    "A reward model trained on human preferences provides the reward, and policy-gradient RL makes preferred responses more likely",
+    "It plays the chatbot against itself in Go",
+    "It uses Q-tables for every sentence"
+  ]}
+  answer={1}
+  explanation="RLHF turns human preference rankings into a reward signal, then uses policy-gradient RL to shift the model toward responses humans rate highly."
+/>
+
+**That completes Reinforcement Learning.** You've gone from a single reward to the algorithm that aligns modern AI. The final frontier track: how machines *create* — Generative AI & Diffusion.
+
+
+<Homework>
+Turn the action scores `[2, 1, 1]` into a policy (divide by the sum so they total 1) and print the probabilities. Then, in one sentence each, explain how **policy gradients** and **RLHF** both nudge those probabilities toward higher reward.
+</Homework>

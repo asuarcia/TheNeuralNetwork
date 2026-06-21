@@ -1,0 +1,128 @@
+export const meta = { title: "Spam Filter with Naive Bayes" };
+
+You'll build the classic email spam filter from scratch — pure probability, no libraries. By the end it'll classify unseen messages as spam or ham. Run the cells in order.
+
+## 1. The training data
+
+A handful of labeled messages. Run this to count how many of each class we have.
+
+<CodeExercise
+  id="nb-data"
+  prompt="Count the spam and ham messages."
+  starter={`data = [
+    ("win money now", "spam"),
+    ("win a free prize", "spam"),
+    ("cheap meds win", "spam"),
+    ("meeting at noon", "ham"),
+    ("lunch tomorrow", "ham"),
+    ("project update meeting", "ham"),
+]
+spam = sum(1 for _, label in data if label == "spam")
+ham = sum(1 for _, label in data if label == "ham")
+print(spam, ham)`}
+  expected="3 3"
+  solution={`data = [
+    ("win money now", "spam"),
+    ("win a free prize", "spam"),
+    ("cheap meds win", "spam"),
+    ("meeting at noon", "ham"),
+    ("lunch tomorrow", "ham"),
+    ("project update meeting", "ham"),
+]
+spam = sum(1 for _, label in data if label == "spam")
+ham = sum(1 for _, label in data if label == "ham")
+print(spam, ham)`}
+/>
+
+## 2. Count words per class
+
+The model learns by counting how often each word appears in spam vs. ham. Build a word-frequency table for each class.
+
+<CodeExercise
+  id="nb-counts"
+  prompt="Count words per class, then print how many times 'win' appears in spam."
+  starter={`from collections import Counter
+data = [
+    ("win money now", "spam"),
+    ("win a free prize", "spam"),
+    ("cheap meds win", "spam"),
+    ("meeting at noon", "ham"),
+    ("lunch tomorrow", "ham"),
+    ("project update meeting", "ham"),
+]
+spam_words, ham_words = Counter(), Counter()
+for text, label in data:
+    (spam_words if label == "spam" else ham_words).update(text.split())
+
+print(spam_words["win"])`}
+  expected="3"
+  solution={`from collections import Counter
+data = [
+    ("win money now", "spam"),
+    ("win a free prize", "spam"),
+    ("cheap meds win", "spam"),
+    ("meeting at noon", "ham"),
+    ("lunch tomorrow", "ham"),
+    ("project update meeting", "ham"),
+]
+spam_words, ham_words = Counter(), Counter()
+for text, label in data:
+    (spam_words if label == "spam" else ham_words).update(text.split())
+print(spam_words["win"])`}
+/>
+
+"win" shows up 3 times in spam, 0 in ham — a strong signal.
+
+## 3. Score a new message
+
+To classify, we score a message under each class by multiplying its word probabilities. We add **+1 smoothing** so an unseen word doesn't zero out the whole score. Whichever class scores higher wins.
+
+<CodeExercise
+  id="nb-classify"
+  prompt="Score 'win free money' under each class and print the predicted label."
+  starter={`from collections import Counter
+data = [
+    ("win money now", "spam"), ("win a free prize", "spam"), ("cheap meds win", "spam"),
+    ("meeting at noon", "ham"), ("lunch tomorrow", "ham"), ("project update meeting", "ham"),
+]
+spam_words, ham_words = Counter(), Counter()
+for text, label in data:
+    (spam_words if label == "spam" else ham_words).update(text.split())
+
+def score(words, counts):
+    total = sum(counts.values())
+    vocab = len(set(spam_words) | set(ham_words))
+    s = 1.0
+    for w in words:
+        s *= (counts[w] + 1) / (total + vocab)   # +1 smoothing
+    return s
+
+msg = "win free money".split()
+label = "spam" if score(msg, spam_words) > score(msg, ham_words) else "ham"
+print(label)`}
+  expected="spam"
+  solution={`from collections import Counter
+data = [
+    ("win money now", "spam"), ("win a free prize", "spam"), ("cheap meds win", "spam"),
+    ("meeting at noon", "ham"), ("lunch tomorrow", "ham"), ("project update meeting", "ham"),
+]
+spam_words, ham_words = Counter(), Counter()
+for text, label in data:
+    (spam_words if label == "spam" else ham_words).update(text.split())
+def score(words, counts):
+    total = sum(counts.values())
+    vocab = len(set(spam_words) | set(ham_words))
+    s = 1.0
+    for w in words:
+        s *= (counts[w] + 1) / (total + vocab)
+    return s
+msg = "win free money".split()
+label = "spam" if score(msg, spam_words) > score(msg, ham_words) else "ham"
+print(label)`}
+/>
+
+It works — a working spam classifier built from counting and probability. Try changing `msg` to "lunch meeting tomorrow" and re-run; it flips to ham.
+
+<Homework>
+Improve it: (1) classify several test messages and compute its accuracy; (2) switch from multiplying probabilities to **summing log-probabilities** (use `math.log`) so it won't underflow on long emails; (3) print the words with the highest spam-to-ham ratio — your filter's "most suspicious" words.
+</Homework>

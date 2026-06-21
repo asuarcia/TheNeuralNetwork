@@ -1,0 +1,85 @@
+export const meta = {
+  title: "Convolution & Filters",
+  summary: "Convolution is the one operation behind all of modern computer vision. It's a tiny window that slides over an image looking for a pattern — and it's simpler than it sounds.",
+};
+
+How does a model find an edge, a corner, or a texture in a grid of numbers? With **convolution** — sliding a small grid of weights (a **filter** or **kernel**) across the image and, at each spot, multiplying and summing.
+
+## The core move: multiply and sum
+
+Line the filter up over a patch of the image, multiply each pair of overlapping numbers, and add them all into a single output value. Slide the filter one step and repeat. The grid of outputs is a **feature map** — a map of *where the pattern was found*.
+
+Let's do one step in 1D first. A classic **edge detector** is the filter `[-1, 1]`: it computes the *difference* between neighbors, which is large exactly where brightness suddenly changes — an edge.
+
+<CodeExercise
+  id="conv-edge"
+  prompt="Apply the edge filter [-1, 1] to the pixel pair [5, 8]: multiply element-wise and sum."
+  starter={`window = [5, 8]
+kernel = [-1, 1]
+# Print the convolution output: sum of window[i] * kernel[i]
+`}
+  expected="3"
+  solution={`window = [5, 8]
+kernel = [-1, 1]
+print(sum(s * k for s, k in zip(window, kernel)))`}
+/>
+
+The output `3` means brightness rose by 3 across that pair. On a flat region (`[5, 5]`) the same filter gives `0` — no edge. That's edge detection in one line.
+
+<Quiz
+  question="An edge-detecting filter gives an output near 0 over a patch of the image. What does that mean?"
+  options={[
+    "There's a strong edge there",
+    "That region is flat / uniform — no sudden brightness change",
+    "The image is corrupted",
+    "The filter is broken"
+  ]}
+  answer={1}
+  explanation="Edge filters measure change between neighboring pixels. Near-zero output means little change — a smooth, uniform area with no edge."
+/>
+
+## Bigger filters detect bigger patterns
+
+Real filters are small 2D grids (3×3 is classic) that slide over the 2D image. The math is identical — overlay, multiply matching cells, sum. Different filters detect different things: horizontal edges, vertical edges, blurs, sharpening.
+
+<CodeExercise
+  id="conv-2d"
+  prompt="Convolve a 2x2 image patch with a 2x2 filter: multiply matching cells across both grids and sum."
+  starter={`patch  = [[1, 2],
+          [3, 4]]
+filter = [[1, 0],
+          [0, 1]]
+# Sum of patch[i][j] * filter[i][j] over all cells
+`}
+  expected="5"
+  solution={`patch  = [[1, 2], [3, 4]]
+filter = [[1, 0], [0, 1]]
+print(sum(p * f for prow, frow in zip(patch, filter) for p, f in zip(prow, frow)))`}
+/>
+
+## The big idea: the model *learns* the filters
+
+In classic image processing, humans designed filters by hand. The breakthrough of deep learning is that a network **learns its own filters** from data — discovering which patterns matter for the task, instead of being told. That's what the next lesson is about.
+
+<Callout type="tip">
+Two properties make convolution perfect for images: <strong>locality</strong> (a pattern is found from nearby pixels) and <strong>weight sharing</strong> (the same filter slides everywhere, so a cat detected in one corner is detected in any corner). This is why CNNs need far fewer parameters than treating every pixel separately.
+</Callout>
+
+<Quiz
+  question="What is a 'feature map' produced by convolution?"
+  options={[
+    "A list of the image's filenames",
+    "A grid showing where (and how strongly) the filter's pattern appears across the image",
+    "The original image, unchanged",
+    "The model's final prediction"
+  ]}
+  answer={1}
+  explanation="Sliding a filter over the image produces a feature map — a grid of responses indicating where that filter's pattern (an edge, texture, etc.) was found."
+/>
+
+You can convolve a filter over an image by hand. Now let's stack convolutions into the architecture that powers modern vision — the CNN.
+
+
+<Homework>
+Apply the edge filter `[-1, 0, 1]` across the 1-D signal `[10, 10, 20, 20, 10]`, sliding it over every window of three. Print the output values and point out where the edges (largest magnitudes) are.
+</Homework>

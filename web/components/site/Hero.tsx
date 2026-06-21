@@ -114,7 +114,7 @@ export const Hero = () => {
           transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-wrap justify-center gap-3 mt-16 max-w-2xl"
         >
-          {['Beginner Friendly', 'Expert Level', 'Hands-on Projects', 'AI Certification'].map((feature, i) => (
+          {['Beginner Friendly', 'Through to Expert', 'Real Python In-Browser', 'Always Free'].map((feature, i) => (
             <div
               key={i}
               className="px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm text-sm text-neutral-400"

@@ -1,0 +1,91 @@
+export const meta = {
+  title: "Quantization & Fast Inference",
+  summary: "A trained model is useless if it's too big or slow to run. Quantization shrinks it; caching and batching speed it up. This is what makes deployment real.",
+};
+
+Training gets the headlines, but **inference** — actually running the model to serve users — is where the bills pile up and the latency hurts. A 70-billion-parameter model won't fit on a normal GPU at full precision, and a slow response loses users. This lesson is the engineering that makes big models practical.
+
+## Why models are so big
+
+A model's memory footprint is simply its parameter count times the bytes used to store each number. At full precision (FP32), each weight is 4 bytes; at half precision (FP16), 2 bytes.
+
+<CodeExercise
+  id="inf-memory"
+  prompt="A 7-billion-parameter model in FP16 uses 2 bytes per parameter. Print its size in gigabytes (bytes / 1e9)."
+  starter={`params = 7_000_000_000
+bytes_per_param = 2
+# Print memory in GB (total bytes divided by 1e9)
+`}
+  expected="14.0"
+  solution={`params = 7_000_000_000
+bytes_per_param = 2
+print(params * bytes_per_param / 1e9)`}
+/>
+
+14 GB just to *hold* the weights — before any actual computation. Scale to 70B and you need multiple high-end GPUs. That's the problem quantization solves.
+
+## Quantization: fewer bits per weight
+
+**Quantization** stores each weight using fewer bits — INT8 (1 byte), or even INT4 (half a byte) — instead of FP16/FP32. The model gets dramatically smaller and faster, at the cost of a little precision.
+
+<CodeExercise
+  id="inf-quant"
+  prompt="FP16 uses 2 bytes/weight; INT4 uses 0.5. Print how many times smaller the INT4 model is."
+  starter={`fp16_bytes = 2
+int4_bytes = 0.5
+# Print the size reduction factor (fp16 / int4)
+`}
+  expected="4.0"
+  solution={`fp16_bytes = 2
+int4_bytes = 0.5
+print(fp16_bytes / int4_bytes)`}
+/>
+
+A 4× reduction can turn "needs a data-center GPU" into "runs on my laptop." The surprise of modern AI is how *little* quality you lose — a well-quantized INT4 model is often nearly indistinguishable from the full-precision original.
+
+<Quiz
+  question="What does quantization trade off?"
+  options={[
+    "It makes the model more accurate at higher cost",
+    "It uses fewer bits per weight — shrinking size and speeding inference — at the cost of a small amount of numerical precision",
+    "It deletes layers from the model",
+    "It increases the parameter count"
+  ]}
+  answer={1}
+  explanation="Quantization lowers the bits used per weight (e.g., FP16 → INT4), greatly reducing memory and increasing speed, while sacrificing a little precision — usually with minimal quality loss."
+/>
+
+## Speeding up generation: the KV cache
+
+Recall that a chat model is autoregressive — it generates one token at a time, re-reading the whole sequence each step. Naively, that means recomputing attention over *all* previous tokens for *every* new token. Wildly wasteful.
+
+The **KV cache** fixes it: the Keys and Values computed for past tokens (from the self-attention lesson) are **stored and reused**, so each new token only computes attention against the cache instead of redoing everything. It's the single biggest reason generation is fast — at the cost of memory to hold the cache.
+
+## Other inference levers
+
+- **Batching** — process many users' requests together to keep the GPU saturated (throughput).
+- **Smaller / distilled models** — a tuned 7B can beat a generic 70B for a specific task, far cheaper.
+- **Streaming** — send tokens as they're generated so the user sees output immediately (better *perceived* latency).
+
+<Callout type="tip">
+The deployment mindset flips training on its head. In training you maximize learning; in inference you minimize cost and latency per request. Quantization, KV caching, and batching are the three biggest knobs — and together they decide whether your AI feature is profitable or a money pit.
+</Callout>
+
+<Quiz
+  question="What does the KV cache do during text generation?"
+  options={[
+    "Stores the user's password",
+    "Saves the Keys and Values of past tokens so attention isn't recomputed from scratch for every new token",
+    "Caches the final answer for reuse",
+    "Compresses the model weights"
+  ]}
+  answer={1}
+  explanation="Autoregressive generation would otherwise recompute attention over all prior tokens each step. The KV cache reuses past Keys/Values, making each new token far cheaper to produce."
+/>
+
+Your model now fits and runs fast. But is it actually *good*? Evaluating generative models is its own hard problem — next.
+
+
+<Homework>
+A model has **7 billion** parameters. Compute its memory footprint in GB at FP32 (4 bytes), FP16 (2 bytes), and INT8 (1 byte). Then state which one you'd pick to run it on a single 16 GB GPU, and what you'd be trading away.
+</Homework>

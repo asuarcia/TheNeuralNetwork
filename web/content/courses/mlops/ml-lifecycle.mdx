@@ -1,0 +1,74 @@
+export const meta = {
+  title: "From Notebook to Production",
+  summary: "Training a model is maybe 10% of the work. The other 90% — getting it serving real users reliably and keeping it healthy — is MLOps. Here's the whole map.",
+};
+
+You can train a model. But a model that lives in a notebook helps no one. **MLOps** (machine-learning operations) is the discipline of turning a trained model into a reliable product — and it's where most real-world AI effort actually goes. This track, inspired by what cloud platforms like AWS SageMaker teach, walks the full lifecycle.
+
+## The ML lifecycle is a loop, not a line
+
+Production ML is a cycle that never really ends:
+
+1. **Data** — collect, clean, and version the data.
+2. **Train & experiment** — build models, track experiments, pick the best.
+3. **Evaluate** — test on held-out data and against the current production model.
+4. **Deploy** — package the model and serve it behind an API.
+5. **Monitor** — watch quality, latency, cost, and drift in the wild.
+6. **Retrain** — when the world shifts or data grows, loop back to step 1.
+
+The first three you've practiced all curriculum. This track is about steps 4–6 — the part that separates a demo from a dependable system.
+
+<Quiz
+  question="Roughly how much of real-world ML work is training the model itself?"
+  options={[
+    "Almost all of it",
+    "A small fraction — most effort goes into data, deployment, monitoring, and maintenance",
+    "Exactly half",
+    "None — training is automatic"
+  ]}
+  answer={1}
+  explanation="Training is a small slice. Data engineering, serving, monitoring, and keeping models healthy over time dominate production ML — the domain of MLOps."
+/>
+
+## Should this model ship?
+
+A core lifecycle decision: only promote a new model if it beats the current one by a meaningful margin (not just noise). That guard prevents shipping a model that's no better — or worse.
+
+<CodeExercise
+  id="lifecycle-promote"
+  prompt="Promote the new model only if its accuracy beats the current one by more than the margin. Print True or False."
+  starter={`new_acc = 0.91
+current_acc = 0.88
+margin = 0.01
+# Print True if new_acc beats current_acc by more than the margin
+`}
+  expected="True"
+  solution={`new_acc = 0.91
+current_acc = 0.88
+margin = 0.01
+print(new_acc > current_acc + margin)`}
+/>
+
+The new model is 3 points better, clearing the 1-point margin — ship it. At 0.885 it wouldn't have: too close to call.
+
+<Callout type="tip">
+Reproducibility is the foundation of all of this. If you can't recreate exactly which data + code + config produced a model, you can't debug it, audit it, or safely improve it. Version <em>everything</em> — data, code, and models — which is the subject of the last lesson.
+</Callout>
+
+<Quiz
+  question="Why does the ML lifecycle loop back to data and retraining?"
+  options={[
+    "Because models wear out physically",
+    "Because the world changes — new data and shifting patterns mean a static model degrades over time",
+    "Because training is fun",
+    "It doesn't; deployment is the end"
+  ]}
+  answer={1}
+  explanation="Data distributions drift as the world changes, so a once-good model slowly gets worse. Monitoring detects this and triggers retraining — closing the loop."
+/>
+
+Next, the unglamorous foundation everything sits on: the pipelines that feed your model clean, consistent data — in training *and* in production.
+
+<Homework>
+Pick any model you've built or imagined in this course (a spam filter, a price predictor, an image classifier). Write out its full lifecycle loop in your own words: where the **data** comes from, how you'd **deploy** it, what you'd **monitor**, and what would **trigger a retrain**. Identify the one step you think would be hardest in practice — and why.
+</Homework>

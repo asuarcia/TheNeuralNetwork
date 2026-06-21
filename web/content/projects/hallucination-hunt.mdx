@@ -1,0 +1,71 @@
+export const meta = { title: "The Fact-Checking Hallucination Hunt" };
+
+In this project you'll make an AI hallucinate on purpose, then build a verification workflow that catches it. It's a hands-on lesson in why models invent facts — and how grounding defends against it. You'll use a real chat assistant for the generation and this notebook for the checking.
+
+## 1. Generate a narrative with planted errors
+
+<Callout type="tip">
+**Do this now:** In your chat tool, ask for a confident, multi-paragraph summary of a historical event — and explicitly request that it include a couple of *subtle factual errors* (wrong dates, wrong names). Copy the result. You now have text that sounds authoritative but contains traps.
+</Callout>
+
+## 2. Extract the claims
+
+A verification workflow first breaks the text into individual checkable claims. Run this to see a list of extracted claims.
+
+<CodeExercise
+  id="hh-claims"
+  prompt="Store the extracted claims and print how many there are."
+  starter={`claims = [
+    "The Eiffel Tower was completed in 1889.",
+    "The Eiffel Tower is located in Rome.",
+    "It was designed by Gustave Eiffel's company.",
+]
+print(len(claims))`}
+  expected="3"
+  solution={`claims = [
+    "The Eiffel Tower was completed in 1889.",
+    "The Eiffel Tower is located in Rome.",
+    "It was designed by Gustave Eiffel's company.",
+]
+print(len(claims))`}
+/>
+
+## 3. Check each claim against trusted sources
+
+The core of the hunt: compare each claim to a set of trusted facts, and flag any that aren't supported. Count the unsupported ones — those are your hallucinations.
+
+<CodeExercise
+  id="hh-verify"
+  prompt="Count how many claims are NOT supported by the trusted sources."
+  starter={`trusted = {
+    "The Eiffel Tower was completed in 1889.",
+    "The Eiffel Tower is located in Paris.",
+    "It was designed by Gustave Eiffel's company.",
+}
+claims = [
+    "The Eiffel Tower was completed in 1889.",
+    "The Eiffel Tower is located in Rome.",
+    "It was designed by Gustave Eiffel's company.",
+]
+unsupported = sum(1 for c in claims if c not in trusted)
+print(unsupported)`}
+  expected="1"
+  solution={`trusted = {
+    "The Eiffel Tower was completed in 1889.",
+    "The Eiffel Tower is located in Paris.",
+    "It was designed by Gustave Eiffel's company.",
+}
+claims = [
+    "The Eiffel Tower was completed in 1889.",
+    "The Eiffel Tower is located in Rome.",
+    "It was designed by Gustave Eiffel's company.",
+]
+unsupported = sum(1 for c in claims if c not in trusted)
+print(unsupported)`}
+/>
+
+One claim ("located in Rome") isn't supported — caught. That exact-match check is crude, but it's the shape of every fact-checking system: extract claims, compare to a trusted source, flag the gaps.
+
+<Homework>
+Make it smarter: (1) have the AI itself extract the claims from the narrative; (2) for each claim, ask the AI "is this supported by the following sources? answer yes/no and cite which one"; (3) count how many planted errors your loop catches vs. misses; (4) reflect: why is grounding (giving the model real sources) a better fix than just asking it to "be accurate"?
+</Homework>

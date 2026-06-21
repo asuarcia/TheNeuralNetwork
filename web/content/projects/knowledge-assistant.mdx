@@ -1,0 +1,84 @@
+export const meta = { title: "The Syllabus Knowledge Assistant" };
+
+You'll build a working **RAG** (retrieval-augmented generation) assistant in miniature — it stores documents, retrieves the relevant one for a question, and builds a grounded prompt. This is the exact pattern behind production "chat with your docs" apps. Run the cells in order.
+
+## 1. The knowledge base
+
+A handful of "documents" (think: chunks of a syllabus or wiki). Run this.
+
+<CodeExercise
+  id="ka-docs"
+  prompt="Store the documents and print how many there are."
+  starter={`docs = [
+    "The library opens at 9am on weekdays.",
+    "Return books within 21 days to avoid a fine.",
+    "The cafe on the third floor serves coffee until 5pm.",
+]
+print(len(docs))`}
+  expected="3"
+  solution={`docs = [
+    "The library opens at 9am on weekdays.",
+    "Return books within 21 days to avoid a fine.",
+    "The cafe on the third floor serves coffee until 5pm.",
+]
+print(len(docs))`}
+/>
+
+## 2. Retrieve the relevant document
+
+Given a question, find the document with the most words in common (a keyword retriever — real systems use embeddings, but the *shape* is identical).
+
+<CodeExercise
+  id="ka-retrieve"
+  prompt="Write retrieve(question, docs) that returns the best-matching document, and test it."
+  starter={`docs = [
+    "The library opens at 9am on weekdays.",
+    "Return books within 21 days to avoid a fine.",
+    "The cafe on the third floor serves coffee until 5pm.",
+]
+
+def retrieve(question, docs):
+    q = set(question.lower().split())
+    return max(docs, key=lambda d: len(q & set(d.lower().split())))
+
+print(retrieve("when does the cafe close", docs))`}
+  expected="The cafe on the third floor serves coffee until 5pm."
+  solution={`docs = [
+    "The library opens at 9am on weekdays.",
+    "Return books within 21 days to avoid a fine.",
+    "The cafe on the third floor serves coffee until 5pm.",
+]
+def retrieve(question, docs):
+    q = set(question.lower().split())
+    return max(docs, key=lambda d: len(q & set(d.lower().split())))
+print(retrieve("when does the cafe close", docs))`}
+/>
+
+It pulled the cafe document — the one that can actually answer the question.
+
+## 3. Build the grounded prompt
+
+Now wrap the retrieved context and the question into a single prompt. The instruction "answer only from the context" is what keeps the model honest.
+
+<CodeExercise
+  id="ka-prompt"
+  prompt="Assemble the augmented prompt with the retrieved context and the question."
+  starter={`context = "The cafe on the third floor serves coffee until 5pm."
+question = "When does the cafe close?"
+prompt = f"Answer only from the context.\\nContext: {context}\\nQuestion: {question}"
+print(prompt)`}
+  solution={`context = "The cafe on the third floor serves coffee until 5pm."
+question = "When does the cafe close?"
+prompt = f"Answer only from the context.\\nContext: {context}\\nQuestion: {question}"
+print(prompt)`}
+/>
+
+Send that prompt to any LLM and it answers "5pm" — grounded in your document, not its training memory. That's RAG.
+
+## 4. From toy to real
+
+Two upgrades turn this into a production system: replace keyword matching with **embedding similarity** (so "closing time" matches "serves until 5pm" even with no shared words), and replace the print with a real **LLM API call** that receives the prompt.
+
+<Homework>
+Make it real: (1) chunk a longer document into pieces before storing; (2) return the **top-2** matches and stuff both into the prompt; (3) swap keyword matching for embedding cosine similarity (see the Embeddings lesson); (4) wire the prompt to an actual LLM API and ask it questions about your own notes.
+</Homework>

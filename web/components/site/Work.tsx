@@ -34,7 +34,7 @@ export const Work = () => {
               </span>
             </h1>
             <p className="mt-6 max-w-xl text-lg font-light text-neutral-400">
-              Four tracks, beginner to expert. Every lesson runs real code in your browser. Start anywhere — they build on each other.
+              Beginner to expert — start with no coding at all, or dive straight into runnable code. Start anywhere; they build on each other.
             </p>
           </div>
         </div>
@@ -51,7 +51,7 @@ export const Work = () => {
                 transition={{ delay: index * 0.08 }}
               >
                 <Link
-                  href={`/learn/${course.slug}`}
+                  href={`/courses/${course.slug}`}
                   className="group block h-full rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden hover:border-violet-500/30 hover:bg-violet-500/[0.03] transition-all duration-500"
                 >
                   <div className={`h-1 w-full bg-gradient-to-r ${style.bar}`} />

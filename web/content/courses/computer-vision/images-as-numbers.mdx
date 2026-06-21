@@ -1,0 +1,87 @@
+export const meta = {
+  title: "Images Are Just Numbers",
+  summary: "Before a model can 'see', an image has to become numbers. Once you picture an image as a grid of values, computer vision stops being magic.",
+};
+
+A computer doesn't see a photo — it sees a **grid of numbers**. Every technique in this track is just math on that grid. Get this one idea and the rest follows.
+
+## A grayscale image is a grid of brightness values
+
+In a black-and-white image, each **pixel** is a single number from **0 (black)** to **255 (white)**, with grays in between. The whole image is a grid — rows and columns of these values. In code, that's a list of lists.
+
+```python
+# A tiny 2x2 grayscale image
+image = [[0,   255],
+         [255, 0  ]]   # a little checkerboard
+```
+
+## Manipulating pixels is manipulating numbers
+
+Because an image is numbers, image edits are arithmetic. To **invert** a pixel (negative effect), subtract it from 255.
+
+<CodeExercise
+  id="img-invert"
+  prompt="Invert a single grayscale pixel of value 200 (255 minus the value)."
+  starter={`pixel = 200
+# Print the inverted pixel value
+`}
+  expected="55"
+  solution={`pixel = 200
+print(255 - pixel)`}
+/>
+
+## Brightness is the average
+
+The overall **brightness** of an image is just the average of all its pixel values — sum them up and divide by how many there are.
+
+<CodeExercise
+  id="img-brightness"
+  prompt="Compute the average brightness of this 2x2 image (sum of all pixels / 4)."
+  starter={`image = [[0,   255],
+         [255, 0  ]]
+# Print the average pixel value across the whole image
+`}
+  expected="127.5"
+  solution={`image = [[0, 255], [255, 0]]
+total = sum(sum(row) for row in image)
+print(total / 4)`}
+/>
+
+<Quiz
+  question="In a grayscale image, what does a pixel value of 0 represent?"
+  options={[
+    "Pure white",
+    "Pure black",
+    "A missing pixel",
+    "The brightest possible value"
+  ]}
+  answer={1}
+  explanation="Grayscale runs 0 (black) to 255 (white). 0 is the darkest value; 255 is the brightest."
+/>
+
+## Color adds channels
+
+A color image stacks **three** grids — one each for **Red, Green, and Blue**. Each pixel becomes three numbers, like `[255, 0, 0]` for pure red. So a color image is a grid of grids: height × width × 3. (A 1000×1000 color photo is three million numbers — which is exactly why we need clever methods instead of treating every pixel as an independent input.)
+
+<Callout type="tip">
+Everything ahead — filters, convolution, CNNs — operates on this grid-of-numbers. "An image is a matrix" is the single most useful sentence in computer vision.
+</Callout>
+
+<Quiz
+  question="How is a color image represented numerically?"
+  options={[
+    "As a single number per image",
+    "As three grids of numbers — red, green, and blue channels",
+    "As text labels for each color",
+    "As one grid of values from 0 to 255 only"
+  ]}
+  answer={1}
+  explanation="Color images use three stacked grids (R, G, B). Each pixel is three values, so the image has shape height × width × 3."
+/>
+
+You can now represent and tweak images as numbers. Next: the operation that lets a model find *patterns* in that grid — convolution.
+
+
+<Homework>
+Represent a tiny 3×3 grayscale image as a list of lists. Write code to **flip it horizontally** (reverse each row) and to **invert** it (255 − each pixel). Print both results.
+</Homework>

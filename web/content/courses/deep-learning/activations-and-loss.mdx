@@ -5,6 +5,10 @@ export const meta = {
 
 A neuron's weighted sum `z` is linear. Stack a thousand linear steps and you still get... a line. To model curves, language, and images, networks need **non-linearity** — and that comes from the **activation function**.
 
+## Why linearity alone fails
+
+Composing linear functions gives you another linear function. `2(3x + 1) + 5` is still just a line. No matter how many linear layers you stack, the whole network collapses into a single line — useless for anything curved. The non-linear activation *between* layers is what breaks this collapse and unlocks real expressiveness.
+
 ## ReLU: the workhorse
 
 The most common activation is almost insultingly simple — **ReLU** (Rectified Linear Unit): keep positives, zero out negatives.
@@ -23,13 +27,39 @@ print(relu(-2.0))   # 0.0
 
 That tiny "bend" at zero is enough: stack ReLUs across layers and the network can approximate almost any function.
 
-## Loss: the thing we minimize
+<CodeExercise
+  id="relu-layer"
+  prompt="Apply ReLU (max(0.0, z)) to every value in zs and print the resulting list."
+  starter={`zs = [-2.0, 0.5, 3.0]
+# Print the list after applying ReLU to each value
+`}
+  expected="[0.0, 0.5, 3.0]"
+  solution={`zs = [-2.0, 0.5, 3.0]
+print([max(0.0, z) for z in zs])`}
+/>
 
-To learn, the network needs a score for how wrong it is — the **loss**. You already met one: Mean Absolute Error. Training is just nudging weights to push the loss down.
+## A zoo of activations
 
-<Callout type="tip">
-Activation gives the network <strong>expressiveness</strong> (it can bend). Loss gives it a <strong>goal</strong> (get the number down). Next lesson connects them: how to nudge weights to reduce loss.
-</Callout>
+ReLU rules the hidden layers, but the **output** layer uses an activation matched to the task:
+
+- **ReLU** — hidden layers; fast, simple, avoids some training problems.
+- **Sigmoid** — squashes to (0, 1); used for binary probability (you met it in logistic regression).
+- **Softmax** — turns a vector of scores into probabilities that sum to 1; used for multi-class output (which of 1,000 labels?).
+
+A useful diagnostic: after ReLU, some neurons output exactly 0 — they're "inactive" for that input. Count them and you can see how sparse a layer's response is.
+
+<CodeExercise
+  id="relu-active"
+  prompt="After applying ReLU, print how many neurons are active (output strictly greater than 0)."
+  starter={`zs = [-1.0, 2.0, -3.0, 4.0]
+# Print how many values are active (max(0.0, z) > 0)
+`}
+  expected="2"
+  solution={`zs = [-1.0, 2.0, -3.0, 4.0]
+print(sum(1 for z in zs if max(0.0, z) > 0))`}
+/>
+
+Only the two positive neurons fire; the negatives are silenced.
 
 <Quiz
   question="Why do neural networks need a non-linear activation like ReLU?"
@@ -43,19 +73,29 @@ Activation gives the network <strong>expressiveness</strong> (it can bend). Loss
   explanation="Composing linear functions yields another linear function. A non-linearity between layers lets the network represent complex, curved relationships."
 />
 
-## Your turn
+## Loss: the thing we minimize
 
-Apply ReLU across a layer's outputs.
+To learn, the network needs a score for how wrong it is — the **loss**. You already met two: **MSE** for regression, and **cross-entropy** (log loss) for classification. Training is nothing more than nudging the weights to push the loss down, step by step.
 
-<CodeExercise
-  id="relu-layer"
-  prompt="Apply ReLU (max(0.0, z)) to every value in zs and print the resulting list."
-  starter={`zs = [-2.0, 0.5, 3.0]
-# Print the list after applying ReLU to each value
-`}
-  expected="[0.0, 0.5, 3.0]"
-  solution={`zs = [-2.0, 0.5, 3.0]
-print([max(0.0, z) for z in zs])`}
+<Callout type="tip">
+Activation gives the network <strong>expressiveness</strong> (it can bend). Loss gives it a <strong>goal</strong> (get the number down). The next lesson connects them: how to compute which way to nudge every weight to reduce that loss — backpropagation.
+</Callout>
+
+<Quiz
+  question="You're building a network that picks one of 10 classes. Which output activation fits?"
+  options={[
+    "ReLU, to keep values positive",
+    "Softmax, to produce 10 probabilities that sum to 1",
+    "No activation at all",
+    "Sigmoid on a single output"
+  ]}
+  answer={1}
+  explanation="Softmax turns the output scores into a probability distribution over all classes (summing to 1), which is exactly what multi-class classification needs."
 />
 
-You now have a network that can express complex functions and a number telling it how wrong it is. The final piece is *how* it improves — gradients.
+You now have a network that can express complex functions and a number telling it how wrong it is. The final piece is *how* it improves — by sending the error backward through the layers.
+
+
+<Homework>
+Implement the **sigmoid** function and apply it to the list `[-2, 0, 2]`, rounding each to 2 decimals. Then explain why you'd use sigmoid on the output layer for yes/no, but ReLU in the hidden layers.
+</Homework>

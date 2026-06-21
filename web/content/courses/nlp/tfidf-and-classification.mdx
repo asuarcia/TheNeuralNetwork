@@ -1,0 +1,80 @@
+export const meta = {
+  title: "TF-IDF & Text Classification",
+  summary: "Not all words matter equally. TF-IDF turns down the volume on common words and highlights the ones that actually distinguish a document.",
+};
+
+Bag-of-words counts have a flaw: the word "the" appears constantly and tells you almost nothing, while a rare word like "refund" might be highly revealing. **TF-IDF** rebalances counts so distinctive words carry more weight.
+
+## Two halves: TF and IDF
+
+- **Term Frequency (TF)** — how often a word appears in *this* document (relative to its length). Common in this doc → higher TF.
+- **Inverse Document Frequency (IDF)** — how *rare* the word is across *all* documents. A word in every document → low IDF (boring). A word in few documents → high IDF (distinctive).
+
+Multiply them: **TF-IDF = TF × IDF**. The score is high only when a word is frequent *here* but rare *overall* — exactly the words that characterize a document.
+
+<CodeExercise
+  id="tfidf-tf"
+  prompt="Compute the term frequency of 'ai': it appears 2 times in a 4-word document."
+  starter={`count = 2
+total_words = 4
+# Term frequency = count / total_words
+`}
+  expected="0.5"
+  solution={`count = 2
+total_words = 4
+print(count / total_words)`}
+/>
+
+<CodeExercise
+  id="tfidf-score"
+  prompt="Combine the parts: TF-IDF = TF × IDF. With TF = 0.5 and IDF = 2, print the score."
+  starter={`tf = 0.5
+idf = 2
+# Print TF-IDF
+`}
+  expected="1.0"
+  solution={`tf = 0.5
+idf = 2
+print(tf * idf)`}
+/>
+
+<Quiz
+  question="Why does TF-IDF give the word 'the' a low score?"
+  options={[
+    "Because it's short",
+    "It appears in almost every document, so its IDF (rarity) is very low",
+    "Because it has no vowels",
+    "TF-IDF ignores it entirely"
+  ]}
+  answer={1}
+  explanation="'the' is everywhere, so its inverse document frequency is tiny — multiplying by it crushes the score. TF-IDF rewards words that are frequent here but rare overall."
+/>
+
+## From features to a classifier
+
+Once each document is a TF-IDF vector, classifying text is just classifying vectors — and you already know how. Feed those vectors to a model from the ML track (logistic regression is a classic choice) with labels like spam/not-spam or positive/negative, and it learns which words push toward which class.
+
+This pipeline — **text → TF-IDF vector → logistic regression** — was the workhorse of practical NLP for years, and it's still a strong, fast, interpretable baseline today.
+
+<Callout type="tip">
+Always build the simple baseline first. A TF-IDF + logistic-regression classifier trains in seconds and often gets you 80–90% of the way. Reach for heavy transformers only when that baseline isn't good enough.
+</Callout>
+
+<Quiz
+  question="After converting documents to TF-IDF vectors, how do you classify them?"
+  options={[
+    "You can't — TF-IDF isn't usable for ML",
+    "Feed the vectors (with labels) to a classifier like logistic regression, exactly like any other feature vectors",
+    "Only a transformer can classify them",
+    "By counting characters"
+  ]}
+  answer={1}
+  explanation="TF-IDF turns text into numeric feature vectors. From there it's ordinary supervised classification — logistic regression on those vectors is a strong, fast baseline."
+/>
+
+TF-IDF + a linear model is great, but there's an even simpler, beautifully intuitive classifier built straight from probability. Next: a spam filter with Naive Bayes.
+
+
+<Homework>
+For the document "ai ai ml data ai", compute the **term frequency** of each unique word (count / total words). Then explain which word would get the *lowest* TF-IDF if "ai" also appeared in every other document.
+</Homework>

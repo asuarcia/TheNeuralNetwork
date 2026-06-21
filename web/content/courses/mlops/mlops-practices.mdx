@@ -1,0 +1,88 @@
+export const meta = {
+  title: "Versioning, CI/CD & Safe Rollouts",
+  summary: "The final discipline: ship model changes the way good teams ship code — versioned, tested, and rolled out gradually so a bad model can't take everything down.",
+};
+
+You can train, serve, and monitor. The last MLOps skill is **changing things safely** — because in production, a new model is a risk until proven otherwise. Borrow the hard-won practices of software engineering and adapt them to ML.
+
+## Version everything
+
+In normal software you version code. In ML you must version **three** things, because any of them changes the result:
+
+- **Code** — the training and serving logic (Git).
+- **Data** — which dataset and version trained this model.
+- **Model** — the resulting weights, stored in a **model registry** with its metrics and lineage.
+
+If you can't say exactly which code + data produced a given model, you can't reproduce, debug, audit, or safely roll back. Reproducibility is non-negotiable.
+
+<Quiz
+  question="Beyond code, what else must be versioned in an ML system?"
+  options={[
+    "Nothing — code versioning is enough",
+    "The data and the trained model (with their metrics and lineage)",
+    "Only the documentation",
+    "The user interface"
+  ]}
+  answer={1}
+  explanation="A model is a product of code + data. Versioning all three (often via a model registry) is what makes results reproducible, auditable, and safely reversible."
+/>
+
+## CI/CD for models
+
+**Continuous integration / continuous delivery** for ML means automating the path from change to production with checks at each gate: run the test suite, retrain, **evaluate against the current production model**, and only deploy if it passes. The evaluation set is your safety net — nothing ships that fails it (exactly the discipline from the AI Engineering eval lesson).
+
+## Roll out gradually: canary deploys
+
+Never flip 100% of traffic to a new model at once. A **canary** (or A/B) rollout sends a *small slice* of traffic to the new version, watches its metrics, and only then ramps up. If something's wrong, the blast radius is tiny.
+
+<CodeExercise
+  id="ops-canary"
+  prompt="You send 10% of 1000 users to the new (canary) model. Print how many users that is."
+  starter={`total_users = 1000
+canary_percent = 10
+# Print the number of users on the canary (use integer math: total * percent // 100)
+`}
+  expected="100"
+  solution={`total_users = 1000
+canary_percent = 10
+print(total_users * canary_percent // 100)`}
+/>
+
+While the canary runs, you compare its error rate to the current model and **roll back automatically** if it's worse.
+
+<CodeExercise
+  id="ops-rollback"
+  prompt="The canary's error rate is 0.08; the baseline's is 0.03. Print 'rollback' if the canary is worse, else 'keep'."
+  starter={`canary_error = 0.08
+baseline_error = 0.03
+# Print "rollback" if canary is worse than baseline, else "keep"
+`}
+  expected="rollback"
+  solution={`canary_error = 0.08
+baseline_error = 0.03
+print("rollback" if canary_error > baseline_error else "keep")`}
+/>
+
+The canary failed, so it's pulled before most users ever saw it. That's the whole point: **fail small.**
+
+<Quiz
+  question="Why use a canary (gradual) rollout instead of switching all traffic to a new model at once?"
+  options={[
+    "It's faster to deploy",
+    "It limits the blast radius — if the new model is bad, only a small slice of users is affected and you can roll back",
+    "It uses less memory",
+    "It avoids the need for testing"
+  ]}
+  answer={1}
+  explanation="A canary exposes a small fraction of traffic first. You catch problems on a few users instead of everyone, and roll back with minimal damage."
+/>
+
+<Callout type="tip">
+Put it together and production AI looks like mature software engineering: versioned artifacts, automated tests and evals, gradual rollouts, fast rollback, and constant monitoring. Cloud platforms (AWS SageMaker pipelines, model registry, endpoints) package these patterns — but the patterns matter more than any one vendor's buttons.
+</Callout>
+
+**That completes AI in Production (MLOps).** You can now take a model from notebook to a reliable, monitored, safely-updated service — the skills that turn AI from a demo into a product. Combined with everything before it, you've covered the entire arc of modern AI, from "what is it?" to running it at scale.
+
+<Homework>
+Sketch a **release checklist** for shipping a new model version, in order — from "code committed" to "100% rollout." Include where you'd run **evals**, what **canary %** you'd start at, and the single metric whose threshold would trigger an automatic **rollback**. Keep it to 6–8 steps you'd actually follow.
+</Homework>

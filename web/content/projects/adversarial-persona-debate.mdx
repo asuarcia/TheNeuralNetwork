@@ -1,0 +1,56 @@
+export const meta = { title: "The Adversarial Persona Debate" };
+
+In this project you'll stage a structured debate between two AI personas with opposing goals, then referee it with a third. It's the best way to *feel* how much behavior is controlled by the prompt alone. You'll do the talking part in a real chat assistant (ChatGPT, Claude, or Gemini) and use this notebook to structure and score it.
+
+## 1. Design two opposing personas
+
+The whole project lives in the **system prompts**. Each persona needs a role, a goal, and a tone. Build one as a string to see the pattern.
+
+<CodeExercise
+  id="apd-prompt"
+  prompt="Assemble a persona system prompt from its parts."
+  starter={`role = "You are a bold startup founder."
+goal = "Argue that the product should ship now."
+tone = "Confident, persuasive, concise."
+system_prompt = f"{role} {goal} {tone}"
+print(system_prompt)`}
+  solution={`role = "You are a bold startup founder."
+goal = "Argue that the product should ship now."
+tone = "Confident, persuasive, concise."
+system_prompt = f"{role} {goal} {tone}"
+print(system_prompt)`}
+/>
+
+<Callout type="tip">
+**Do this now:** In your chat tool, open two conversations. Paste the founder prompt above into one. In the other, write the opposing persona — a *cautious regulator* who argues the product needs more review. Give them the same debate topic.
+</Callout>
+
+## 2. Run the debate
+
+Copy each side's argument into the other's chat, back and forth, for 3 rounds. Watch how rigidly each model stays in character — that's the constraint power of the system prompt.
+
+<Callout type="note">
+Keep each turn short ("Respond in 3 sentences"). Notice what happens if you *remove* the persona instructions — the two sides start agreeing and the debate collapses. The personas are doing all the work.
+</Callout>
+
+## 3. Add a judge and score it
+
+Now open a third chat with a **neutral judge** persona: "You are an impartial debate judge. Read both arguments and name the more convincing side and why." Score each round, then take the majority across rounds.
+
+<CodeExercise
+  id="apd-judge"
+  prompt="The judge picked a winner each round. Print the overall winner (majority vote)."
+  starter={`from collections import Counter
+round_winners = ["Founder", "Regulator", "Founder"]
+print(Counter(round_winners).most_common(1)[0][0])`}
+  expected="Founder"
+  solution={`from collections import Counter
+round_winners = ["Founder", "Regulator", "Founder"]
+print(Counter(round_winners).most_common(1)[0][0])`}
+/>
+
+You've run a full multi-agent debate with a judge — three personas, all steered purely by prompts.
+
+<Homework>
+Push it further: (1) add a constraint to each persona ("never concede a point") and see how the debate changes; (2) make the judge score on specific criteria (logic, evidence, clarity) out of 10 and average them; (3) run the same topic twice with the personas swapped to check for judge bias; (4) write up which prompt details mattered most.
+</Homework>

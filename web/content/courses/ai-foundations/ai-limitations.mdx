@@ -1,0 +1,102 @@
+export const meta = {
+  title: "Limits, Risks & Ethics",
+  summary: "AI fails in specific, predictable ways. Knowing them is what separates someone who uses AI well from someone who gets burned by it. No tech background needed.",
+};
+
+An AI that's right 95% of the time is wonderful — until the other 5% lands on something that matters and you didn't check. This lesson is about the ways AI goes wrong by design, and how to use it safely and fairly anyway.
+
+## Hallucination: confidently wrong
+
+Because an AI chases *plausible* next words rather than *true* ones, it sometimes produces a **hallucination**: fluent, confident, completely made-up output — a fake statistic, a non-existent book, a quote nobody said.
+
+The danger isn't that it's wrong; it's that it's wrong in the *exact same confident voice* it uses when it's right. There's no built-in "I'm not sure" signal.
+
+Your defenses are simple:
+
+- **Ask for sources** and actually check them — sometimes the AI invents those too.
+- **Verify anything that matters** — names, numbers, dates, medical/legal/financial claims.
+- **Give it the source material** and ask it to answer only from that, so the answer is grounded in something real.
+
+<Quiz
+  question="What is an AI 'hallucination'?"
+  options={[
+    "When the app crashes mid-answer",
+    "Fluent, confident output that is actually made up",
+    "When the AI refuses to answer",
+    "A creative answer you specifically asked for"
+  ]}
+  answer={1}
+  explanation="A hallucination is plausible-sounding but false output, delivered as confidently as a correct answer. Verifying and grounding are your defenses."
+/>
+
+<Callout type="tip">
+**Try this:** Ask an AI for "three books about [a niche topic] with their authors," then check whether those books actually exist. It's a quick, eye-opening way to see hallucination first-hand — and to build the habit of verifying.
+</Callout>
+
+## Bias: the examples leak through
+
+An AI learns patterns from its training examples — **including the unfair ones**. If the data it learned from reflected society's biases, the AI can quietly repeat them: in which résumés it rates highly, whose accent it transcribes accurately, which assumptions it makes about people.
+
+This isn't the AI "deciding" to be unfair; it's an echo of its data. The takeaway: **an AI is only as fair as its training and the care you take around it.** Be especially careful using it for anything that affects people's opportunities — hiring, lending, grading.
+
+## Privacy: where does your text go?
+
+When you type into an online AI tool, your words leave your device. Depending on the tool and its settings, they may be stored, reviewed, or even used to train future models. Treat it like sending information to an outside company:
+
+- Don't paste passwords, financial details, or other people's private information into tools you haven't checked.
+- For sensitive work, prefer tools with a clear "we don't train on your data" setting, or ones your employer has approved.
+
+<Callout type="warning">
+There's a sneaky version of this called **prompt injection**: text the AI reads from somewhere else — a web page, a document, an email — can contain hidden instructions like "ignore your rules." If you have an AI summarize an untrusted document, treat anything odd in its response with suspicion. Never fully trust text just because an AI produced or read it.
+</Callout>
+
+<Quiz
+  question="Before pasting something into an online AI tool, the safest assumption is:"
+  options={[
+    "Whatever I type is completely private and instantly deleted",
+    "My input may be stored or even used to improve the tool, so I shouldn't paste secrets or others' private data",
+    "It's fine to paste anything as long as I delete the chat after",
+    "The tool legally cannot keep my data"
+  ]}
+  answer={1}
+  explanation="Assume your input may be retained or used for training unless the tool clearly says otherwise. Keep secrets and other people's private data out of it."
+/>
+
+## Why the AI is so polite: alignment
+
+Out of the box, a model trained on the raw internet would happily produce toxic or dangerous text — it's just predicting words. Companies put it through a process (often called **alignment**, using lots of human feedback) that steers it toward being helpful, honest, and harmless. Humans rate which answers are better, and the model learns to produce more of the good kind.
+
+That's why assistants feel cooperative and safe — and also why they sometimes over-apologize, refuse harmless requests, or sound oddly similar across different companies.
+
+<Quiz
+  question="Why do AI assistants generally respond in a helpful, polite, safe way?"
+  options={[
+    "They're naturally kind",
+    "Companies deliberately trained them using human feedback to be helpful, honest, and harmless",
+    "It happens automatically with no effort",
+    "Because users pay for them"
+  ]}
+  answer={1}
+  explanation="Raw models aren't safe by default. Human-feedback training (alignment) shapes them toward helpful, honest, harmless behavior — which also explains occasional over-caution."
+/>
+
+## Your everyday checklist
+
+You don't need to fear these tools — just use them like a pro:
+
+- **Verify anything that matters.** Facts, numbers, quotes, sources.
+- **Don't paste secrets.** Assume your input may be stored.
+- **Distrust text the AI reads from elsewhere.** It can carry hidden instructions.
+- **Watch for bias.** Especially in anything affecting people.
+- **Stay the editor.** AI gives a great draft; the judgment is yours.
+
+**That completes AI Foundations.** You can now understand AI, choose the right tool, prompt it well, put it to work, and use it safely — all without writing a line of code.
+
+<Callout type="note">
+Curious to go further and start *building* with AI? The next track, **Python for AI**, is a gentle, hands-on on-ramp to writing your first code — entirely optional, and designed for total beginners.
+</Callout>
+
+
+<Homework>
+Ask an AI for three facts or sources on a topic you can verify. Check each one. Record how many were correct, how many were wrong, and whether the wrong ones sounded any less confident. This is the verification habit, made concrete.
+</Homework>

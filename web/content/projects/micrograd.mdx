@@ -1,0 +1,121 @@
+export const meta = { title: "micrograd: Build an Autograd Engine" };
+
+This is the project that demystifies deep learning. You'll build a tiny **automatic differentiation engine** — the same thing PyTorch does — that tracks operations and computes gradients by walking backward through the computation graph. It's Andrej Karpathy's famous micrograd, in your browser. Run the cells in order.
+
+<Callout type="note">
+Each cell builds on the last. The `Value` class you define stays available in later cells.
+</Callout>
+
+## 1. A number that remembers
+
+Normally `2 * 3` just gives `6` and forgets how it got there. We want a `Value` that remembers its inputs so we can later compute gradients. Here's the engine — read it, run it, and confirm the forward math still works.
+
+<CodeExercise
+  id="mg-class"
+  prompt="Define the Value autograd class and confirm a forward computation works."
+  starter={`class Value:
+    def __init__(self, data, _children=()):
+        self.data = data
+        self.grad = 0.0
+        self._prev = set(_children)
+        self._backward = lambda: None
+
+    def __add__(self, other):
+        out = Value(self.data + other.data, (self, other))
+        def _backward():
+            self.grad += out.grad
+            other.grad += out.grad
+        out._backward = _backward
+        return out
+
+    def __mul__(self, other):
+        out = Value(self.data * other.data, (self, other))
+        def _backward():
+            self.grad += other.data * out.grad
+            other.grad += self.data * out.grad
+        out._backward = _backward
+        return out
+
+    def backward(self):
+        topo, visited = [], set()
+        def build(v):
+            if v not in visited:
+                visited.add(v)
+                for child in v._prev:
+                    build(child)
+                topo.append(v)
+        build(self)
+        self.grad = 1.0
+        for v in reversed(topo):
+            v._backward()
+
+# Forward check
+print((Value(2) * Value(3)).data)`}
+  expected="6"
+  solution={`class Value:
+    def __init__(self, data, _children=()):
+        self.data = data
+        self.grad = 0.0
+        self._prev = set(_children)
+        self._backward = lambda: None
+    def __add__(self, other):
+        out = Value(self.data + other.data, (self, other))
+        def _backward():
+            self.grad += out.grad
+            other.grad += out.grad
+        out._backward = _backward
+        return out
+    def __mul__(self, other):
+        out = Value(self.data * other.data, (self, other))
+        def _backward():
+            self.grad += other.data * out.grad
+            other.grad += self.data * out.grad
+        out._backward = _backward
+        return out
+    def backward(self):
+        topo, visited = [], set()
+        def build(v):
+            if v not in visited:
+                visited.add(v)
+                for child in v._prev:
+                    build(child)
+                topo.append(v)
+        build(self)
+        self.grad = 1.0
+        for v in reversed(topo):
+            v._backward()
+print((Value(2) * Value(3)).data)`}
+/>
+
+The forward pass works *and* every result secretly remembers its parents. Now the magic.
+
+## 2. Backpropagation in action
+
+Build the expression `d = a*b + c`, call `d.backward()`, and read the gradients. By calculus, ∂d/∂a = b, ∂d/∂b = a, ∂d/∂c = 1 — let's confirm the engine computes exactly that.
+
+<CodeExercise
+  id="mg-backward"
+  prompt="Build d = a*b + c with a=2, b=-3, c=10, run backward(), and print a.grad, b.grad, c.grad."
+  starter={`a = Value(2)
+b = Value(-3)
+c = Value(10)
+d = a * b + c     # forward
+d.backward()      # backward — fills in every .grad
+print(a.grad, b.grad, c.grad)`}
+  solution={`a = Value(2)
+b = Value(-3)
+c = Value(10)
+d = a * b + c
+d.backward()
+print(a.grad, b.grad, c.grad)`}
+/>
+
+You should see `-3.0 2.0 1.0` — exactly b, a, and 1. The engine figured out the derivatives **automatically**, just by walking the graph backward and multiplying local slopes (the chain rule). That's the entire secret behind PyTorch and TensorFlow.
+
+## 3. Why this matters
+
+A neural network is just a giant expression built from `+` and `*` (and a squashing function). Because every `Value` knows how to push its gradient backward, one call to `.backward()` computes the gradient for *every weight at once* — which is what lets gradient descent train networks with millions of parameters.
+
+<Homework>
+Extend the engine: (1) add a `relu` method (forward: `max(0, data)`; backward: pass the gradient only if `data > 0`); (2) build a single neuron `w*x + b`, define a loss like `(pred - target)**2`, call backward, and do one manual gradient-descent step on `w` and `b`; (3) loop that step and watch the loss fall. You've now built a trainable neural net from scratch.
+</Homework>

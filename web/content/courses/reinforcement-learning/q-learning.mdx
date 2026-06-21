@@ -1,0 +1,91 @@
+export const meta = {
+  title: "Q-Learning from Scratch",
+  summary: "Q-learning is the algorithm that lets an agent learn the value of its actions purely from experience — no model of the world required. It's one update rule.",
+};
+
+**Q-learning** is the classic RL algorithm, and it's beautifully simple: keep a table of how good each action is in each state, and nudge those numbers toward reality every time you act. It learned to play Atari, solve grid mazes, and balance poles.
+
+## The Q-table
+
+`Q(state, action)` estimates the **value of taking an action in a state** — the expected return that follows. Store these in a table: one number per (state, action) pair. At first they're all zero (the agent knows nothing). Through experience, they converge toward the truth.
+
+To act, the agent looks up the current state's row and picks the action with the highest Q-value.
+
+<CodeExercise
+  id="ql-greedy"
+  prompt="For the current state, these are the Q-values of each action. Print the best action to take."
+  starter={`Q_row = {"up": 0.2, "down": 0.8, "left": 0.1}
+# Print the action with the highest Q-value
+`}
+  expected="down"
+  solution={`Q_row = {"up": 0.2, "down": 0.8, "left": 0.1}
+print(max(Q_row, key=Q_row.get))`}
+/>
+
+## The update rule
+
+Here's the heart of it. After taking an action and seeing the reward and next state, nudge the old estimate toward a better one:
+
+```text
+Q(s,a) ← Q(s,a) + α · ( reward + γ · max Q(next state) − Q(s,a) )
+```
+
+- **α (alpha)** is the learning rate — how big a step to take.
+- **reward + γ · max Q(next)** is the new, better estimate (immediate reward plus the discounted value of where you landed).
+- The part in parentheses is the **error** — how wrong the old estimate was. (Sound familiar? It's gradient-descent thinking applied to values.)
+
+<CodeExercise
+  id="ql-update"
+  prompt="Apply one Q-learning update. Q=0, alpha=0.5, reward=1, gamma=0.9, and the best next-state value is 0."
+  starter={`Q = 0
+alpha = 0.5
+reward = 1
+gamma = 0.9
+max_next = 0
+# Q_new = Q + alpha * (reward + gamma * max_next - Q). Print it.
+`}
+  expected="0.5"
+  solution={`Q = 0
+alpha = 0.5
+reward = 1
+gamma = 0.9
+max_next = 0
+print(Q + alpha * (reward + gamma * max_next - Q))`}
+/>
+
+Run this update over thousands of steps in a grid world, and the Q-table fills in until the agent reliably walks the best path to the goal. That's Q-learning.
+
+<Quiz
+  question="What does Q(state, action) estimate?"
+  options={[
+    "The immediate reward only",
+    "The expected total future reward of taking that action in that state, then playing well",
+    "The number of times the action was taken",
+    "The probability of the state"
+  ]}
+  answer={1}
+  explanation="Q is the value of a state–action pair: the expected return from taking that action and continuing optimally. The agent picks the highest-Q action."
+/>
+
+<Callout type="tip">
+Q-learning is <strong>model-free</strong>: the agent never needs to know the rules of the environment in advance. It learns purely from experienced (state, action, reward, next-state) transitions — which is why it's so widely applicable.
+</Callout>
+
+<Quiz
+  question="In the update rule, what is the term (reward + γ·maxQ(next) − Q)?"
+  options={[
+    "The learning rate",
+    "The error: how far the old estimate was from a better one — the agent steps to reduce it",
+    "The final answer",
+    "The discount factor"
+  ]}
+  answer={1}
+  explanation="It's the temporal-difference error. The update moves Q a fraction (alpha) of the way toward the improved estimate, shrinking the error over time."
+/>
+
+There's a catch: if the agent always takes the current-best action, it may never discover something better. Balancing trying-new-things against using-what-works is next.
+
+
+<Homework>
+Run **two** Q-learning updates in sequence on a single Q-value. Start Q=0, alpha=0.5, gamma=0.9. First step: reward=1, max_next=0. Second step: reward=0, max_next=1. Print Q after each. Watch it climb toward its true value.
+</Homework>

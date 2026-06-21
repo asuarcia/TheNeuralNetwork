@@ -11,7 +11,7 @@ export const meta = {
 2. Add them all up, plus a **bias**.
 3. Pass the result through an **activation function** (next lesson).
 
-The first two steps are exactly the linear model you already built — `w · x + b` — just with several inputs:
+The first two steps are exactly the linear model you built last track — `w · x + b` — just with several inputs:
 
 ```text
 z = (w1 * x1 + w2 * x2 + ...) + b
@@ -26,11 +26,69 @@ z = sum(i * w for i, w in zip(inputs, weights)) + bias
 print(z)   # -0.5
 ```
 
-Stack many neurons side by side and you get a **layer**. Stack layers and you get a **deep** network. The math never gets harder than this — there's just a lot of it.
-
 <Callout type="tip">
 A neuron is linear regression with multiple inputs, plus a squashing step. If you understood the last course, you already understand 80% of this one.
 </Callout>
+
+<CodeExercise
+  id="neuron-z"
+  prompt="Compute the neuron's pre-activation value z = dot(inputs, weights) + bias, and print it."
+  starter={`inputs  = [1.0, 2.0]
+weights = [0.5, 0.25]
+bias    = 0.5
+# Print z = weighted sum of inputs + bias
+`}
+  expected="1.5"
+  solution={`inputs  = [1.0, 2.0]
+weights = [0.5, 0.25]
+bias    = 0.5
+print(sum(i * w for i, w in zip(inputs, weights)) + bias)`}
+/>
+
+## Weights are what the network learns
+
+The inputs are given. The **weights and bias are the knobs** — the parameters that training adjusts (via gradient descent, exactly like last track). A big positive weight says "this input matters a lot, in this direction." A near-zero weight says "ignore this input." Learning *is* finding good weights.
+
+## Adding the activation
+
+The raw `z` is linear. The neuron's final output applies an activation — here, ReLU (`max(0, z)`) — which is the "squash" step. That tiny non-linearity is what (next lesson) lets stacked neurons model curves.
+
+<CodeExercise
+  id="neuron-activated"
+  prompt="Compute z = dot(inputs, weights) + bias, then apply ReLU (max(0.0, z)). Print the neuron's output."
+  starter={`inputs  = [1.0, 2.0]
+weights = [0.5, -1.0]
+bias    = 1.0
+# Compute z, then print max(0.0, z)
+`}
+  expected="0.0"
+  solution={`inputs  = [1.0, 2.0]
+weights = [0.5, -1.0]
+bias    = 1.0
+z = sum(i * w for i, w in zip(inputs, weights)) + bias
+print(max(0.0, z))`}
+/>
+
+Here `z = -0.5`, so ReLU clamps it to 0 — this neuron stays silent for this input.
+
+## From a neuron to a layer
+
+Put several neurons side by side, each with its **own** weights and bias, all reading the same inputs. That's a **layer** — it turns one input vector into a new vector (one number per neuron). Stack layers and you get a **deep** network. The math never gets harder than this; there's just a lot of it.
+
+<CodeExercise
+  id="neuron-layer"
+  prompt="A layer of 2 neurons reads the same inputs. Print the list of z values (one per neuron)."
+  starter={`inputs = [1.0, 2.0]
+W = [[0.5, 0.5], [1.0, 0.0]]   # weights for neuron 0 and neuron 1
+b = [0.0, 1.0]                 # bias for each neuron
+# Print [z0, z1] — each neuron's weighted sum plus its bias
+`}
+  expected="[1.5, 2.0]"
+  solution={`inputs = [1.0, 2.0]
+W = [[0.5, 0.5], [1.0, 0.0]]
+b = [0.0, 1.0]
+print([sum(i * w for i, w in zip(inputs, wn)) + bn for wn, bn in zip(W, b)])`}
+/>
 
 <Quiz
   question="What are the first two steps a neuron performs on its inputs?"
@@ -44,21 +102,21 @@ A neuron is linear regression with multiple inputs, plus a squashing step. If yo
   explanation="A neuron computes a weighted sum of its inputs plus a bias (z = Σ wᵢxᵢ + b), then applies an activation function."
 />
 
-## Your turn
-
-<CodeExercise
-  id="neuron-z"
-  prompt="Compute the neuron's pre-activation value z = sum(inputs · weights) + bias, and print it."
-  starter={`inputs  = [1.0, 2.0]
-weights = [0.5, 0.25]
-bias    = 0.5
-# Print z = weighted sum of inputs + bias
-`}
-  expected="1.5"
-  solution={`inputs  = [1.0, 2.0]
-weights = [0.5, 0.25]
-bias    = 0.5
-print(sum(i * w for i, w in zip(inputs, weights)) + bias)`}
+<Quiz
+  question="What does a single layer of neurons do to its input?"
+  options={[
+    "Returns one number, always",
+    "Transforms the input vector into a new vector — one value per neuron in the layer",
+    "Sorts the input",
+    "Deletes the bias"
+  ]}
+  answer={1}
+  explanation="Each neuron in the layer produces one output from the shared inputs, so a layer maps an input vector to an output vector. Stacking these is what makes a network deep."
 />
 
-That `z` is the raw signal. Next we squash it into something useful with an activation function.
+That `z` is the raw signal. Next we squash it with an activation function — the ingredient that turns a stack of multiplications into something that can model anything.
+
+
+<Homework>
+Implement a single neuron with **three** inputs: compute the weighted sum plus bias, then apply ReLU. Test it with inputs `[1, -2, 3]`, weights `[0.5, 0.5, 0.5]`, bias `-1`. Then change the bias until the neuron "fires" (outputs > 0).
+</Homework>

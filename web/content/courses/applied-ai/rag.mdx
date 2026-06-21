@@ -1,0 +1,104 @@
+export const meta = {
+  title: "Retrieval-Augmented Generation",
+  summary: "Language models don't know your private docs or yesterday's news. RAG fixes that by fetching relevant text and handing it to the model.",
+};
+
+A language model only knows what it saw during training. It doesn't know your company's wiki, your latest emails, or anything after its cutoff. **Retrieval-Augmented Generation (RAG)** bridges that gap — and it's the single most common pattern in production LLM apps.
+
+## The pattern
+
+1. **Chunk & store** your documents (split into bite-sized pieces).
+2. On a question, **retrieve** the most relevant chunks.
+3. **Augment** the prompt by stuffing those chunks in as context.
+4. The model **generates** an answer using *that* context, not just its memory.
+
+The win is twofold: the model can use fresh, private knowledge — and it's far less likely to **hallucinate**, because the answer is grounded in real retrieved text you can cite.
+
+<Callout type="note">
+Real systems retrieve by <em>meaning</em> using vector embeddings (the next lesson). But the core loop — find relevant text, add it to the prompt — is exactly what you'll build below with simple matching.
+</Callout>
+
+## Step 1: chunking
+
+You can't store a 200-page PDF as one blob — it won't fit a context window, and retrieval would return way too much. So you split documents into **chunks** (say, a few hundred words each). Retrieval then works at the chunk level.
+
+<CodeExercise
+  id="rag-chunk"
+  prompt="Split the document's words into chunks of 3. Print how many chunks you get (the last may be smaller)."
+  starter={`words = "the quick brown fox jumps over the lazy dog".split()
+size = 3
+# Print the number of chunks of the given size
+`}
+  expected="3"
+  solution={`words = "the quick brown fox jumps over the lazy dog".split()
+size = 3
+print((len(words) + size - 1) // size)`}
+/>
+
+## Step 2: retrieve the relevant chunk
+
+Given a question, find the chunk most likely to contain the answer. Production uses embedding similarity; here, a keyword match shows the shape.
+
+<CodeExercise
+  id="rag-retrieve"
+  prompt="Print the first document that contains the query word."
+  starter={`docs = ["cats are mammals", "python is a language", "the sky is blue"]
+query = "python"
+# Print the first doc that contains the query word
+`}
+  expected="python is a language"
+  solution={`docs = ["cats are mammals", "python is a language", "the sky is blue"]
+query = "python"
+print(next(d for d in docs if query in d))`}
+/>
+
+## Step 3: augment the prompt
+
+Now wrap the retrieved context and the question into a single prompt. The instruction "answer only from the context" is what keeps the model grounded.
+
+<CodeExercise
+  id="rag-augment"
+  prompt="Build a grounded prompt in the form 'Context: ...' on one line and 'Question: ...' on the next."
+  starter={`context = "Paris is the capital of France."
+question = "What is the capital of France?"
+# Print "Context: <context>" then "Question: <question>" on separate lines
+`}
+  expected={`Context: Paris is the capital of France.
+Question: What is the capital of France?`}
+  solution={`context = "Paris is the capital of France."
+question = "What is the capital of France?"
+print(f"Context: {context}\\nQuestion: {question}")`}
+/>
+
+Hand that to the model and it answers from the retrieved fact — not from hazy training memory.
+
+<Quiz
+  question="What problem does RAG primarily solve?"
+  options={[
+    "It makes the model run faster",
+    "It lets a model use external, up-to-date, or private knowledge it wasn't trained on — and grounds answers to reduce hallucination",
+    "It shrinks the model's size",
+    "It removes the need for prompts"
+  ]}
+  answer={1}
+  explanation="RAG injects relevant retrieved text into the prompt, so the model can answer from knowledge outside its training data and stay grounded in citable sources."
+/>
+
+<Quiz
+  question="Why chunk documents instead of retrieving whole files?"
+  options={[
+    "Chunks look nicer in the database",
+    "Whole files often won't fit the context window, and small chunks let retrieval return only the relevant part",
+    "Chunking trains the model",
+    "It's required by the API"
+  ]}
+  answer={1}
+  explanation="Chunking keeps retrieved context small and on-target, so it fits the window and you don't drown the model in irrelevant text (remember 'lost in the middle')."
+/>
+
+You've built a RAG pipeline in miniature: chunk, retrieve, augment, generate. The one crude part is keyword matching — real systems retrieve by *meaning*. That's embeddings, next.
+
+
+<Homework>
+Take three short facts (sentences) as your "documents." Write a keyword retriever that returns the one matching a question, then assemble the final grounded prompt ("Context: … / Question: …"). Test it with a question whose answer is **not** in the docs and decide what your system should do.
+</Homework>

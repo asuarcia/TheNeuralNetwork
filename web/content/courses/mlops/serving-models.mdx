@@ -1,0 +1,92 @@
+export const meta = {
+  title: "Serving Models at Scale",
+  summary: "A trained model is a file. Serving turns it into something users can actually call — fast, reliably, and under load. Here are the choices that matter.",
+};
+
+**Serving** is making your model available to do inference on demand. The trained model is just a file of weights; serving wraps it so applications (and users) can send inputs and get predictions back — at the speed and scale they need.
+
+## Batch vs. real-time
+
+The first decision: how do predictions get used?
+
+- **Batch (offline)** — run the model on a big pile of data on a schedule (e.g., score every customer's churn risk nightly). Simple, cheap, high-throughput. Fine when predictions aren't needed instantly.
+- **Real-time (online)** — wrap the model in an API that responds to each request in milliseconds (e.g., fraud check at checkout). Harder: you must hit a **latency** target under live load.
+
+<Quiz
+  question="When is batch serving the right choice over real-time?"
+  options={[
+    "When users need an instant answer per request",
+    "When predictions can be precomputed on a schedule and don't need to be instant",
+    "When latency must be under 50ms",
+    "Batch is always better"
+  ]}
+  answer={1}
+  explanation="Batch suits predictions you can compute ahead of time in bulk (nightly scores, recommendations). Real-time is for instant, per-request needs like fraud detection."
+/>
+
+## Latency and throughput
+
+Two numbers define a real-time service:
+
+- **Latency** — how long one request takes. Usually measured at the **tail** (p95/p99), because the slowest requests are what users feel — not the average.
+- **Throughput** — how many requests per second you can handle. Divide total requests by the time taken.
+
+<CodeExercise
+  id="serve-throughput"
+  prompt="The service handled 600 requests in 60 seconds. Print its throughput (requests per second)."
+  starter={`requests = 600
+seconds = 60
+# Print requests per second
+`}
+  expected="10.0"
+  solution={`requests = 600
+seconds = 60
+print(requests / seconds)`}
+/>
+
+You also need to know when you're **breaching your SLA** (service-level agreement) — the latency budget you promised. Counting requests over budget is the simplest health check.
+
+<CodeExercise
+  id="serve-sla"
+  prompt="Your latency budget is 200ms. Count how many of these request latencies (ms) breached it."
+  starter={`latencies = [100, 250, 90, 500, 120]
+budget = 200
+# Count how many requests exceeded the budget
+`}
+  expected="2"
+  solution={`latencies = [100, 250, 90, 500, 120]
+budget = 200
+print(sum(1 for ms in latencies if ms > budget))`}
+/>
+
+## Scaling and cost
+
+Under load, one server isn't enough. The usual levers:
+
+- **Horizontal scaling** — run many copies behind a load balancer; **autoscale** the count with traffic.
+- **Batching requests** — group incoming requests so the GPU stays busy (great for throughput, trades a little latency).
+- **The inference tricks from AI Engineering** — quantization and KV caching make each prediction cheaper and faster.
+
+Cloud services (SageMaker endpoints, Bedrock for hosted LLMs) handle much of this for you — but the trade-offs are the same whoever runs the servers.
+
+<Callout type="tip">
+There's no single "fast enough." Define your targets up front — "p95 latency under 200ms at 1,000 requests/second for under $X/month" — then engineer to them. Vague goals like "make it fast" can't be met or measured.
+</Callout>
+
+<Quiz
+  question="Why report p95/p99 latency instead of the average?"
+  options={[
+    "It's easier to compute",
+    "The slowest requests are what users actually feel; the average hides bad tail experiences",
+    "Averages are always wrong",
+    "p95 is smaller than the average"
+  ]}
+  answer={1}
+  explanation="Tail latency (p95/p99) captures the worst experiences real users hit. A good average can still hide a painful slice of slow requests."
+/>
+
+Your model is live and handling traffic. But models silently rot over time — so next, how to watch them in production.
+
+<Homework>
+Write a one-line **SLA** for a model you'd deploy — fill in the blanks: "p95 latency under ___ ms, at ___ requests/second, for under $___ /month." Then decide: should it be served **batch** or **real-time**, and why? Note one thing you'd do if traffic suddenly doubled.
+</Homework>

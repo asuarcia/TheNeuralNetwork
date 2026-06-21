@@ -1,0 +1,114 @@
+export const meta = {
+  title: "Talking to Models in Code",
+  summary: "The chat box is the demo. The API is the product. Learn the request/response shape every model provider shares — and the knobs that control it.",
+};
+
+So far you've typed into a chat box. To *build* with AI, you call a model from code. Every major provider — OpenAI, Anthropic, Google — exposes the same basic shape: you send a list of messages, you get back a message. Master that shape once and you can use any of them.
+
+<Callout type="note">
+This track assumes a little Python. Never written code? Take the short **Python for AI** track first — it's built for total beginners and covers exactly the basics used here.
+</Callout>
+
+## The request is a list of messages
+
+You don't send a single string. You send a structured conversation, where each message has a **role** (`system`, `user`, or `assistant`) and **content**. This is the same role idea from the prompting lessons, now as data.
+
+<CodeExercise
+  id="api-messages"
+  prompt="Build the messages list: a system message and a user message. Print how many messages it contains."
+  starter={`system = "You are a helpful assistant."
+user = "What's the capital of France?"
+# Build messages as a list of {"role", "content"} dicts, then print its length
+`}
+  expected="2"
+  solution={`system = "You are a helpful assistant."
+user = "What's the capital of France?"
+messages = [
+    {"role": "system", "content": system},
+    {"role": "user", "content": user},
+]
+print(len(messages))`}
+/>
+
+In a real call you'd hand `messages` to a client — `client.chat.completions.create(model=..., messages=messages)` — and get a response object back.
+
+## The response is structured too
+
+Providers return JSON, not plain text. The model's actual words are nested a few levels deep. Knowing how to dig them out is half of integration work.
+
+<CodeExercise
+  id="api-parse"
+  prompt="This mimics an API response. Print just the assistant's text content."
+  starter={`response = {"choices": [{"message": {"content": "Paris"}}]}
+# Print the assistant's reply text
+`}
+  expected="Paris"
+  solution={`response = {"choices": [{"message": {"content": "Paris"}}]}
+print(response["choices"][0]["message"]["content"])`}
+/>
+
+<Quiz
+  question="Why send a list of role-tagged messages instead of one big string?"
+  options={[
+    "It's required by HTTP",
+    "Roles let the model distinguish standing instructions (system) from the user's turn and its own past replies — preserving conversation structure",
+    "It makes the request smaller",
+    "There's no real reason; it's legacy"
+  ]}
+  answer={1}
+  explanation="The role structure tells the model who said what — system rules vs. user input vs. prior assistant turns. That's how multi-turn context and persistent instructions work over an API."
+/>
+
+## The knobs: sampling parameters
+
+When you call the API you pass parameters that control *how* the model decodes — the same ideas from "How LLMs Work," now as arguments:
+
+- **`temperature`** — randomness. Low (≈0) = focused and repeatable; high (≈1) = creative and varied.
+- **`top_p`** — nucleus sampling: only consider the most probable tokens that sum to `p` of the probability mass. An alternative to temperature.
+- **`max_tokens`** — a hard cap on how many tokens the model may generate. Controls length *and* cost.
+
+Pass an out-of-range value and you'll get an error, so apps often clamp inputs first.
+
+<CodeExercise
+  id="api-clamp"
+  prompt="A user passed temperature = 1.8, but the valid range is 0.0 to 1.0. Clamp it and print the result."
+  starter={`temperature = 1.8
+# Clamp temperature into the range [0.0, 1.0] and print it
+`}
+  expected="1.0"
+  solution={`temperature = 1.8
+print(min(1.0, max(0.0, temperature)))`}
+/>
+
+<Callout type="warning">
+Your API key is a secret — it spends real money. Never hard-code it in source or commit it to git. Load it from an environment variable (`os.environ["OPENAI_API_KEY"]`) and keep it out of version control.
+</Callout>
+
+## Sync vs. async, and being a good client
+
+A simple call is **synchronous**: send, wait, get the reply. When you're firing many calls (say, classifying 10,000 reviews), **asynchronous** calls let you have many in flight at once instead of waiting for each.
+
+Either way, networks fail. Production clients add:
+
+- **Retries with backoff** — on a transient error, wait and try again, waiting longer each time.
+- **Rate-limit handling** — respect the provider's requests-per-minute, or you'll get throttled.
+- **Timeouts** — don't hang forever on a slow response.
+
+<Quiz
+  question="What does max_tokens control?"
+  options={[
+    "How smart the model is",
+    "The maximum number of tokens the model may generate in its reply — bounding length and cost",
+    "The size of the input you can send",
+    "The temperature"
+  ]}
+  answer={1}
+  explanation="max_tokens caps the length of the generated reply. Since you pay per output token, it's also a direct cost control."
+/>
+
+You can now call a model and read its reply in code. But every one of those tokens costs money and competes for limited space — so next we get precise about tokens, cost, and the context window.
+
+
+<Homework>
+In code or pseudocode, build the **messages** list for a two-turn conversation (system + user + assistant + user), then write the line that pulls just the reply text out of a response object. Add a clamp that keeps **temperature** within 0–1.
+</Homework>

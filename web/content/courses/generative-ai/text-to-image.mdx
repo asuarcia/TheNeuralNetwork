@@ -1,0 +1,91 @@
+export const meta = {
+  title: "Text-to-Image, CLIP & Guidance",
+  summary: "How does 'a corgi astronaut on Mars' become a picture? The missing link is a model that puts text and images in the same space — CLIP — plus guidance.",
+};
+
+Diffusion can turn noise into *an* image. To turn noise into the image you **described in words**, the denoiser needs to be steered by your prompt. Two ideas make that work: a shared text–image space (**CLIP**) and **guidance**.
+
+## CLIP: text and images in one space
+
+**CLIP** (Contrastive Language–Image Pre-training) is trained on hundreds of millions of (image, caption) pairs with one goal: put an image and its matching caption **close together** in a shared embedding space, and mismatched pairs far apart.
+
+The result is a space where "a photo of a dog" (text) lands near actual dog photos (images). Now text and images are directly comparable — you can measure how well an image matches a prompt with the same dot product you've used all along.
+
+<CodeExercise
+  id="t2i-clip"
+  prompt="A text prompt is embedded as a vector. Find which image best matches it (highest dot product). Print the index."
+  starter={`text   = [1, 0]
+images = [[1, 0], [0, 1], [0, 0]]
+# Print the index of the image whose vector best matches the text (max dot product)
+`}
+  expected="0"
+  solution={`text   = [1, 0]
+images = [[1, 0], [0, 1], [0, 0]]
+scores = [sum(t * i for t, i in zip(text, img)) for img in images]
+print(scores.index(max(scores)))`}
+/>
+
+Image 0 aligns with the text, so it's the best match. CLIP doing this at scale is how a generator knows whether it's drawing the right thing.
+
+<Quiz
+  question="What does CLIP provide for text-to-image generation?"
+  options={[
+    "A way to compress images",
+    "A shared space where text and images can be compared, so a prompt can steer image generation",
+    "A faster GPU",
+    "A discriminator network"
+  ]}
+  answer={1}
+  explanation="CLIP aligns text and image embeddings in one space. That lets a model measure how well an image matches a text prompt — the signal used to guide generation toward your words."
+/>
+
+## Guidance: steering each denoising step
+
+During diffusion's reverse process, the prompt's CLIP embedding is fed in at every denoising step, nudging the model toward images that match the text. A knob called the **guidance scale** controls how strongly:
+
+- **Low guidance** — more creative and varied, but may drift from your prompt.
+- **High guidance** — sticks tightly to the prompt, sometimes at the cost of naturalness.
+
+This is **classifier-free guidance**, the standard technique in modern text-to-image systems.
+
+## Interpolating prompts
+
+Because prompts live in a vector space, you can **blend** them — mix "a cat" and "a tiger" halfway and generate the in-between. Blending two vectors is a weighted average (the lerp from earlier tracks).
+
+<CodeExercise
+  id="t2i-blend"
+  prompt="Blend two prompt vectors halfway (t = 0.5): (1-t)*a + t*b for each element."
+  starter={`a = [0, 0]
+b = [10, 10]
+t = 0.5
+# Print the blended vector element-wise
+`}
+  expected="[5.0, 5.0]"
+  solution={`a = [0, 0]
+b = [10, 10]
+t = 0.5
+print([(1 - t) * x + t * y for x, y in zip(a, b)])`}
+/>
+
+<Callout type="tip">
+Prompt engineering for images is real: word choice, style terms ("oil painting", "35mm photo"), and the guidance scale dramatically change results — exactly the prompting mindset from AI Foundations, applied to a different output. Same skill, new medium.
+</Callout>
+
+<Quiz
+  question="What does a high 'guidance scale' do in text-to-image diffusion?"
+  options={[
+    "Makes generation slower only",
+    "Forces the image to stick closely to the prompt, sometimes reducing naturalness",
+    "Removes the text prompt",
+    "Switches the model to a GAN"
+  ]}
+  answer={1}
+  explanation="Higher guidance pushes each denoising step harder toward the prompt's embedding — closer adherence to your words, but too high can look over-saturated or unnatural."
+/>
+
+You now understand how words become images. With this power come real harms — so the final lesson confronts the ethics of generative AI.
+
+
+<Homework>
+Given a text-prompt vector and three image vectors, pick the best match by dot product (this is CLIP in miniature). Then write a detailed text-to-image prompt for "a cozy reading nook," using style words, and predict how raising the **guidance scale** would change the result.
+</Homework>

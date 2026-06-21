@@ -1,41 +1,68 @@
 export const meta = {
   title: "What Is AI, Really?",
-  summary: "Cut through the hype. A clear, honest picture of what today's AI does — and what it doesn't.",
+  summary: "Cut through the hype. A clear, honest picture of what today's AI does — and what it doesn't. No technical background needed.",
 };
 
-People throw the word **AI** at everything from chatbots to dishwashers. So let's be precise.
+People throw the word **AI** at everything from chatbots to dishwashers. So let's be precise — in plain language, no math, no code.
 
-Artificial intelligence is software that learns patterns from data and uses those patterns to make predictions — instead of following rules a human wrote by hand. That single idea covers spam filters, recommendation feeds, image generators, and the large language models you've been chatting with.
+Artificial intelligence is software that learns patterns from lots of examples and uses those patterns to make predictions — instead of following step-by-step rules a human wrote by hand. That one idea covers spam filters, recommendation feeds, photo tagging, image generators, and the chatbots you've been talking to.
 
 <Callout type="tip">
-The shift that made modern AI possible wasn't smarter rules — it was letting the computer **find the rules itself** from huge amounts of examples.
+The shift that made modern AI possible wasn't smarter rules — it was letting the computer **find the patterns itself** from huge amounts of examples.
 </Callout>
 
 ## A model is a prediction machine
 
-Strip away the mystique and a model does one thing: given some input, it predicts a likely output. A language model predicts the next word. An image classifier predicts a label. A recommender predicts what you'll click.
+Strip away the mystique and an AI "model" does one thing: given some input, it predicts a likely output. A chatbot predicts the next words. A photo app predicts "this is a cat." A streaming service predicts what you'll watch next.
 
-It doesn't "understand" the way you do. It has seen so many examples that its predictions are often uncannily good — and sometimes confidently wrong. Holding both of those facts at once is the core skill of working with AI well.
+It doesn't "understand" the way you do. It has seen so many examples that its guesses are often uncannily good — and sometimes confidently wrong. Holding both of those facts in mind at once is the single most important skill for using AI well.
 
-<Quiz question="Which best describes how a modern AI model produces its answers?" options={["It looks up the exact answer in a database", "It predicts likely outputs from patterns it learned in data", "It follows a fixed set of rules a programmer wrote", "It reasons from first principles like a human expert"]} answer={1} explanation="Models learn statistical patterns from data and predict from them. That's why they generalize to new inputs — and also why they can be confidently wrong." />
+<Quiz question="Which best describes how a modern AI model produces its answers?" options={["It looks up the exact answer in a database", "It predicts a likely output from patterns it learned in examples", "It follows a fixed set of rules a programmer wrote", "It reasons from first principles like a human expert"]} answer={1} explanation="Models learn patterns from examples and predict from them. That's why they handle new situations — and also why they can be confidently wrong." />
 
-## Your turn — run some Python
+## Two phases: learning, then using
 
-You'll write real code throughout this course, and it runs right here in your browser. No setup. Let's start tiny: a model's predictions are often just math over numbers, so get comfortable with the basics.
+People constantly mix these up, so it's worth being clear:
 
-**Print the average of the numbers below.**
+- **Training** happens once, ahead of time, and is hugely expensive. The model is shown millions of examples until its guesses match them well. This is the "learning" phase.
+- **Using it** (the techies call this *inference*) happens every time you type a message. The learning is already done and frozen — the model just runs your input through and answers.
 
-<CodeExercise
-  id="avg-1"
-  prompt="Compute and print the average (mean) of the list."
-  starter={`nums = [10, 20, 30, 40]
-# Print the average of nums
-`}
-  expected="25.0"
-  solution={`nums = [10, 20, 30, 40]
-print(sum(nums) / len(nums))`}
+When you chat with an AI, it is *not* learning from your conversation. It already learned everything it knows, earlier, during training.
+
+<Callout type="note">
+This is why a chatbot can have a "knowledge cutoff" and not know recent events. Its knowledge was frozen when training ended — anything newer, it simply never saw. (There are ways to give it fresh information; that's a later track.)
+</Callout>
+
+## Not all "AI" is the same
+
+It helps to sort the zoo into a few buckets:
+
+- **Narrow AI** — does one thing well: filter spam, transcribe speech, recommend a song. Everything in use today is narrow.
+- **Generative AI** — *creates* new content: text, images, audio, video. Chatbots and image generators live here.
+- **General AI (AGI)** — a hypothetical system that matches humans at *any* task. It does not exist today, despite what headlines suggest.
+
+<Quiz
+  question="When you chat with an AI assistant, what's actually happening?"
+  options={[
+    "It's learning from your messages in real time and getting smarter",
+    "It's using patterns it already learned during training to predict a response",
+    "It's looking your question up word-for-word in a database",
+    "A human is typing the replies on the other end"
+  ]}
+  answer={1}
+  explanation="Chatting uses a model whose learning is already finished and frozen. It predicts a response from patterns learned earlier — it isn't learning from you in the moment."
 />
 
-That number — the mean — is the simplest "model" there is: predict the average every time. Crude, but it's a real baseline, and beating the baseline is how every AI project starts.
+## Try it yourself
 
-In the next lesson you'll talk to a language model deliberately, and learn why *how* you ask changes what you get.
+You don't need to install anything or write code to start learning AI — you just need to *use* it and pay attention.
+
+<Callout type="tip">
+**Try this:** Open a free AI assistant (ChatGPT, Claude, or Gemini) and ask it something you already know the answer to — a fact about your town, your job, or a hobby. Notice two things: how natural the answer sounds, and whether every detail is actually correct. That gap between *fluent* and *true* is the thing this whole course teaches you to manage.
+</Callout>
+
+In the next lesson, we'll peek inside the kind of AI you talk to every day — the chatbot — and see, in plain terms, what it's really doing when it answers you.
+
+
+<Homework>
+Open a free AI assistant and ask it about three topics you know well. Note every place it sounds confident but gets a detail **wrong**. That gap between *fluent* and *true* is the instinct to carry through this whole course.
+</Homework>

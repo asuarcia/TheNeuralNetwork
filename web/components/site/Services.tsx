@@ -2,42 +2,18 @@
 
 import { useRef } from 'react';
 import { motion, useInView } from 'motion/react';
-import { Layers, Code2, FlaskConical, Rocket } from 'lucide-react';
+import { Layers, Code2, FlaskConical, Rocket, ArrowUpRight } from 'lucide-react';
+import Link from 'next/link';
+import { curriculum, type Level } from '@/content/curriculum';
 
-const paths = [
-  {
-    icon: Layers,
-    number: '01',
-    title: 'AI Foundations',
-    description: 'Linear algebra, probability, and Python. Everything you need before the first neuron fires.',
-    tag: 'Beginner',
-    tagColor: 'text-emerald-400',
-  },
-  {
-    icon: Code2,
-    number: '02',
-    title: 'ML Engineering',
-    description: 'Classical ML, feature engineering, scikit-learn, and model evaluation at production scale.',
-    tag: 'Intermediate',
-    tagColor: 'text-amber-400',
-  },
-  {
-    icon: FlaskConical,
-    number: '03',
-    title: 'Deep Learning',
-    description: 'CNNs, RNNs, transformers, and attention. Build state-of-the-art architectures from scratch.',
-    tag: 'Advanced',
-    tagColor: 'text-violet-400',
-  },
-  {
-    icon: Rocket,
-    number: '04',
-    title: 'AI in Production',
-    description: 'MLOps, model serving, monitoring, and scaling pipelines that power real products.',
-    tag: 'Expert',
-    tagColor: 'text-pink-400',
-  },
-];
+const icons = [Layers, Code2, FlaskConical, Rocket];
+
+const tagColor: Record<Level, string> = {
+  Beginner: 'text-emerald-400',
+  Intermediate: 'text-amber-400',
+  Advanced: 'text-violet-400',
+  Expert: 'text-pink-400',
+};
 
 export const Services = () => {
   const containerRef = useRef(null);
@@ -68,7 +44,7 @@ export const Services = () => {
           <div>
             <div className="flex items-center gap-6 mb-8">
               <div className="flex items-baseline gap-3">
-                <span className="font-mono text-violet-500 text-sm">03</span>
+                <span className="font-mono text-violet-500 text-sm">02</span>
                 <span className="text-xs font-mono uppercase tracking-[0.3em] text-neutral-400">/ Learning Paths</span>
               </div>
               <div className="h-px w-32 bg-gradient-to-r from-violet-500/40 to-transparent" />
@@ -96,50 +72,60 @@ export const Services = () => {
           >
             <div className="absolute top-0 left-[-1px] h-12 w-[1px] bg-gradient-to-b from-violet-400 to-transparent" />
             <p className="text-xl font-light text-neutral-300 leading-relaxed">
-              Structured learning paths that take you from zero to production-ready AI engineer — with clear milestones at every stage.
+              A path of tracks that takes you from understanding AI to building and shipping it — each one builds on the last.
             </p>
           </motion.div>
         </div>
 
         {/* Path cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 group/list">
-          {paths.map((path, index) => (
-            <motion.div
-              key={path.number}
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1, duration: 0.7 }}
-              className={`relative ${index % 2 === 1 ? 'lg:mt-16' : ''} hover:!opacity-100 group-hover/list:opacity-30 transition-all duration-500`}
-            >
+          {curriculum.map((course, index) => {
+            const Icon = icons[index % icons.length];
+            return (
               <motion.div
-                whileHover={{ y: -8 }}
-                transition={{ duration: 0.4 }}
-                className="group h-full p-7 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-violet-500/30 hover:bg-violet-500/5 transition-all duration-500 backdrop-blur-sm flex flex-col gap-6"
+                key={course.slug}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.7 }}
+                className={`relative ${index % 2 === 1 ? 'lg:mt-16' : ''} hover:!opacity-100 group-hover/list:opacity-30 transition-all duration-500`}
               >
-                {/* Top row */}
-                <div className="flex items-start justify-between">
-                  <div className="w-11 h-11 rounded-xl bg-violet-500/10 flex items-center justify-center group-hover:bg-violet-500/20 transition-colors">
-                    <path.icon className="w-5 h-5 text-violet-400" />
-                  </div>
-                  <span className="font-mono text-xs text-neutral-600">{path.number}</span>
-                </div>
+                <Link href={`/courses/${course.slug}`}>
+                  <motion.div
+                    whileHover={{ y: -8 }}
+                    transition={{ duration: 0.4 }}
+                    className="group h-full p-7 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-violet-500/30 hover:bg-violet-500/5 transition-all duration-500 backdrop-blur-sm flex flex-col gap-6"
+                  >
+                    {/* Top row */}
+                    <div className="flex items-start justify-between">
+                      <div className="w-11 h-11 rounded-xl bg-violet-500/10 flex items-center justify-center group-hover:bg-violet-500/20 transition-colors">
+                        <Icon className="w-5 h-5 text-violet-400" />
+                      </div>
+                      <span className="font-mono text-xs text-neutral-600">{String(index + 1).padStart(2, '0')}</span>
+                    </div>
 
-                {/* Content */}
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold tracking-tight mb-2 text-white">{path.title}</h3>
-                  <p className="text-neutral-500 text-sm leading-relaxed group-hover:text-neutral-400 transition-colors">
-                    {path.description}
-                  </p>
-                </div>
+                    {/* Content */}
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold tracking-tight mb-2 text-white">{course.title}</h3>
+                      <p className="text-neutral-500 text-sm leading-relaxed group-hover:text-neutral-400 transition-colors">
+                        {course.summary}
+                      </p>
+                    </div>
 
-                {/* Tag */}
-                <span className={`font-mono text-xs uppercase tracking-widest ${path.tagColor}`}>
-                  {path.tag}
-                </span>
+                    {/* Footer */}
+                    <div className="flex items-center justify-between">
+                      <span className={`font-mono text-xs uppercase tracking-widest ${tagColor[course.level]}`}>
+                        {course.level}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-xs font-mono text-neutral-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {course.lessons.length} lessons <ArrowUpRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </motion.div>
+                </Link>
               </motion.div>
-            </motion.div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

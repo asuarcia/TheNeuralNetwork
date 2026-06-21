@@ -1,0 +1,92 @@
+export const meta = {
+  title: "Statistics & Distributions",
+  summary: "Statistics is how we summarize a pile of numbers and put features on a level playing field — a step almost every model depends on.",
+};
+
+Raw data is a heap of numbers. **Statistics** turns that heap into a few meaningful summaries, and reshapes it so a model can learn from it fairly. Two ideas do most of the work: measuring the center, and measuring the spread.
+
+## Center: the mean
+
+The **mean** (average) is the center of mass of your data — the single number that best represents "typical." You've computed it before; here it's the anchor everything else compares against.
+
+## Spread: variance and standard deviation
+
+The **variance** measures how spread out the data is: the average of the squared distances from the mean. Its square root, the **standard deviation**, is in the same units as the data, so it's easier to interpret — "most values fall within one standard deviation of the mean."
+
+<CodeExercise
+  id="stat-variance"
+  prompt="Compute the variance of the data (the mean of the squared distances from the mean). Round to 2 decimals."
+  starter={`data = [2, 4, 6]
+mean = sum(data) / len(data)
+# variance = average of (x - mean)**2 over the data. Print it rounded to 2.
+`}
+  expected="2.67"
+  solution={`data = [2, 4, 6]
+mean = sum(data) / len(data)
+var = sum((x - mean) ** 2 for x in data) / len(data)
+print(round(var, 2))`}
+/>
+
+<Quiz
+  question="Two datasets have the same mean, but dataset A has a much larger standard deviation. What does that tell you?"
+  options={[
+    "A's values are more spread out / variable",
+    "A's values are all identical",
+    "A has more data points",
+    "A's average is higher"
+  ]}
+  answer={0}
+  explanation="Standard deviation measures spread. A larger value means the data is more scattered around the (same) mean — more variability."
+/>
+
+## Normalizing: putting features on equal footing
+
+Imagine predicting house prices from *square meters* (values like 50–200) and *number of bedrooms* (values like 1–5). The big numbers can drown out the small ones just because of scale. **Normalizing** fixes this. A common method is the **z-score**: subtract the mean and divide by the standard deviation, so every feature is centered at 0 with a spread of 1.
+
+```text
+z = (value − mean) / standard_deviation
+```
+
+<CodeExercise
+  id="stat-zscore"
+  prompt="Compute the z-score of x = 6 given a mean of 4 and a standard deviation of 2."
+  starter={`x = 6
+mean = 4
+std = 2
+# z = (x - mean) / std
+`}
+  expected="1.0"
+  solution={`x = 6
+mean = 4
+std = 2
+print((x - mean) / std)`}
+/>
+
+A z-score of 1.0 means "one standard deviation above average." Now every feature speaks the same language, and the model can weigh them fairly.
+
+<Callout type="tip">
+Normalizing inputs is one of the highest-impact, lowest-effort steps in all of ML. Skip it and training can be slow or unstable; do it and models often learn faster and better.
+</Callout>
+
+## Distributions
+
+Finally, data tends to follow **distributions** — shapes that describe how values cluster. The famous one is the **normal (bell-curve) distribution**: most values near the mean, rare values far out. Lots of natural data is roughly normal, and many ML methods quietly assume it.
+
+<Quiz
+  question="Why normalize features before training a model?"
+  options={[
+    "To delete outliers",
+    "So features on different scales contribute fairly, instead of large-valued ones dominating",
+    "To make the dataset smaller",
+    "It's only for image data"
+  ]}
+  answer={1}
+  explanation="Without normalization, a feature measured in the thousands can swamp one measured in single digits purely due to scale. Normalizing (e.g., z-scores) levels the playing field."
+/>
+
+**That completes Math for Machine Learning.** You've got the working toolkit — vectors, matrices, derivatives, probability, and statistics — that every later track quietly relies on. Now go put it to use: the Machine Learning, Deep Learning, and beyond.
+
+
+<Homework>
+For the list `[10, 12, 14, 16, 18]`, compute the **mean**, **variance**, and **standard deviation**, then z-score normalize every value. Confirm the normalized values have a mean of (about) 0.
+</Homework>

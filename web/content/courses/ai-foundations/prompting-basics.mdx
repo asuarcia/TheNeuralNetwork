@@ -1,50 +1,81 @@
 export const meta = {
   title: "Prompting Basics",
-  summary: "The same model gives wildly different answers depending on how you ask. Here's how to ask well.",
+  summary: "The same AI gives wildly different answers depending on how you ask. Here's the simple structure that fixes most disappointing results.",
 };
 
-A language model predicts the next words based on everything you've given it so far. So the text you provide — the **prompt** — is the single biggest lever you control. Same model, better prompt, dramatically better output.
+The message you type — the **prompt** — is the single biggest lever you control. Same AI, better prompt, dramatically better answer. And the good news: prompting well isn't a secret art. It's mostly about **reducing ambiguity** — every useful detail you add removes a way the AI could guess wrong.
 
 ## Three habits that fix most bad answers
 
-1. **Be specific about the outcome.** "Write about dogs" drifts. "Write three one-sentence tips for crate-training a puppy" lands.
-2. **Give context.** Tell it who it's for and any constraints — audience, length, tone, format.
-3. **Show the shape you want.** If you need a list, ask for a list. If you need JSON, show an example.
+1. **Be specific about what you want.** "Write about dogs" wanders. "Write three one-sentence tips for house-training a puppy" lands.
+2. **Give context.** Say who it's for and any limits — audience, length, tone, format.
+3. **Show the shape you want.** Need a list? Ask for a list. Need a table? Ask for a table. Need it short? Say how short.
 
 <Callout type="note">
-You're not casting spells. You're reducing ambiguity. Every detail you add removes a way the model could guess wrong.
+A vague prompt isn't "easier" for the AI — it's harder. With nothing to go on, it falls back on the most generic, average-sounding answer. Specifics are a gift to both of you.
 </Callout>
 
 <Quiz
-  question="You get a vague, rambling answer. What's the highest-leverage fix?"
+  question="You get a vague, rambling answer. What's the highest-impact fix?"
   options={[
     "Ask the exact same thing again and hope",
-    "Add specifics: audience, format, and length",
-    "Switch to a bigger model immediately",
-    "Make the prompt as short as possible"
+    "Add specifics: who it's for, the format, and the length",
+    "Type in all capital letters",
+    "Make your prompt as short as possible"
   ]}
   answer={1}
-  explanation="Specificity removes ambiguity. Bigger models help, but a clear prompt beats a vague one on any model."
+  explanation="Specificity removes ambiguity. Telling the AI the audience, format, and length is the fastest way to a better answer."
 />
 
-## Practice: structure a prompt
+## A reusable recipe: Role · Task · Format
 
-A useful pattern is **role + task + format**. Let's build one as a string and print it.
+Almost any request fits a simple pattern. Tell the AI **who** to be, **what** you want, and **how** the answer should look:
 
-<CodeExercise
-  id="prompt-1"
-  prompt="Combine the three parts into one prompt string and print it."
-  starter={`role = "You are a friendly Python tutor."
-task = "Explain what a variable is."
-fmt = "Use one short sentence."
+> **Role:** You are a friendly fitness coach.
+> **Task:** Suggest a 20-minute home workout for a total beginner.
+> **Format:** A simple numbered list, no equipment, one line per exercise.
 
-# Combine role, task, and fmt into one string (separated by spaces) and print it
-`}
-  expected="You are a friendly Python tutor. Explain what a variable is. Use one short sentence."
-  solution={`role = "You are a friendly Python tutor."
-task = "Explain what a variable is."
-fmt = "Use one short sentence."
-print(role + " " + task + " " + fmt)`}
+That single structure works for emails, plans, explanations, recipes — almost anything.
+
+<Callout type="tip">
+**Try this:** Open any AI assistant and paste a Role · Task · Format prompt for something real in your life — a workout, a meal plan, a tricky email. Then change just the **Format** line ("make it a table," "make it 3 bullets") and watch the answer reshape itself.
+</Callout>
+
+## Put your constraints in writing
+
+If you have rules in your head — a word limit, a tone, something to avoid — *write them down*. The AI can't honor a rule it never saw. Just add them to the prompt:
+
+> "...Keep it under 50 words, friendly but professional, and don't use the word 'synergy'."
+
+## Show an example of what "good" looks like
+
+The fastest way to get the format you want is to *show* it. Compare:
+
+> **Vague:** "Give me the details about the event."
+>
+> **Clear:** "List the event details like this — **Date:** … **Time:** … **Location:** … **Cost:** …"
+
+The second version makes a clean, usable answer the obvious thing to produce.
+
+<Quiz
+  question="What's the most reliable way to get an answer in a specific format?"
+  options={[
+    "Ask politely and hope it guesses",
+    "Show a short example of exactly the format you want",
+    "Use longer, more formal sentences",
+    "Ask several times until it happens"
+  ]}
+  answer={1}
+  explanation="Showing an example makes the desired layout the obvious thing to produce. Demonstration beats description when it comes to format."
 />
 
-That role + task + format skeleton works for almost any request. You've now got the two fundamentals — what a model is, and how to steer it. Next up: the math that makes it all tick.
+## Prompting is iteration, not magic
+
+Don't agonize over a perfect first prompt. Write a decent one, look at what's wrong, and add the one detail that would have fixed it. Two or three quick passes beats one "perfect" attempt every time.
+
+You've got the fundamentals. Next we level up to the techniques that separate casual users from people who get genuinely great results.
+
+
+<Homework>
+Take a vague request you'd normally type and rewrite it using **Role · Task · Format** plus one explicit constraint. Run both the vague and the structured version in a real AI tool and compare the results side by side.
+</Homework>

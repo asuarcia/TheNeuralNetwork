@@ -1,0 +1,82 @@
+export const meta = {
+  title: "Data & Feature Pipelines",
+  summary: "Models are only as good as the data feeding them — in training AND at serving time. The subtle bugs here cause more production failures than bad models do.",
+};
+
+Before a model trains or predicts, raw data must be turned into **features** — the clean numeric inputs the model expects. Doing this consistently, every time, in both training and production, is one of the hardest parts of real ML.
+
+## The pipeline
+
+A feature pipeline takes raw data and outputs model-ready features: clean missing values, encode categories, scale numbers, derive new fields. You built the ingredients in the Applied AI and Math tracks — here they become a *repeatable, automated* process that runs the same way every time.
+
+## The silent killer: train/serve skew
+
+Here's the bug that bites everyone. If features are computed **one way during training** and a **different way during serving**, the model sees inputs it was never trained on — and quietly makes bad predictions. This is **train/serve skew**, and because nothing crashes, it's brutal to catch.
+
+<CodeExercise
+  id="fp-skew"
+  prompt="Compare a feature's value computed in training vs. serving. Print 'skew' if they differ, else 'ok'."
+  starter={`train_value = 0.5   # how the feature was computed in training
+serve_value = 0.7   # how it was computed in production
+# Print "skew" if they differ, otherwise "ok"
+`}
+  expected="skew"
+  solution={`train_value = 0.5
+serve_value = 0.7
+print("skew" if train_value != serve_value else "ok")`}
+/>
+
+The classic cause: **normalization stats**. If you scale a feature using its mean and standard deviation, you must use the **training** mean/std at serving time — not recompute them from live data. Reusing the saved training stats keeps train and serve identical.
+
+<CodeExercise
+  id="fp-normalize"
+  prompt="At serving time, normalize x=8 using the SAVED training mean (4) and std (2). Print the z-score."
+  starter={`x = 8
+train_mean = 4   # saved from training, not recomputed
+train_std = 2
+# Print (x - train_mean) / train_std
+`}
+  expected="2.0"
+  solution={`x = 8
+train_mean = 4
+train_std = 2
+print((x - train_mean) / train_std)`}
+/>
+
+<Quiz
+  question="What is train/serve skew?"
+  options={[
+    "When the model is too large to serve",
+    "When features are computed differently in training vs. production, so the model gets inputs it wasn't trained on",
+    "When the training data is too small",
+    "When serving is slower than training"
+  ]}
+  answer={1}
+  explanation="Train/serve skew is a mismatch between how features are produced in training vs. serving. It silently degrades predictions and is a leading cause of production ML failures."
+/>
+
+## Feature stores
+
+The professional fix is a **feature store** — a central system that computes and stores features once, so both training and serving read the *exact same* definitions. It also enables reuse (teams share features) and point-in-time correctness (no accidentally using future data). Cloud platforms (like SageMaker Feature Store) provide these as managed services.
+
+<Callout type="tip">
+The golden rule: <strong>compute a feature one way, in one place.</strong> Whether via a shared library or a feature store, eliminating the chance for training and serving to diverge prevents a whole category of silent, painful bugs.
+</Callout>
+
+<Quiz
+  question="Why must you use the saved training statistics (mean/std) when normalizing at serving time?"
+  options={[
+    "To save memory",
+    "So serving-time features match exactly how the model was trained — recomputing from live data causes skew",
+    "Because live data has no mean",
+    "It doesn't matter which stats you use"
+  ]}
+  answer={1}
+  explanation="The model learned on features scaled by training stats. Using different (live) stats at serving produces inputs on a different scale than training — train/serve skew."
+/>
+
+A model fed clean, consistent features is ready to serve. Next: how to actually put it behind an API and handle real traffic.
+
+<Homework>
+Take the spam filter or price predictor idea again. List every feature it needs, and for each, write down **exactly how it's computed**. Now spot the skew risk: which feature would be easiest to accidentally compute differently in production than in training? Describe one concrete way you'd guarantee they stay identical.
+</Homework>
