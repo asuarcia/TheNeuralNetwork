@@ -6,10 +6,26 @@ import { GraduationCap, Check, ArrowRight, Sparkles } from "lucide-react";
 import { useProgress } from "@/lib/gamification/useProgress";
 import { courseCompletedCount } from "@/lib/gamification/store";
 
+// Credential ID is unique per user (random suffix stored in localStorage) and
+// per course (slug prefix). Not server-verified — this is a self-reported
+// completion certificate based on in-browser progress tracking.
+const CRED_KEY = "tnn:cred-salt";
+
 function credentialId(slug: string): string {
+  // Stable random salt per browser (not per user — Supabase auth is optional).
+  // Ensures the ID differs between devices/users even for the same course.
+  let salt = "";
+  try {
+    salt = window.localStorage.getItem(CRED_KEY) ?? "";
+    if (!salt) {
+      salt = Math.random().toString(36).slice(2, 8).toUpperCase();
+      window.localStorage.setItem(CRED_KEY, salt);
+    }
+  } catch { salt = "LOCAL"; }
+  const combined = slug + "-" + salt;
   let h = 0;
-  for (const ch of slug) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  return "TNN-" + h.toString(36).toUpperCase().padStart(6, "0").slice(0, 6);
+  for (const ch of combined) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return "TNN-" + h.toString(36).toUpperCase().padStart(8, "0").slice(0, 8);
 }
 
 export function Certificate({
@@ -81,7 +97,7 @@ export function Certificate({
                 <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-xs font-mono text-neutral-500 border-t border-white/10 pt-6">
                   <span>{date}</span>
                   <span>Credential&nbsp;ID&nbsp;<span className="text-neutral-300">{credentialId(slug)}</span></span>
-                  <span className="inline-flex items-center gap-1 text-emerald-400"><Check className="w-3.5 h-3.5" /> Verified</span>
+                  <span className="inline-flex items-center gap-1 text-violet-400"><Check className="w-3.5 h-3.5" /> Completed</span>
                 </div>
               </div>
             </div>
@@ -101,7 +117,7 @@ export function Certificate({
               <GraduationCap className="w-7 h-7 text-violet-400" />
             </div>
             <h1 className="text-3xl font-bold tracking-tight mb-3">Your certificate is waiting</h1>
-            <p className="text-neutral-400 mb-2">Finish all {total} lessons of <span className="text-white font-medium">{title}</span> to unlock a verifiable Certificate of Completion.</p>
+            <p className="text-neutral-400 mb-2">Finish all {total} lessons of <span className="text-white font-medium">{title}</span> to unlock your Certificate of Completion.</p>
             <p className="text-sm text-neutral-500 mb-8">Progress: <span className="text-violet-300 font-bold">{done} / {total}</span> lessons</p>
             <div className="w-full max-w-sm mx-auto h-2 rounded-full bg-white/10 overflow-hidden mb-8">
               <div className="h-full bg-gradient-to-r from-violet-400 to-purple-500 transition-all" style={{ width: `${total ? (done / total) * 100 : 0}%` }} />

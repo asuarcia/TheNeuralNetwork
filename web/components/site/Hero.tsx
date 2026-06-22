@@ -25,7 +25,7 @@ export const Hero = () => {
       </div>
 
       {/* Subtle Noise Texture */}
-      <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none z-[1]" />
+      <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay bg-[url('/noise.svg')] pointer-events-none z-[1]" />
 
       {/* Main Content */}
       <motion.div

@@ -15,7 +15,8 @@ How TheNeuralNetwork protects users and data, what's enforced in code, and what 
 - Route gating: `proxy.ts` redirects unauthenticated users away from `/dashboard` and `/learn`. This is defense-in-depth; RLS is the authoritative check.
 
 ### Brute-force protection
-- Auth server actions are **rate-limited** per IP (`lib/security/rate-limit.ts`, 8 attempts/minute). In-memory for single-instance/beta; move to a shared store (Upstash/Redis) for multi-instance production.
+- Auth server actions are **rate-limited** per IP + per email (`lib/security/rate-limit.ts`, 8/6 attempts/minute). In-memory for single-instance/beta; move to a shared store (Upstash/Redis) for multi-instance production.
+- `x-forwarded-for` handling takes the **last hop** (added by the trusted edge), not the first (client-controlled). This prevents IP spoofing to bypass rate limits.
 
 ### HTTP security headers (`next.config.ts`)
 - `X-Frame-Options: DENY` + CSP `frame-ancestors 'none'` — anti-clickjacking.
@@ -23,21 +24,39 @@ How TheNeuralNetwork protects users and data, what's enforced in code, and what 
 - `Referrer-Policy: strict-origin-when-cross-origin`.
 - `Permissions-Policy` — denies camera/mic/geolocation/topics.
 - **Production-only**: `Content-Security-Policy` (restricts script/style/img/connect/worker sources to self + the few required origins: jsdelivr for Pyodide, Supabase) and `Strict-Transport-Security` (HSTS). CSP is prod-only so it doesn't block local HMR.
+- All static assets (including `/noise.svg`) are self-hosted — no external image dependencies that could be blocked by CSP or used for tracking.
 
 ### CSRF
 - Mutations go through **Next.js Server Actions**, which include built-in Origin verification — standard CSRF protection.
+
+### Open-redirect protection
+- All user-supplied `next`/redirect parameters are validated by `lib/security/safe-redirect.ts` before use. Only same-origin paths (`/path`, not `//evil.com` or `https://evil.com`) are accepted.
+
+### Input validation
+- Email format and password length are validated server-side before any Supabase call.
+- OAuth provider is validated against an explicit allowlist (`google` | `github`).
+- Lesson/course slugs used in Supabase upserts are validated against the curriculum manifest (`getLessonContext`) before writing — arbitrary slugs are rejected.
 
 ### Untrusted code execution (lesson exercises)
 - Learner Python runs in **Pyodide (WebAssembly)** — a sandboxed runtime with no access to the host filesystem or network unless explicitly granted. It can't read cookies or call your backend.
 - Lesson content (MDX) is **authored in-repo** and trusted; it is not user-generated, so no injection surface there.
 
-### Secrets
+### Secrets & supply-chain hygiene
 - `.env.local` is git-ignored (`.gitignore` covers `.env*`). Only `NEXT_PUBLIC_*` values reach the browser.
 - The **service-role key** is server-only and never imported into client code.
+- `NEXT_PUBLIC_SITE_URL` pins the canonical origin for auth redirects, preventing host-header injection from poisoning OAuth/confirmation links.
+- Unused dependencies are removed: `gray-matter` (CVE: js-yaml DoS) and `next-mdx-remote` were in `package.json` but never imported — removed to shrink the attack surface.
+
+### Certificates
+- Completion certificates are **client-side / self-reported** — they reflect in-browser progress tracked in localStorage. They are not server-verified.
+- Credential IDs are unique per browser session (random salt stored in localStorage) and per course — they will differ between devices and users.
+- The certificate label reads "Completed" (not "Verified") to accurately represent what is being attested.
 
 ## Known tradeoffs / future hardening
 - The production CSP includes `'unsafe-inline'` and `'unsafe-eval'` in `script-src` because (a) Next injects inline hydration scripts and (b) Pyodide needs eval/wasm-eval. To tighten: adopt **nonce-based CSP** and run Pyodide in a **dedicated Web Worker** with a stricter policy.
-- Rate limiting is in-memory (resets on restart, per-instance). Use a shared store for real scale.
+- Rate limiting is in-memory (resets on restart, per-instance). Use Upstash/Redis for real scale.
+- Pyodide is loaded from the jsdelivr CDN without Subresource Integrity (SRI). Adding SRI would prevent supply-chain attacks on the CDN at the cost of breaking when Pyodide ships patch versions. Current mitigation: version is pinned in `lib/pyodide/runtime.ts`.
+- The remaining `npm audit` findings (`postcss` inside Next's internal bundle) cannot be fixed without downgrading the framework. They are build-time only and not exploitable via user input at runtime.
 
 ## Operator responsibilities (do these)
 1. **Never commit `.env.local`** or expose the service-role key.

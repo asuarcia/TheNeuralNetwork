@@ -24,7 +24,7 @@ export function CourseCertBadge({ slug, total }: { slug: string; total: number }
         {complete ? (
           <span className="font-medium text-emerald-300">Claim your Certificate of Completion</span>
         ) : (
-          <span className="text-neutral-300">Earn a verifiable certificate — finish all {total} lessons {ready && done > 0 ? `(${done}/${total} done)` : ""}</span>
+          <span className="text-neutral-300">Earn a certificate of completion — finish all {total} lessons {ready && done > 0 ? `(${done}/${total} done)` : ""}</span>
         )}
       </div>
       <ArrowRight className="w-4 h-4 text-neutral-500 shrink-0" />
