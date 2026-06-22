@@ -4,6 +4,9 @@
 
 const PYODIDE_VERSION = "v0.27.7";
 const INDEX_URL = `https://cdn.jsdelivr.net/pyodide/${PYODIDE_VERSION}/full/`;
+// SHA-384 of pyodide.js at the pinned version above. Recompute when upgrading:
+// PowerShell: (Invoke-WebRequest <url>).Content | SHA-384 → base64
+const PYODIDE_JS_INTEGRITY = "sha384-90so5tCKvl0xs9agU29IMKlAVzhfzFX7QO//YxQkRhJG58bBZrFN+2ZTRB026X5X";
 
 let pyodidePromise: Promise<any> | null = null;
 
@@ -12,6 +15,8 @@ function loadScript(src: string): Promise<void> {
     if (document.querySelector(`script[data-pyodide]`)) return resolve();
     const script = document.createElement("script");
     script.src = src;
+    script.integrity = PYODIDE_JS_INTEGRITY;
+    script.crossOrigin = "anonymous";
     script.dataset.pyodide = "true";
     script.onload = () => resolve();
     script.onerror = () => reject(new Error("Failed to load the Python runtime."));
