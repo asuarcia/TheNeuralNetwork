@@ -28,10 +28,12 @@ export const NeuralNetworkBackground = () => {
 
     const REPULSION_RADIUS = 120;
     const REPULSION_FORCE = 6;
-    const CONNECTION_DIST = 160;
+    const CONNECTION_DIST = 170;
 
     const initNodes = () => {
-      const count = Math.floor((canvas.width * canvas.height) / 12000);
+      // Denser web → reads more like a real neural network (same look & physics).
+      // Capped so the O(n²) connection pass stays smooth on large/4K screens.
+      const count = Math.min(420, Math.floor((canvas.width * canvas.height) / 6500));
       nodesRef.current = [];
       for (let i = 0; i < count; i++) {
         const x = Math.random() * canvas.width;

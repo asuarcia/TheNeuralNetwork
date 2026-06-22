@@ -4,6 +4,9 @@ import { Callout } from "./Callout";
 import { Quiz } from "./Quiz";
 import { CodeExercise } from "./CodeExercise";
 import { Homework } from "./Homework";
+import { NeuronLab } from "@/components/lab/NeuronLab";
+import { GradientDescentLab } from "@/components/lab/GradientDescentLab";
+import { PredictThenReveal } from "@/components/lab/PredictThenReveal";
 
 // Maps markdown elements to brand-styled components, plus the interactive
 // lesson primitives usable directly in MDX.
@@ -53,4 +56,7 @@ export const mdxComponents = {
   Quiz,
   CodeExercise,
   Homework,
+  NeuronLab,
+  GradientDescentLab,
+  PredictThenReveal,
 };

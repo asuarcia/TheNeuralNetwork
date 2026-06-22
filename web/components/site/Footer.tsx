@@ -13,8 +13,9 @@ const social = [
 
 const platform = [
   { name: 'Courses', href: '/courses' },
-  { name: 'Learning Paths', href: '/#paths' },
-  { name: 'Community', href: '/#community' },
+  { name: 'Projects', href: '/projects' },
+  { name: 'Learning Map', href: '/map' },
+  { name: 'Daily Review', href: '/review' },
   { name: 'Sign in', href: '/login' },
 ];
 

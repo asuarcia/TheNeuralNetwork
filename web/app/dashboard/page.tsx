@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowUpRight, BookOpen, Flame, Trophy, LogOut, TriangleAlert } from "lucide-react";
+import { ArrowUpRight, LogOut, TriangleAlert } from "lucide-react";
+import { DashboardStats } from "@/components/gamification/DashboardStats";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { signOut } from "@/lib/auth/actions";
@@ -63,24 +64,8 @@ export default async function DashboardPage() {
           </form>
         </div>
 
-        {/* Stats */}
-        <div className="grid sm:grid-cols-3 gap-4 mb-16">
-          {[
-            { icon: Flame, label: "Day streak", value: "0" },
-            { icon: BookOpen, label: "Lessons completed", value: "0" },
-            { icon: Trophy, label: "Courses started", value: "0" },
-          ].map((s) => (
-            <div key={s.label} className="rounded-2xl border border-white/5 bg-white/[0.02] p-6 flex items-center gap-4">
-              <div className="w-11 h-11 rounded-xl bg-violet-500/10 flex items-center justify-center">
-                <s.icon className="w-5 h-5 text-violet-400" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold tracking-tight">{s.value}</p>
-                <p className="text-xs uppercase tracking-widest text-neutral-500">{s.label}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* Stats (live from local progress) */}
+        <DashboardStats />
 
         {/* Continue learning — empty state for now (lesson engine arrives in Phase 2) */}
         <section className="mb-16">

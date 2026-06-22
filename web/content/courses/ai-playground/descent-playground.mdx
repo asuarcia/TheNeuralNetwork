@@ -1,0 +1,42 @@
+export const meta = {
+  title: "Feel Gradient Descent",
+  summary: "Every model on Earth learns by rolling downhill. Press Run, drag the learning rate, and watch it work — and break.",
+};
+
+Training a model means finding the settings that make its error as small as possible. The algorithm that does it — **gradient descent** — is just "feel the slope, take a step downhill, repeat." Let's watch a ball find the bottom of a valley.
+
+<PredictThenReveal prompt="The valley's lowest point is at x = 3. If you crank the learning rate way up (past 1.0), do you think the ball will reach the bottom faster, or something else?">
+Something else — it **overshoots**. Too big a step jumps past the bottom to a point that's even higher, then overshoots again, spiraling outward until it flies off the curve. Bigger isn't faster; it's broken. Try it below.
+</PredictThenReveal>
+
+## Roll downhill
+
+Press **Run**. Then drag the learning rate and re-run from **Reset**:
+
+- **≈ 0.1** — smooth, steady glide into the minimum.
+- **≈ 0.9** — overshoots back and forth but still settles (bouncy).
+- **&gt; 1.0** — diverges and explodes off the curve.
+
+<GradientDescentLab />
+
+The yellow arrow always points downhill (opposite the slope). The whole of training is taking that step, over and over, across millions of weights at once.
+
+<Quiz
+  question="Your model's loss keeps exploding to huge numbers instead of shrinking. The most likely fix?"
+  options={[
+    "Train for more steps",
+    "Lower the learning rate",
+    "Add more data",
+    "Raise the learning rate"
+  ]}
+  answer={1}
+  explanation="An exploding loss is the classic sign of an oversized learning rate — each step overshoots and grows. Turn it down and the steps land inside the valley again."
+/>
+
+<Callout type="tip">
+Same idea, every model: linear regression, logistic regression, a deep neural network, even fine-tuning a giant LLM. They all roll downhill on a loss surface. You just felt the engine of machine learning.
+</Callout>
+
+<Homework>
+With the lab, find (by trial) the largest learning rate that still converges on this curve, and the smallest one that's painfully slow. Write both down. Why do you think real training often *starts* with a bigger rate and shrinks it over time?
+</Homework>

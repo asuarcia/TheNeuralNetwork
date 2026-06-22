@@ -77,48 +77,45 @@ export const Services = () => {
           </motion.div>
         </div>
 
-        {/* Path cards */}
+        {/* Path-by-level cards (the journey, not every course) */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 group/list">
-          {curriculum.map((course, index) => {
+          {(['Beginner', 'Intermediate', 'Advanced', 'Expert'] as Level[]).map((level, index) => {
             const Icon = icons[index % icons.length];
+            const tracks = curriculum.filter((c) => c.level === level);
+            const lessons = tracks.reduce((n, c) => n + c.lessons.length, 0);
             return (
               <motion.div
-                key={course.slug}
+                key={level}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.7 }}
                 className={`relative ${index % 2 === 1 ? 'lg:mt-16' : ''} hover:!opacity-100 group-hover/list:opacity-30 transition-all duration-500`}
               >
-                <Link href={`/courses/${course.slug}`}>
+                <Link href="/courses">
                   <motion.div
                     whileHover={{ y: -8 }}
                     transition={{ duration: 0.4 }}
                     className="group h-full p-7 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-violet-500/30 hover:bg-violet-500/5 transition-all duration-500 backdrop-blur-sm flex flex-col gap-6"
                   >
-                    {/* Top row */}
                     <div className="flex items-start justify-between">
                       <div className="w-11 h-11 rounded-xl bg-violet-500/10 flex items-center justify-center group-hover:bg-violet-500/20 transition-colors">
                         <Icon className="w-5 h-5 text-violet-400" />
                       </div>
-                      <span className="font-mono text-xs text-neutral-600">{String(index + 1).padStart(2, '0')}</span>
+                      <span className={`font-mono text-xs uppercase tracking-widest ${tagColor[level]}`}>{level}</span>
                     </div>
 
-                    {/* Content */}
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold tracking-tight mb-2 text-white">{course.title}</h3>
+                      <h3 className="text-lg font-bold tracking-tight mb-2 text-white">{tracks.length} tracks</h3>
                       <p className="text-neutral-500 text-sm leading-relaxed group-hover:text-neutral-400 transition-colors">
-                        {course.summary}
+                        {tracks.map((t) => t.title).join(' · ')}
                       </p>
                     </div>
 
-                    {/* Footer */}
                     <div className="flex items-center justify-between">
-                      <span className={`font-mono text-xs uppercase tracking-widest ${tagColor[course.level]}`}>
-                        {course.level}
-                      </span>
+                      <span className="font-mono text-xs text-neutral-600">{lessons} lessons</span>
                       <span className="inline-flex items-center gap-1 text-xs font-mono text-neutral-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                        {course.lessons.length} lessons <ArrowUpRight className="w-3 h-3" />
+                        Explore <ArrowUpRight className="w-3 h-3" />
                       </span>
                     </div>
                   </motion.div>
