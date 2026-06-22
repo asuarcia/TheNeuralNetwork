@@ -55,7 +55,7 @@ How TheNeuralNetwork protects users and data, what's enforced in code, and what 
 ## Known tradeoffs / future hardening
 - The production CSP includes `'unsafe-inline'` and `'unsafe-eval'` in `script-src` because (a) Next injects inline hydration scripts and (b) Pyodide needs eval/wasm-eval. To tighten: adopt **nonce-based CSP** and run Pyodide in a **dedicated Web Worker** with a stricter policy.
 - Rate limiting is in-memory (resets on restart, per-instance). Use Upstash/Redis for real scale.
-- Pyodide is loaded from the jsdelivr CDN without Subresource Integrity (SRI). Adding SRI would prevent supply-chain attacks on the CDN at the cost of breaking when Pyodide ships patch versions. Current mitigation: version is pinned in `lib/pyodide/runtime.ts`.
+- Pyodide's main loader (`pyodide.js`) is loaded with `script.integrity` (SHA-384, pinned to `PYODIDE_VERSION` in `lib/pyodide/runtime.ts`). **Update `PYODIDE_JS_INTEGRITY` whenever the version is bumped.** The wheels and `.wasm` files Pyodide dynamically fetches internally cannot be SRI-protected; version-pinning is the mitigation for those.
 - The remaining `npm audit` findings (`postcss` inside Next's internal bundle) cannot be fixed without downgrading the framework. They are build-time only and not exploitable via user input at runtime.
 
 ## Operator responsibilities (do these)
